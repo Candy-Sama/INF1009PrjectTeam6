@@ -3,7 +3,7 @@
 ### 1) Submission Logistics
 
 - **Deadline:** Wednesday, 18 February 2026, by 23:59
-- **Method:** Submit a single `.zip` to your lab group’s xSITE Dropbox
+- **Method:** Submit a single `.zip` to your lab group's xSITE Dropbox
 - **Naming:** `[LabGroup_TeamNumber_ProjectPart1Final]`
 - **Folder contents:**
   1. Report
@@ -54,7 +54,7 @@ The goal is to demonstrate solid OOP (classes, inheritance, polymorphism) and ad
   - Complete UML diagram for the Abstract Engine
   - Justification of OOP principles adopted
   - Reflection on engine design limitations
-  - Clear description of each team member’s contribution
+  - Clear description of each team member's contribution
 - **Quality:** Professional, well-structured, clearly explains results and conclusions
 
 #### Presentation and Video (5% + 5% of grade)
@@ -91,5 +91,40 @@ The goal is to demonstrate solid OOP (classes, inheritance, polymorphism) and ad
 
 - Keep the engine generic; push game-specific logic into the simulation or game layer
 - Prefer components over deep inheritance; keep entities lightweight
-- Document each manager’s responsibilities and boundaries
+- Document each manager's responsibilities and boundaries
 - Add small load tests to demonstrate scalability (e.g., spawn many simple entities)
+
+#### Example: Abstract Classes in Java
+
+```java
+// Abstract class declaration
+public abstract class Animal {
+        // Abstract method (no body, must be implemented by subclasses)
+        public abstract void makeSound();
+
+        // Concrete method (with implementation)
+        public void eat() {
+                System.out.println("This animal eats food.");
+        }
+}
+
+// Concrete subclass
+public class Dog extends Animal {
+        // Must implement the abstract method
+        @Override
+        public void makeSound() {
+                System.out.println("Woof woof");
+        }
+}
+
+public class Main {
+        public static void main(String[] args) {
+                Dog myDog = new Dog();
+                myDog.makeSound(); // Output: Woof woof
+                myDog.eat();       // Output: This animal eats food.
+
+                // Invalid: Cannot instantiate an abstract class
+                // Animal genericAnimal = new Animal();
+        }
+}
+```
