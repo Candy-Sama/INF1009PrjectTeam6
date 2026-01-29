@@ -10,8 +10,8 @@ public class MovementManager {
             TransformComponent tranC = entity.getComponent(TransformComponent.class);
 
             if (phyC != null && tranC != null) {
-                tranC.setX(tranC.getX + phyC.getVelocityX * deltaTime);
-                tranC.setY(tranC.getY + phyC.getVelocityY * deltaTime);
+                tranC.setX(tranC.getX() + phyC.getVelocityX() * deltaTime);
+                tranC.setY(tranC.getY() + phyC.getVelocityY() * deltaTime);
             }
         }
     }

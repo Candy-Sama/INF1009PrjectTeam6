@@ -1,7 +1,7 @@
 package com.team6.arcadesim.ecs;
 
 abstract public class Component {
-    private Entity owner;
+    protected Entity owner;
 
     public abstract void update(float deltaTime);
 
