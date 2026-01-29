@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 
 public class CollisionManager {
-    public void update(Entity[] entities) {
+    public void update(List<Entity> entities) {
         for (int i = 0; i < entities.length; i++) {
             // Double for loop to ensure every entity is checked with every other entity
             for (int j = i + 1; j < entities.length; j++) {
