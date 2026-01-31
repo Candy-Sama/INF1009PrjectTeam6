@@ -13,14 +13,6 @@ public class CollisionComponent extends Component {
     private float offsetY;
 
     private final Rectangle bounds = new Rectangle();
-    /**
-     * Constructor
-     *
-    * @param width  width of collision box
-    * @param height  height of collision box
-    * @param offsetX  x-axis from entity's pos
-    * @param offsetY  y-axis from entity's pos
-    */
     public CollisionComponent(float width, float height, float offsetX, float offsetY) {
         this.width = width;
         this.height = height;
