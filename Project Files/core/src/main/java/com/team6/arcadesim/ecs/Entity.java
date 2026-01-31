@@ -1,3 +1,5 @@
+/* Mus Code */
+
 package com.team6.arcadesim.ecs;
 
 import com.badlogic.gdx.graphics.Color;
@@ -7,6 +9,7 @@ public abstract class Entity {
  
     private List<Component> listOfComponents;
     private int id;
+    private String name;
     private boolean isActive;
     
     public void addComponent(Component component) {
@@ -14,9 +17,9 @@ public abstract class Entity {
     }
 
     //gets the component of the specified class type
-    public Component get(Class<? extends Component> componentClass) {
-        for (Component component : listOfComponents) {
-            if (component.getClass().equals(componentClass)) {
+    public Component get(Class<? extends Component> componentClass) { //get component of specified class type
+        for (Component component : listOfComponents) { // for each component in listOfComponents
+            if (component.getClass().equals(componentClass)) { 
                 return component;
             }
         }
@@ -32,15 +35,21 @@ public abstract class Entity {
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
     public boolean isActive() {
         return isActive;
     }
-
     public void setActive(boolean active) {
         isActive = active;
     }
