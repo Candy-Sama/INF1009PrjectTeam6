@@ -26,7 +26,7 @@ public abstract class Entity {
         return null;
     }
 
-    public void update(float delta) {
+    public void update(float delta) { // update all components using their component update method
         for (Component component : listOfComponents) {
             component.update(delta);
         }
@@ -38,6 +38,7 @@ public abstract class Entity {
     public void setId(int id) {
         this.id = id;
     }
+
 
     public String getName() {
         return name;
