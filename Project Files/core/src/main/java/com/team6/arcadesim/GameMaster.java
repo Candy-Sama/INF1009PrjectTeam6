@@ -6,7 +6,7 @@ import com.team6.arcadesim.scenes.MenuScene;
 import com.team6.arcadesim.scenes.Scene;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
-public class Main extends Game {
+public class GameMaster extends Game {
     SceneManager sceneManager;
 
     @Override
