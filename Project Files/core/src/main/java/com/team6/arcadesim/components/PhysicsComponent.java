@@ -1,6 +1,8 @@
 package com.team6.arcadesim.components;
 
-public class PhysicsComponent {
+import com.team6.arcadesim.ecs.Component;
+
+public class PhysicsComponent extends Component {
 
     private float velocityX;
     private float velocityY;
@@ -13,6 +15,10 @@ public class PhysicsComponent {
     public PhysicsComponent(float velocityX, float velocityY) {
         this.velocityX = velocityX;
         this.velocityY = velocityY;
+    }
+
+    @Override // It will not have any changes
+    public void update(float deltaTime) {
     }
 
     public float getVelocityX() {
