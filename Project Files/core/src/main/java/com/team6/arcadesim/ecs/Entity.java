@@ -16,6 +16,12 @@ public abstract class Entity {
         listOfComponents.add(component);
     }
 
+    public Entity(int id, String name) {
+        this.id = id;
+        this.name = name;
+        this.isActive = true;
+    }
+
     //gets the component of the specified class type
     public Component get(Class<? extends Component> componentClass) { //get component of specified class type
         for (Component component : listOfComponents) { // for each component in listOfComponents
