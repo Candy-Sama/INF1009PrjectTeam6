@@ -1,8 +1,7 @@
 package com.team6.arcadesim;
 
 import com.badlogic.gdx.Game;
-import com.team6.arcadesim.scenes.SceneManager;
-import com.team6.arcadesim.scenes.MenuScene;
+import com.team6.arcadesim.managers.SceneManager;
 import com.team6.arcadesim.scenes.Scene;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */

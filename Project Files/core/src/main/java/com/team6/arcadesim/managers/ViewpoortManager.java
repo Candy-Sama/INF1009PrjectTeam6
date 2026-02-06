@@ -1,5 +1,5 @@
 package com.team6.arcadesim.managers;
 
-public class CollisionManager {
+public class ViewpoortManager {
 
 }
