@@ -1,0 +1,20 @@
+{
+    // Java auto-import settings
+    "java.completion.importOrder": [
+        "java",
+        "javax",
+        "com",
+        "org"
+    ],
+    "java.completion.guessMethodArguments": true,
+    "java.autoimport.enabled": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
+    },
+    // Quick fix will suggest imports automatically
+    "editor.quickSuggestions": {
+        "other": true,
+        "comments": false,
+        "strings": false
+    }
+}
