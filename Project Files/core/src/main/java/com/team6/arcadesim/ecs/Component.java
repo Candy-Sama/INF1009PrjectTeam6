@@ -1,5 +1,5 @@
 package com.team6.arcadesim.ecs;
 
-public abstract class Component {
+public class Component {
 
 }
