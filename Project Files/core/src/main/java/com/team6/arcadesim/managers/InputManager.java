@@ -1,29 +1,37 @@
 package com.team6.arcadesim.managers;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.team6.arcadesim.input.InputState;
 
 public class InputManager {
-    private InputState currentState;
+    private final InputState currentState;
 
+    public InputManager(){
+        this.currentState = new InputState();
+    }
+
+    /**
+     * Polls libGDX hardware state and updates our internal InputState
+     */
     public void poll() {
-        // Poll the current input state from the input system
-        // This is a placeholder; actual implementation depends on the input library used
+        currentState.clearJustPressed();
+
+        // Example: Checking common keys. 
+        // In a more robust engine, you might iterate through all possible keys.
+        checkKey(Input.Keys.UP);
+        checkKey(Input.Keys.DOWN);
+        checkKey(Input.Keys.LEFT);
+        checkKey(Input.Keys.RIGHT);
+        checkKey(Input.Keys.SPACE);
+    }
+
+    private void checkKey(int keyCode) {
+        currentState.setKeyPressed(keyCode, Gdx.input.isKeyPressed(keyCode));
     }
 
     public InputState getState() {
-        return currentState;
-    }
-
-    public boolean isKeyDown(int keyCode) {
-        return currentState.isKeyDown(keyCode);
-    }
-
-    public boolean isKeyPressed(int keyCode) {
-        return currentState.isKeyPressed(keyCode);
-    }
-
-    public boolean isKeyReleased(int keyCode) {
-        return currentState.isKeyReleased(keyCode);
+        return currentState; //
     }
     
 }
