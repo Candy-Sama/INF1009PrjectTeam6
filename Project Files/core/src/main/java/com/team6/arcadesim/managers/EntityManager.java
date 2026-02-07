@@ -16,7 +16,8 @@ public class EntityManager {
 
     }
 
-    public <T extends Component> List<Entity> getEntitiesFor(Class<T> componentType) {
+    @SafeVarargs
+    public final <T extends Component> List<Entity> getEntitiesFor(Class<? extends Component>... componentTypes) {
         return null;
     }
 

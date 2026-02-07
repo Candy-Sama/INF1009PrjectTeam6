@@ -10,6 +10,11 @@ import com.team6.arcadesim.interfaces.CollisionResolver;
 public class CollisionManager {
     private EntityManager entityManager;
     private CollisionResolver resolver;
+    private boolean isActive;
+
+    public void resolveCollision(List<Entity> entities) {
+
+    }
 
     public void setResolver(CollisionResolver resolver) {
         this.resolver = resolver; // Strategy Pattern: Injecting the logic
@@ -26,11 +31,19 @@ public class CollisionManager {
 
                 if (checkCollision(a, b)) {
                     if (resolver != null) {
-                        resolver.resolve(a, b); // Delegate the reaction to the resolver
+                        resolver.resolveCollision(a, b); // Delegate the reaction to the resolver
                     }
                 }
             }
         }
+    }
+
+    public boolean isColliding(Entity a, Entity b) {
+        return checkCollision(a, b);
+    }
+
+    public void removeCollisionsInvolvingEntity(Entity e) {
+
     }
 
     private boolean checkCollision(Entity a, Entity b) {
