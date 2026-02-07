@@ -1,12 +1,25 @@
 package com.team6.arcadesim.input;
 
-import java.security.Key;
 import java.util.Set;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-
 public class InputState {
-    private Set<Key> keysPressed;
-    private Set<Key> keysReleased;
-    private Set<Button> mousePressed;
+    private Set<Integer> keysPressed;
+    private Set<Integer> keysReleased;
+    private boolean mousePressed;
+
+    public boolean isKeyDown(int keyCode) {
+        return false;
+    }
+
+    public boolean isKeyPressed(int keyCode) {
+        return false;
+    }
+
+    public boolean isKeyReleased(int keyCode) {
+        return false;
+    }
+
+    public boolean isKeyReleasedKeyCode(int keyCode, boolean b) {
+        return false;
+    }
 }

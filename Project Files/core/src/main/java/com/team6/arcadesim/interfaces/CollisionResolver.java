@@ -1,5 +1,7 @@
 package com.team6.arcadesim.interfaces;
 
-public interface CollisionResolver {
+import com.team6.arcadesim.ecs.Entity;
 
+public interface CollisionResolver {
+    void resolveCollision(Entity a, Entity b);
 }

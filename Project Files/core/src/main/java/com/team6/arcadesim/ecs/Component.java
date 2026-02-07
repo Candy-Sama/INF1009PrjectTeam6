@@ -1,5 +1,5 @@
 package com.team6.arcadesim.ecs;
 
-public class Component {
+public interface Component {
 
 }
