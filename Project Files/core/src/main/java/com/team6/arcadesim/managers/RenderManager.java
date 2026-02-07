@@ -8,22 +8,23 @@ import com.team6.arcadesim.ecs.Entity;
 
 public class RenderManager {
     private SpriteBatch batch;
-    private EntityManager entityManager;
 
-    public RenderManager(EntityManager em) {
-        this.entityManager = em;
+    public RenderManager() {
         this.batch = new SpriteBatch();
     }
 
-    public void render(float dt) {
-        List<Entity> allEntities = entityManager.getAllEntities();
-
+    /**
+     * Now the Manager doesn't know WHERE the entities come from. 
+     * It just draws what it is given.
+     */
+    public void render(List<Entity> entitiesToDraw) {
         batch.begin();
-        for (Entity e : allEntities) {
+        for (Entity e : entitiesToDraw) {
             // Filter: Can only draw things with a position
             if (e.hasComponent(TransformComponent.class)) {
                 TransformComponent tc = e.getComponent(TransformComponent.class);
-                // Placeholder drawing logic (You will add sprites in Part 2)
+                // Placeholder drawing logic
+                // batch.draw(texture, tc.getPosition().x, tc.getPosition().y);
             }
         }
         batch.end();
