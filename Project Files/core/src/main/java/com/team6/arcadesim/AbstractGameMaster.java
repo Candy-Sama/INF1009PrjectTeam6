@@ -19,12 +19,12 @@ import com.team6.arcadesim.managers.ViewportManager;
 
 public abstract class AbstractGameMaster extends Game {
 
-    //Variables
+    // State variables
     private boolean isRunning;
     private float deltaTime;
     private long lastFrameTime;
 
-    //Managers
+    // Managers
     protected EntityManager entityManager;
     protected InputManager inputManager;
     protected MovementManager movementManager;
@@ -42,7 +42,7 @@ public abstract class AbstractGameMaster extends Game {
         collisionManager = new CollisionManager();
         sceneManager = new SceneManager();
         viewportManager = new ViewportManager();
-        // soundManager = new SoundManager();
+        soundManager = new SoundManager();
 
         // Specific game initialization (Tetris/Space Invaders logic)
         init();
@@ -50,25 +50,23 @@ public abstract class AbstractGameMaster extends Game {
     
     @Override
     public void render() {
-        float dt = Gdx.graphics.getDeltaTime();
-        deltaTime = dt;
-        lastFrameTime = System.currentTimeMillis();
+        // Calculate delta time
+        deltaTime = Gdx.graphics.getDeltaTime();
 
-        // 1. Input Phase - Raw hardware polling
-        inputManager.poll();
+        // Convert InputState into MovementComponent velocity
+        update(deltaTime);
 
-        // 2. Logic/Simulation Phase
-        // GameMaster coordinates here (e.g. converting input to velocity)
-        update(dt); 
+        // Run the physics and scenes
+        if (isRunning) {
+            sceneManager.update(deltaTime);
+            movementManager.update(deltaTime, entityManager.getAllEntities());
+            collisionManager.update(deltaTime, entityManager.getAllEntities());
+        }
 
-        // 3. Movement & Physics Phase
-        movementManager.update(dt, null, null);
-        collisionManager.update(dt);
-
-        // 4. Render Phase
+        // Render the current scene
         viewportManager.apply();
         if (sceneManager.getCurrentScene() != null) {
-            sceneManager.getCurrentScene().render(dt);
+            sceneManager.getCurrentScene().render(deltaTime);
         }
     }
 
