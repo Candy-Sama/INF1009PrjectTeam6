@@ -6,6 +6,7 @@ import com.team6.arcadesim.managers.CollisionManager;
 import com.team6.arcadesim.managers.EntityManager;
 import com.team6.arcadesim.managers.InputManager;
 import com.team6.arcadesim.managers.MovementManager;
+import com.team6.arcadesim.managers.RenderManager;
 import com.team6.arcadesim.managers.SceneManager;
 import com.team6.arcadesim.managers.SoundManager;
 import com.team6.arcadesim.managers.ViewportManager;
@@ -24,25 +25,23 @@ public abstract class AbstractGameMaster extends Game {
     private float deltaTime;
     private long lastFrameTime;
 
-    // Managers
+    //Managers
     protected EntityManager entityManager;
     protected InputManager inputManager;
     protected MovementManager movementManager;
     protected CollisionManager collisionManager;
-    protected SceneManager sceneManager;
-    protected ViewportManager viewportManager;
+    protected RenderManager renderManager;
     protected SoundManager soundManager;
+    protected ViewportManager viewportManager;
 
     @Override
     public void create() {
         // Initialize the Must-Have Managers
         entityManager = new EntityManager();
         inputManager = new InputManager();
-        movementManager = new MovementManager();
-        collisionManager = new CollisionManager();
         sceneManager = new SceneManager();
         viewportManager = new ViewportManager();
-        soundManager = new SoundManager();
+        // soundManager = new SoundManager();
 
         // Specific game initialization (Tetris/Space Invaders logic)
         init();
