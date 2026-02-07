@@ -1,83 +1,49 @@
 package com.team6.arcadesim.managers;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class ViewportManager {
+    // Fields from your UML
     private OrthographicCamera camera;
-    private int baseResolutionWidth, baseResolutionHeight, scale, screenWidth, screenHeight;
+    private Viewport viewport;
+    private int baseResolutionWidth = 800;
+    private int baseResolutionHeight = 600;
 
     public ViewportManager() {
-        this.camera = new OrthographicCamera();
-        this.scale = 1;
+        // Initialize the camera and a FitViewport to maintain aspect ratio [cite: 25]
+        camera = new OrthographicCamera();
+        viewport = new FitViewport(baseResolutionWidth, baseResolutionHeight, camera);
+        camera.position.set(baseResolutionWidth / 2f, baseResolutionHeight / 2f, 0);
     }
 
-    public void setVirtualResolution(int width, int height) {
-        this.baseResolutionWidth = width;
-        this.baseResolutionHeight = height;
-        updateViewport();
+    // Operations from UML
+
+    public void setVirtualResolution(int w, int h) {
+        this.baseResolutionWidth = w;
+        this.baseResolutionHeight = h;
+        viewport.setWorldSize(w, h);
     }
 
-    public void resizeScreen(int screenWidth, int screenHeight) {
-        this.screenWidth = screenWidth;
-        this.screenHeight = screenHeight;
-        updateViewport();
-    }
-
-    public void setCameraPosition(Vector2 p) {
-        camera.position.set(p.x, p.y, 0);
-        camera.update();
-    }
-
-    public Vector2 worldToScreen(Vector2 p) {
-        // Convert world coordinates to screen coordinates
-        float screenX = (p.x - camera.position.x) * scale + screenWidth / 2;
-        float screenY = (p.y - camera.position.y) * scale + screenHeight / 2;
-        return new Vector2(screenX, screenY);
-    }
-
-    public Vector2 screenToWorld(Vector2 p) {
-        // Convert screen coordinates to world coordinates
-        float worldX = (p.x - screenWidth / 2) / scale + camera.position.x;
-        float worldY = (p.y - screenHeight / 2) / scale + camera.position.y;
-        return new Vector2(worldX, worldY);
-    }
-
-    // Get the bounds of the current view in world coordinates
-    public Rectangle getViewBounds() {
-        float width = (screenWidth / (float) scale);
-        float height = (screenHeight / (float) scale);
-        float halfWidth = width / 2f;
-        float halfHeight = height / 2f;
-        return new Rectangle(camera.position.x - halfWidth, camera.position.y - halfHeight,
-                        width, height);
-    }  
-
-    public int getScale() {
-        return scale;
+    /** * Resizes the internal viewport when the window size changes.
+     * This ensures the simulation scales correctly. 
+     */
+    public void resize(int screenW, int screenH) {
+        viewport.update(screenW, screenH, true);
     }
 
     public void apply() {
-        // Apply the viewport transformation to the rendering context
-        camera.update();
+        viewport.apply(); // Standard libGDX call to set the GL viewport
+    }
+
+    public Vector2 screenToWorld(Vector2 screenCoords) {
+        // Converts mouse clicks to in-game coordinates
+        return viewport.unproject(screenCoords); 
     }
 
     public OrthographicCamera getCamera() {
         return camera;
-    }
-
-    private void updateViewport() {
-        if (baseResolutionWidth == 0 || baseResolutionHeight == 0 || screenWidth == 0 || screenHeight == 0) {
-            scale = 1;
-            return;
-        }
-        int scaleX = screenWidth / baseResolutionWidth;
-        int scaleY = screenHeight / baseResolutionHeight;
-        scale = Math.min(scaleX, scaleY);
-        if (scale < 1) scale = 1; // Prevent downscaling below 1
-
-        camera.setToOrtho(false, screenWidth / (float) scale, screenHeight / (float) scale);
-        camera.update();
     }
 }
