@@ -1,12 +1,13 @@
 package com.team6.arcadesim.interfaces;
 
-import java.applet.AudioClip;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 
 public interface AudioHandler {
-    public void init();
-    public void playSFX(AudioClip clip, float volume);
-    public void playMusic(AudioClip clip, boolean loop, float volume);
-    public void stopMusic();
-    public void setVolume(AudioClip clip, float volume);
-    public void shutdown();
+    void init();
+    void playSFX(Sound sound, float volume);
+    void playMusic(Music music, boolean loop, float volume);
+    void stopMusic();
+    void setMusicVolume(float volume);
+    void shutdown();
 }
