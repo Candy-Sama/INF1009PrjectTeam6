@@ -10,40 +10,41 @@ import com.team6.arcadesim.interfaces.CollisionResolver;
 public class CollisionManager {
     private EntityManager entityManager;
     private CollisionResolver resolver;
-    private boolean isActive;
 
-    public void resolveCollision(List<Entity> entities) {
-
+    public CollisionManager(EntityManager em) {
+        this.entityManager = em;
     }
 
-    public void setResolver(CollisionResolver resolver) {
-        this.resolver = resolver; // Strategy Pattern: Injecting the logic
+    public void setResolver(CollisionResolver r) {
+        this.resolver = r;
     }
 
     public void update(float dt) {
-        // Filter entities that have both a position and a hitbox
-        List<Entity> collidables = entityManager.getEntitiesFor(CollisionComponent.class, TransformComponent.class);
+        List<Entity> allEntities = entityManager.getAllEntities();
 
-        for (int i = 0; i < collidables.size(); i++) {
-            for (int j = i + 1; j < collidables.size(); j++) {
-                Entity a = collidables.get(i);
-                Entity b = collidables.get(j);
+        // 1. Double loop for collision detection
+        for (int i = 0; i < allEntities.size(); i++) {
+            Entity a = allEntities.get(i);
+            
+            // Filter A
+            if (!isValid(a)) continue;
+
+            for (int j = i + 1; j < allEntities.size(); j++) {
+                Entity b = allEntities.get(j);
+
+                // Filter B
+                if (!isValid(b)) continue;
 
                 if (checkCollision(a, b)) {
-                    if (resolver != null) {
-                        resolver.resolveCollision(a, b); // Delegate the reaction to the resolver
-                    }
+                    resolveCollision(a, b); //
                 }
             }
         }
     }
 
-    public boolean isColliding(Entity a, Entity b) {
-        return checkCollision(a, b);
-    }
-
-    public void removeCollisionsInvolvingEntity(Entity e) {
-
+    // Helper to check if entity has required components
+    private boolean isValid(Entity e) {
+        return e.hasComponent(TransformComponent.class) && e.hasComponent(CollisionComponent.class);
     }
 
     private boolean checkCollision(Entity a, Entity b) {
@@ -52,10 +53,15 @@ public class CollisionManager {
         TransformComponent tB = b.getComponent(TransformComponent.class);
         CollisionComponent cB = b.getComponent(CollisionComponent.class);
 
-        // Standard AABB Collision Math [cite: 232, 236]
         return tA.getPosition().x < tB.getPosition().x + cB.getWidth() &&
                tA.getPosition().x + cA.getWidth() > tB.getPosition().x &&
                tA.getPosition().y < tB.getPosition().y + cB.getHeight() &&
                tA.getPosition().y + cA.getHeight() > tB.getPosition().y;
+    }
+
+    private void resolveCollision(Entity a, Entity b) {
+        if (resolver != null) {
+            resolver.resolveCollision(a, b);
+        }
     }
 }
