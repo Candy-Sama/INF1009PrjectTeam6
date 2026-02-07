@@ -45,8 +45,8 @@ public abstract class AbstractGameMaster extends Game {
         soundManager = new SoundManager();
 
         movementManager = new MovementManager();
-        collisionManager = new CollisionManager(entityManager);
-        renderManager = new RenderManager(entityManager);
+        collisionManager = new CollisionManager();
+        renderManager = new RenderManager();
 
         // Start the game running
         isRunning = true;
@@ -67,12 +67,12 @@ public abstract class AbstractGameMaster extends Game {
         if (isRunning) {
             sceneManager.update(deltaTime);
             movementManager.update(deltaTime, entityManager.getAllEntities());
-            collisionManager.update(deltaTime);
+            collisionManager.update(deltaTime, entityManager.getAllEntities());
         }
 
         // Render the current scene
         viewportManager.apply();
-        renderManager.render(deltaTime);
+        renderManager.render(entityManager.getAllEntities());
         if (sceneManager.getCurrentScene() != null) {
             sceneManager.getCurrentScene().update(deltaTime);
         }
