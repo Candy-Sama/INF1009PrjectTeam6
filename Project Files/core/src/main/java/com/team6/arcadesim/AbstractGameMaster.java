@@ -3,13 +3,12 @@ package com.team6.arcadesim;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.team6.arcadesim.managers.CollisionManager;
+import com.team6.arcadesim.managers.EntityManager;
 import com.team6.arcadesim.managers.InputManager;
 import com.team6.arcadesim.managers.MovementManager;
 import com.team6.arcadesim.managers.SceneManager;
 import com.team6.arcadesim.managers.SoundManager;
 import com.team6.arcadesim.managers.ViewportManager;
-import com.team6.arcadesim.managers.EntityManager;
-import com.team6.arcadesim.scenes.Scene;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 
@@ -38,7 +37,7 @@ public abstract class AbstractGameMaster extends Game {
         collisionManager = new CollisionManager();
         sceneManager = new SceneManager();
         viewportManager = new ViewportManager();
-        soundManager = new SoundManager();
+        // soundManager = new SoundManager();
 
         // Specific game initialization (Tetris/Space Invaders logic)
         init();

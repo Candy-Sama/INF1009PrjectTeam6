@@ -1,9 +1,10 @@
 package com.team6.arcadesim.managers;
 
-import java.applet.AudioClip;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.team6.arcadesim.interfaces.AudioHandler;
 
 public class SoundManager {
@@ -13,48 +14,53 @@ public class SoundManager {
     private float sfxVolume = 1.0f;
     private String playingMusicId;
 
-    //Why Maps? Because we can map String IDs to AudioClips for easy retrieval.
-    private Map<String, AudioClip> audioClips;
+    //Why Maps? Because we can map String IDs to audio resources for easy retrieval.
+    private Map<String, Sound> soundEffects;
+    private Map<String, Music> musicTracks;
     
-    private AudioClip currentMusicClip;
+    private Music currentMusic;
 
     public SoundManager(AudioHandler audioHandler) {
+        if (audioHandler == null) {
+            throw new IllegalArgumentException("AudioHandler cannot be null");
+        }
         this.audioHandler = audioHandler;
-        this.audioClips = new HashMap<>();
+        this.soundEffects = new HashMap<>();
+        this.musicTracks = new HashMap<>();
         audioHandler.init();
     }
 
     public void playSFX(String id) {
-        AudioClip clip = audioClips.get(id);
-        if (clip != null) {
-            audioHandler.playSFX(clip, sfxVolume * masterVolume);
+        Sound sound = soundEffects.get(id);
+        if (sound != null) {
+            audioHandler.playSFX(sound, sfxVolume * masterVolume);
         }
     }
 
     public void playMusic(String id, boolean loop) {
-        AudioClip clip = audioClips.get(id);
-        if (clip != null) {
+        Music music = musicTracks.get(id);
+        if (music != null) {
             playingMusicId = id;
-            currentMusicClip = clip;
-            audioHandler.playMusic(clip, loop, musicVolume * masterVolume);
+            currentMusic = music;
+            audioHandler.playMusic(music, loop, musicVolume * masterVolume);
         }
     }
 
     public void stopMusic() {
         audioHandler.stopMusic();
         playingMusicId = null;
-        currentMusicClip = null;
+        currentMusic = null;
     }
 
     public void setMasterVolume(float volume) {
         this.masterVolume = Math.max(0.0f, Math.min(1.0f, volume));
-        updateVolumes();
+        updateMusicVolume();
     }
 
     public void setMusicVolume(float volume) {
         this.musicVolume = Math.max(0.0f, Math.min(1.0f, volume));
-        if (currentMusicClip != null) {
-            audioHandler.setVolume(currentMusicClip, musicVolume * masterVolume);
+        if (currentMusic != null) {
+            audioHandler.setMusicVolume(musicVolume * masterVolume);
         }
     }
 
@@ -62,13 +68,21 @@ public class SoundManager {
         this.sfxVolume = Math.max(0.0f, Math.min(1.0f, volume));
     }
 
-    public void preload(String id, AudioClip clip) {
-        audioClips.put(id, clip);
+    public void preloadSFX(String id, Sound sound) {
+        if (sound != null) {
+            soundEffects.put(id, sound);
+        }
     }
 
-    private void updateVolumes() {
-        if (currentMusicClip != null) {
-            audioHandler.setVolume(currentMusicClip, musicVolume * masterVolume);
+    public void preloadMusic(String id, Music music) {
+        if (music != null) {
+            musicTracks.put(id, music);
+        }
+    }
+
+    private void updateMusicVolume() {
+        if (currentMusic != null) {
+            audioHandler.setMusicVolume(musicVolume * masterVolume);
         }
     }
 
