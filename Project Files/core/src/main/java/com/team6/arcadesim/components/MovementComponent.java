@@ -11,6 +11,10 @@ public class MovementComponent implements Component {
 
     }
 
+    public void applyVelocity(Vector2 v) {
+
+    }
+
     public Vector2 getVelocity() {
         return velocity;
     }
