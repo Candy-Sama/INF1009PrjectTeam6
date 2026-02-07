@@ -24,16 +24,6 @@ public abstract class AbstractGameMaster extends Game {
     private float deltaTime;
     private long lastFrameTime;
 
-
-    public void run() {
-        isRunning = true;
-        create();
-        while (isRunning) {
-            render();
-        }
-        dispose();
-    }    
-
     //Managers
     protected EntityManager entityManager;
     protected InputManager inputManager;
@@ -72,7 +62,7 @@ public abstract class AbstractGameMaster extends Game {
         update(dt); 
 
         // 3. Movement & Physics Phase
-        movementManager.update(dt);
+        movementManager.update(dt, null, null);
         collisionManager.update(dt);
 
         // 4. Render Phase
@@ -82,13 +72,16 @@ public abstract class AbstractGameMaster extends Game {
         }
     }
 
-    public void pause() {
-        isRunning = false;
+    public void run() {
+    
     }
 
-    public void resume() {
-        isRunning = true;
-        lastFrameTime = System.currentTimeMillis();
+    public void startup() {
+    
+    }
+
+    public void shutdown() {
+    
     }
 
     public abstract void init();
