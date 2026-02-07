@@ -63,4 +63,8 @@ public class EntityManager {
     public List<Entity> getAllEntities() {
         return new ArrayList<>(entities);
     }
+
+    public void displose() {
+        entities.clear();
+    }
 }

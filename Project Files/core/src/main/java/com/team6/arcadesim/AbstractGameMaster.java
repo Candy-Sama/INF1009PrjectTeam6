@@ -48,6 +48,9 @@ public abstract class AbstractGameMaster extends Game {
         collisionManager = new CollisionManager(entityManager);
         renderManager = new RenderManager(entityManager);
 
+        // Start the game running
+        isRunning = true;
+
         // Specific game initialization (Tetris/Space Invaders logic)
         init();
     }
@@ -79,12 +82,20 @@ public abstract class AbstractGameMaster extends Game {
     
     }
 
-    public void startup() {
-    
+    public void pause() {
+        isRunning = false;
     }
 
-    public void shutdown() {
-    
+    public void resume() {
+        isRunning = true;
+    }
+
+    public boolean isPaused() {
+        return !isRunning;
+    }
+
+    public boolean isRunning() {
+        return isRunning;
     }
 
     public abstract void init();
