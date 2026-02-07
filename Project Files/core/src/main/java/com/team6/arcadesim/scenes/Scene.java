@@ -1,19 +1,22 @@
 package com.team6.arcadesim.scenes;
 
+/*
+    The Abstract class for all Scenes in the game.
+    Each scene represents a different state or screen in the game.
+    - Mus
+ */
 public abstract class Scene {
-    private String sceneName;
+    protected String sceneName;
 
     public Scene(String sceneName) {
         this.sceneName = sceneName;
     }
 
-    public void onEnter() {
-        // Called when the scene becomes active
-    }
-    public void onExit() {
-        // Called when the scene is no longer active
-    }
-
+    public abstract void onEnter();
+    public abstract void onExit();
     public abstract void update(float dt);
-    public abstract void render(float dt);
+    
+    public String getName() {
+        return sceneName;
+    }
 }
