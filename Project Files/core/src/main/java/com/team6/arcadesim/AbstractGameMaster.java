@@ -19,6 +19,21 @@ import com.team6.arcadesim.managers.ViewportManager;
 
 public abstract class AbstractGameMaster extends Game {
 
+    //Variables
+    private boolean isRunning;
+    private float deltaTime;
+    private long lastFrameTime;
+
+
+    public void run() {
+        isRunning = true;
+        create();
+        while (isRunning) {
+            render();
+        }
+        dispose();
+    }    
+
     //Managers
     protected EntityManager entityManager;
     protected InputManager inputManager;
@@ -46,6 +61,8 @@ public abstract class AbstractGameMaster extends Game {
     @Override
     public void render() {
         float dt = Gdx.graphics.getDeltaTime();
+        deltaTime = dt;
+        lastFrameTime = System.currentTimeMillis();
 
         // 1. Input Phase - Raw hardware polling
         inputManager.poll();
@@ -64,7 +81,16 @@ public abstract class AbstractGameMaster extends Game {
             sceneManager.getCurrentScene().render(dt);
         }
     }
-    
+
+    public void pause() {
+        isRunning = false;
+    }
+
+    public void resume() {
+        isRunning = true;
+        lastFrameTime = System.currentTimeMillis();
+    }
+
     public abstract void init();
     public abstract void update(float dt);
 }

@@ -11,8 +11,11 @@ public class SceneManager {
     public Scene getCurrentScene() {
         return currentScene;
     }
-
+    public void loadScene(String sceneName) {
+    }
     public void update(float dt) {
+    }
+    public void dispose() {
     }
 
 }
