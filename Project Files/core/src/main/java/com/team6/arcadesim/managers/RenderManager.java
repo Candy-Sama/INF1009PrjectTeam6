@@ -12,33 +12,24 @@ public class RenderManager {
 
     public RenderManager(EntityManager em) {
         this.entityManager = em;
-        this.batch = new SpriteBatch(); // The tool that actually draws to the GPU
+        this.batch = new SpriteBatch();
     }
 
-    /**
-     * Iterates through all entities with a Transform and draws them.
-     */
     public void render(float dt) {
-        // 1. Get entities that have a position
-        List<Entity> renderables = entityManager.getEntitiesFor(TransformComponent.class);
+        List<Entity> allEntities = entityManager.getAllEntities();
 
         batch.begin();
-        for (Entity e : renderables) {
-            TransformComponent tc = e.getComponent(TransformComponent.class);
-            
-            // In Part 2, you'll add a 'SpriteComponent' to entities.
-            // For now, we just prepare the logic.
-            drawEntity(e, tc);
+        for (Entity e : allEntities) {
+            // Filter: Can only draw things with a position
+            if (e.hasComponent(TransformComponent.class)) {
+                TransformComponent tc = e.getComponent(TransformComponent.class);
+                // Placeholder drawing logic (You will add sprites in Part 2)
+            }
         }
         batch.end();
     }
 
-    private void drawEntity(Entity e, TransformComponent tc) {
-        // Placeholder for drawing logic
-        // batch.draw(texture, tc.getPosition().x, tc.getPosition().y);
-    }
-
     public void dispose() {
-        batch.dispose(); // Important for memory management
+        batch.dispose();
     }
 }

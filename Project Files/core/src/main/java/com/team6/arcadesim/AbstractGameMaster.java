@@ -26,6 +26,7 @@ public abstract class AbstractGameMaster extends Game {
     private long lastFrameTime;
 
     //Managers
+    protected SceneManager sceneManager;
     protected EntityManager entityManager;
     protected InputManager inputManager;
     protected MovementManager movementManager;
@@ -41,7 +42,11 @@ public abstract class AbstractGameMaster extends Game {
         inputManager = new InputManager();
         sceneManager = new SceneManager();
         viewportManager = new ViewportManager();
-        // soundManager = new SoundManager();
+        soundManager = new SoundManager();
+
+        movementManager = new MovementManager();
+        collisionManager = new CollisionManager(entityManager);
+        renderManager = new RenderManager(entityManager);
 
         // Specific game initialization (Tetris/Space Invaders logic)
         init();
@@ -59,13 +64,14 @@ public abstract class AbstractGameMaster extends Game {
         if (isRunning) {
             sceneManager.update(deltaTime);
             movementManager.update(deltaTime, entityManager.getAllEntities());
-            collisionManager.update(deltaTime, entityManager.getAllEntities());
+            collisionManager.update(deltaTime);
         }
 
         // Render the current scene
         viewportManager.apply();
+        renderManager.render(deltaTime);
         if (sceneManager.getCurrentScene() != null) {
-            sceneManager.getCurrentScene().render(deltaTime);
+            sceneManager.getCurrentScene().update(deltaTime);
         }
     }
 

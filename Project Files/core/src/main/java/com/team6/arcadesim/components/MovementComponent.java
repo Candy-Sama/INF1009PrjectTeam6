@@ -27,4 +27,8 @@ public class MovementComponent implements Component {
     public Vector2 getAcceleration() { 
         return acceleration; 
     }
+
+    public void applyVelocity(Vector2 v) {
+        this.velocity.add(v);
+    }
 }

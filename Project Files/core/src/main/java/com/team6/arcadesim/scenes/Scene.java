@@ -16,6 +16,10 @@ public abstract class Scene {
     public abstract void onExit();
     public abstract void update(float dt);
     
+    public void render(float dt) {
+        // Default implementation - can be overridden
+    }
+    
     public String getName() {
         return sceneName;
     }

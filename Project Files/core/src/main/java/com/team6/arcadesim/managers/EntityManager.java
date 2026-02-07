@@ -31,7 +31,8 @@ public class EntityManager {
      * This allows managers to ignore irrelevant entities.
      *
      */
-    public List<Entity> getEntitiesFor(Class<? extends Component>... types) {
+    @SafeVarargs
+    public final List<Entity> getEntitiesFor(Class<? extends Component>... types) {
         List<Entity> results = new ArrayList<>();
         
         for (Entity e : entities) {
