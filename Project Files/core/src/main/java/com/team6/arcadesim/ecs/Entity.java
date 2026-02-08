@@ -42,4 +42,9 @@ public abstract class Entity {
     public void setActive(boolean active) {
         this.active = active;
     }
+
+    public void dispose() {
+        this.active = false;
+        this.components.clear();
+    }
 }
