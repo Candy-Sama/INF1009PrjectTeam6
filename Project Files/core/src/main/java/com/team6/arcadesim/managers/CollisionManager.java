@@ -5,11 +5,12 @@ import java.util.List;
 import com.team6.arcadesim.components.CollisionComponent;
 import com.team6.arcadesim.components.TransformComponent;
 import com.team6.arcadesim.ecs.Entity;
+import com.team6.arcadesim.interfaces.CollisionListener;
 import com.team6.arcadesim.interfaces.CollisionResolver;
 
 public class CollisionManager {
-    // REMOVED: private EntityManager entityManager;
     private CollisionResolver resolver;
+    private List<CollisionListener> listeners;
 
     // Empty constructor (Pure Tool)
     public CollisionManager() {
@@ -58,4 +59,13 @@ public class CollisionManager {
             resolver.resolveCollision(a, b);
         }
     }
+
+    public void addCollisionListener(CollisionListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeCollisionListener(CollisionListener listener) {
+        listeners.remove(listener);
+    }
+
 }

@@ -33,4 +33,12 @@ public class SceneManager {
         return currentScene;
     }
 
+    public void dispose() {
+        // Dispose of the current scene if it exists
+        if (currentScene != null) {
+            currentScene.onExit();
+            currentScene = null;
+        }
+    }
+
 }

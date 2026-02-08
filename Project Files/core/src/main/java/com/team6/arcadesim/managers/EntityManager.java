@@ -14,8 +14,6 @@ public class EntityManager {
         this.entities = new ArrayList<>();
     }
 
-
-
     public void addEntity(Entity e) {
         if (e != null) {
             entities.add(e);
