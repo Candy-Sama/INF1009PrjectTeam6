@@ -4,5 +4,5 @@ import com.team6.arcadesim.ecs.Entity;
 
 public interface CollisionResolver {
 
-    void resolveCollision(Entity a, Entity b);
+    void resolve(Entity a, Entity b);
 }

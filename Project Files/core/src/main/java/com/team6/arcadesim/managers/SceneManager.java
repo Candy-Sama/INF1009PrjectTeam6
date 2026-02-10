@@ -1,31 +1,53 @@
 package com.team6.arcadesim.managers;
 
 import com.team6.arcadesim.scenes.Scene;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SceneManager {
+
     private Scene currentScene;
+    // Optional: Keep a cache of scenes if you want to switch back and forth
+    private Map<String, Scene> sceneMap;
 
-    public void setScene(Scene scene) {
+    public SceneManager() {
+        this.sceneMap = new HashMap<>();
+    }
 
-        // Clean up the current scene by exiting it
+    /**
+     * Registers a scene so it can be loaded by string name later.
+     */
+    public void addScene(Scene scene) {
+        sceneMap.put(scene.getName(), scene);
+    }
+
+    /**
+     * Switches to a new scene immediately.
+     */
+    public void setScene(Scene newScene) {
+        // 1. Cleanup the old scene
         if (currentScene != null) {
             currentScene.onExit();
         }
 
-        // Switch to the new scene
-        this.currentScene = scene;
+        // 2. Switch reference
+        currentScene = newScene;
 
-        // Initialize the new scene by entering it
+        // 3. Setup the new scene
         if (currentScene != null) {
             currentScene.onEnter();
         }
     }
 
-    public void update(float dt) {
-
-        // Update the current scene (include null check)
-        if (currentScene != null) {
-            currentScene.update(dt);
+    /**
+     * Looks up a scene by name and switches to it.
+     */
+    public void loadScene(String sceneName) {
+        Scene scene = sceneMap.get(sceneName);
+        if (scene != null) {
+            setScene(scene);
+        } else {
+            System.err.println("Error: Scene not found - " + sceneName);
         }
     }
 
@@ -33,12 +55,18 @@ public class SceneManager {
         return currentScene;
     }
 
-    public void dispose() {
-        // Dispose of the current scene if it exists
+    // Called by AbstractGameMaster
+    public void update(float dt) {
         if (currentScene != null) {
-            currentScene.onExit();
-            currentScene = null;
+            currentScene.update(dt);
         }
     }
 
+    public void dispose() {
+        // Dispose all cached scenes
+        for (Scene scene : sceneMap.values()) {
+            scene.dispose();
+        }
+        sceneMap.clear();
+    }
 }
