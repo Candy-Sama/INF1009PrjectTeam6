@@ -1,26 +1,54 @@
 package com.team6.arcadesim.scenes;
 
-/*
-    The Abstract class for all Scenes in the game.
-    Each scene represents a different state or screen in the game.
-    - Mus
- */
-public abstract class Scene {
-    protected String sceneName;
+import com.team6.arcadesim.AbstractGameMaster;
+import com.badlogic.gdx.utils.Disposable;
 
-    public Scene(String sceneName) {
+public abstract class Scene implements Disposable {
+
+    private String sceneName;
+    
+    // We keep a reference to the Master so the Scene can access Managers
+    protected AbstractGameMaster gameMaster;
+
+    public Scene(AbstractGameMaster gameMaster, String sceneName) {
+        this.gameMaster = gameMaster;
         this.sceneName = sceneName;
     }
 
+    // --- Lifecycle Hooks ---
+
+    /**
+     * Called when the SceneManager switches TO this scene.
+     * Use this to load assets, create entities, and setup the camera.
+     */
     public abstract void onEnter();
+
+    /**
+     * Called when the SceneManager switches AWAY from this scene.
+     * Use this to clear entities, stop music, or save state.
+     */
     public abstract void onExit();
+
+    /**
+     * Called every frame by the GameMaster.
+     * Use this for scene-specific logic (e.g., spawning waves, checking win condition).
+     */
     public abstract void update(float dt);
-    
-    public void render(float dt) {
-        // Default implementation - can be overridden
-    }
-    
+
+    /**
+     * Called every frame after the physics/logic phase.
+     * Use this to draw backgrounds and UI.
+     * (Entities are drawn automatically by the RenderManager).
+     */
+    public abstract void render(float dt);
+
+    // --- Getters ---
     public String getName() {
         return sceneName;
+    }
+
+    @Override
+    public void dispose() {
+        // Default dispose - override if you have scene-specific textures/sounds
     }
 }

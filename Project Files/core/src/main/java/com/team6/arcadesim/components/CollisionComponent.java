@@ -2,47 +2,26 @@ package com.team6.arcadesim.components;
 import com.team6.arcadesim.ecs.Component;
 
 public class CollisionComponent implements Component {
+
     private float width;
     private float height;
-    private boolean solid;
-    private boolean isTrigger;
+    private boolean isSolid; // If true, physics resolution stops overlap
+    private boolean isTrigger; // If true, only notifies listeners (doesn't push back)
 
-    public CollisionComponent(float width, float height, boolean solid, boolean isTrigger) {
+    public CollisionComponent(float width, float height, boolean isSolid, boolean isTrigger) {
         this.width = width;
         this.height = height;
-        this.solid = solid;
+        this.isSolid = isSolid;
         this.isTrigger = isTrigger;
     }
-
-    public float getWidth() {
-        return width;
+    
+    // Default 32x32 box
+    public CollisionComponent() {
+        this(32, 32, true, false);
     }
 
-    public void setWidth(float width) {
-        this.width = width;
-    }
-
-    public float getHeight() {
-        return height;
-    }
-
-    public void setHeight(float height) {
-        this.height = height;
-    }
-
-    public boolean isSolid() {
-        return solid;
-    }
-
-    public void setSolid(boolean solid) {
-        this.solid = solid;
-    }
-
-    public boolean isTrigger() {
-        return isTrigger;
-    }
-
-    public void setTrigger(boolean trigger) {
-        isTrigger = trigger;
-    }
+    public float getWidth() { return width; }
+    public float getHeight() { return height; }
+    public boolean isSolid() { return isSolid; }
+    public boolean isTrigger() { return isTrigger; }
 }

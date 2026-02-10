@@ -7,65 +7,76 @@ import com.team6.arcadesim.components.TransformComponent;
 import com.team6.arcadesim.ecs.Entity;
 import com.team6.arcadesim.interfaces.CollisionListener;
 import com.team6.arcadesim.interfaces.CollisionResolver;
+import com.badlogic.gdx.math.Rectangle;
+import java.util.ArrayList;
 
 public class CollisionManager {
-    private CollisionResolver resolver;
+
     private List<CollisionListener> listeners;
-
-    // Empty constructor (Pure Tool)
-    public CollisionManager() {
-    }
-
-    public void setResolver(CollisionResolver r) {
-        this.resolver = r;
-    }
-
-    public void update(float dt, List<Entity> allEntities) {
-        // 1. Double loop using the passed list
-        for (int i = 0; i < allEntities.size(); i++) {
-            Entity a = allEntities.get(i);
-            if (!isValid(a)) continue;
-
-            for (int j = i + 1; j < allEntities.size(); j++) {
-                Entity b = allEntities.get(j);
-                if (!isValid(b)) continue;
-
-                if (checkCollision(a, b)) {
-                    resolveCollision(a, b);
-                }
-            }
-        }
-    }
-
-    private boolean isValid(Entity e) {
-        return e.hasComponent(TransformComponent.class) && e.hasComponent(CollisionComponent.class);
-    }
+    private CollisionResolver resolver;
     
-    // ... keep checkCollision and resolveCollision exactly as they were ...
-    private boolean checkCollision(Entity a, Entity b) {
-        TransformComponent tA = a.getComponent(TransformComponent.class);
-        CollisionComponent cA = a.getComponent(CollisionComponent.class);
-        TransformComponent tB = b.getComponent(TransformComponent.class);
-        CollisionComponent cB = b.getComponent(CollisionComponent.class);
+    // Reusable rectangles to avoid creating "garbage" every frame (Memory Optimization)
+    private Rectangle rectA = new Rectangle();
+    private Rectangle rectB = new Rectangle();
 
-        return tA.getPosition().x < tB.getPosition().x + cB.getWidth() &&
-               tA.getPosition().x + cA.getWidth() > tB.getPosition().x &&
-               tA.getPosition().y < tB.getPosition().y + cB.getHeight() &&
-               tA.getPosition().y + cA.getHeight() > tB.getPosition().y;
+    public CollisionManager() {
+        this.listeners = new ArrayList<>();
+        // Default resolver: Stop the entity
+        this.resolver = (a, b) -> { /* Default: Do nothing or implement simple stop */ };
     }
 
-    private void resolveCollision(Entity a, Entity b) {
-        if (resolver != null) {
-            resolver.resolveCollision(a, b);
-        }
+    public void setResolver(CollisionResolver resolver) {
+        this.resolver = resolver;
     }
 
     public void addCollisionListener(CollisionListener listener) {
         listeners.add(listener);
     }
 
-    public void removeCollisionListener(CollisionListener listener) {
-        listeners.remove(listener);
+    public void update(float dt, List<Entity> entities) {
+        // Simple N^2 check. For production games with 1000+ entities, use a QuadTree.
+        for (int i = 0; i < entities.size(); i++) {
+            Entity a = entities.get(i);
+            if (!isValid(a)) continue;
+
+            for (int j = i + 1; j < entities.size(); j++) {
+                Entity b = entities.get(j);
+                if (!isValid(b)) continue;
+
+                if (checkCollision(a, b)) {
+                    // 1. Notify Observers
+                    for (CollisionListener listener : listeners) {
+                        listener.onCollisionStart(a, b);
+                    }
+
+                    // 2. Resolve Physics (if both are solid)
+                    CollisionComponent ca = a.getComponent(CollisionComponent.class);
+                    CollisionComponent cb = b.getComponent(CollisionComponent.class);
+                    
+                    if (ca.isSolid() && cb.isSolid()) {
+                        resolver.resolve(a, b);
+                    }
+                }
+            }
+        }
     }
 
+    private boolean checkCollision(Entity a, Entity b) {
+        TransformComponent ta = a.getComponent(TransformComponent.class);
+        CollisionComponent ca = a.getComponent(CollisionComponent.class);
+        
+        TransformComponent tb = b.getComponent(TransformComponent.class);
+        CollisionComponent cb = b.getComponent(CollisionComponent.class);
+
+        // Update reusable rectangles with current positions
+        rectA.set(ta.getPosition().x, ta.getPosition().y, ca.getWidth(), ca.getHeight());
+        rectB.set(tb.getPosition().x, tb.getPosition().y, cb.getWidth(), cb.getHeight());
+
+        return rectA.overlaps(rectB);
+    }
+
+    private boolean isValid(Entity e) {
+        return e.hasComponent(TransformComponent.class) && 
+               e.hasComponent(CollisionComponent.class);
+    }
 }

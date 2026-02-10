@@ -5,64 +5,68 @@ import java.util.List;
 
 import com.team6.arcadesim.ecs.Component;
 import com.team6.arcadesim.ecs.Entity;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 public class EntityManager {
 
+    // Thread-safe list to prevent crashes when removing entities during the game loop
     private List<Entity> entities;
 
     public EntityManager() {
-        this.entities = new ArrayList<>();
+        this.entities = new CopyOnWriteArrayList<>();
     }
 
     public void addEntity(Entity e) {
-        if (e != null) {
-            entities.add(e);
-        }
+        entities.add(e);
     }
 
     public void removeEntity(Entity e) {
         entities.remove(e);
     }
+    
+    public void removeAll() {
+        entities.clear();
+    }
+
+    public List<Entity> getAllEntities() {
+        return entities;
+    }
 
     /**
-     * Filters the master list for entities that possess specific components.
-     * This allows managers to ignore irrelevant entities.
-     *
+     * The "Star Player" method for ECS performance.
+     * Returns only entities that have ALL the specified component types.
+     * Usage: getEntitiesFor(MovementComponent.class, TransformComponent.class)
      */
     @SafeVarargs
-    public final List<Entity> getEntitiesFor(Class<? extends Component>... types) {
-        List<Entity> results = new ArrayList<>();
+    public final List<Entity> getEntitiesFor(Class<? extends Component>... componentTypes) {
+        List<Entity> result = new ArrayList<>();
         
         for (Entity e : entities) {
             boolean hasAll = true;
-            for (Class<? extends Component> type : types) {
+            for (Class<? extends Component> type : componentTypes) {
                 if (!e.hasComponent(type)) {
                     hasAll = false;
                     break;
                 }
             }
             if (hasAll) {
-                results.add(e);
+                result.add(e);
             }
         }
-        return results;
+        return result;
     }
-
 
     public Entity getEntityById(int id) {
         for (Entity e : entities) {
-            if (e.getId() == id) {
-                return e;
-            }
+            if (e.getId() == id) return e;
         }
         return null;
     }
-
-    public List<Entity> getAllEntities() {
-        return new ArrayList<>(entities);
-    }
-
-    public void displose() {
+    
+    public void dispose() {
         entities.clear();
     }
 }

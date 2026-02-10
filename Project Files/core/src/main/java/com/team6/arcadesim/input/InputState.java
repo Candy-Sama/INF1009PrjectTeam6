@@ -4,34 +4,56 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class InputState {
-    // Stores currently held keys and mouse buttons
-    private final Set<Integer> keysPressed = new HashSet<>();
-    private final Set<Integer> mousePressed = new HashSet<>();
-    
-    // Tracking keys that were JUST pressed this frame
-    private final Set<Integer> keysJustPressed = new HashSet<>();
 
-    public void setKeyPressed(int keyCode, boolean isPressed) {
-        if (isPressed) {
-            if (!keysPressed.contains(keyCode)) {
-                keysJustPressed.add(keyCode); // Mark as just pressed
-            }
-            keysPressed.add(keyCode);
-        } else {
-            keysPressed.remove(keyCode);
-        }
+    // HashSet is O(1) for lookups - very fast
+    private Set<Integer> keysPressed;
+    private Set<Integer> keysJustPressed;
+    private Set<Integer> mouseButtonsPressed;
+
+    public InputState() {
+        this.keysPressed = new HashSet<>();
+        this.keysJustPressed = new HashSet<>();
+        this.mouseButtonsPressed = new HashSet<>();
     }
 
-    public boolean isKeyDown(int keyCode) {
-        return keysPressed.contains(keyCode); // Constant check
-    }
-    
-    public boolean isKeyJustPressed(int keyCode) {
-        // This only returns true if it's in our 'justPressed' list for this frame
-        return keysJustPressed.contains(keyCode);
+    // --- Write Methods (Called by InputHandler) ---
+
+    public void setKeyPressed(int keycode) {
+        keysPressed.add(keycode);
+        keysJustPressed.add(keycode); // Mark as "Just Pressed" for this frame
     }
 
-    public void clearJustPressed() {
+    public void setKeyReleased(int keycode) {
+        keysPressed.remove(keycode);
+        keysJustPressed.remove(keycode);
+    }
+
+    public void setMouseButtonPressed(int button) {
+        mouseButtonsPressed.add(button);
+    }
+
+    public void setMouseButtonReleased(int button) {
+        mouseButtonsPressed.remove(button);
+    }
+
+    // --- Read Methods (Called by InputManager) ---
+
+    public boolean isKeyDown(int keycode) {
+        return keysPressed.contains(keycode);
+    }
+
+    public boolean isKeyJustPressed(int keycode) {
+        return keysJustPressed.contains(keycode);
+    }
+
+    public boolean isMouseButtonDown(int button) {
+        return mouseButtonsPressed.contains(button);
+    }
+
+    // --- Frame Cleanup ---
+
+    public void reset() {
+        // Clear the "Just Pressed" set so they don't trigger again next frame
         keysJustPressed.clear();
     }
 }

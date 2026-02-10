@@ -1,37 +1,49 @@
 package com.team6.arcadesim.managers;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.team6.arcadesim.input.InputState;
+import com.team6.arcadesim.interfaces.InputHandler;
 
 public class InputManager {
-    private final InputState currentState;
 
-    public InputManager(){
-        this.currentState = new InputState();
+    private InputState inputState;
+    private InputHandler inputHandler;
+
+    public InputManager() {
+        this.inputState = new InputState();
+        this.inputHandler = new InputHandler(inputState);
+        
+        // Tells LibGDX to send all hardware events to OUR handler
+        Gdx.input.setInputProcessor(inputHandler);
     }
 
     /**
-     * Polls libGDX hardware state and updates our internal InputState
+     * Called at the end of every frame (in AbstractGameMaster.render)
+     * to clear the "JustPressed" flags.
      */
-    public void poll() {
-        currentState.clearJustPressed();
-
-        // Example: Checking common keys. 
-        // In a more robust engine, you might iterate through all possible keys.
-        checkKey(Input.Keys.UP);
-        checkKey(Input.Keys.DOWN);
-        checkKey(Input.Keys.LEFT);
-        checkKey(Input.Keys.RIGHT);
-        checkKey(Input.Keys.SPACE);
+    public void update() {
+        inputState.reset();
     }
 
-    private void checkKey(int keyCode) {
-        currentState.setKeyPressed(keyCode, Gdx.input.isKeyPressed(keyCode));
+    // --- Public API for Entities/Scenes ---
+
+    public boolean isKeyDown(int keycode) {
+        return inputState.isKeyDown(keycode);
     }
 
-    public InputState getState() {
-        return currentState; //
+    public boolean isKeyJustPressed(int keycode) {
+        return inputState.isKeyJustPressed(keycode);
+    }
+
+    public boolean isMouseButtonDown(int button) {
+        return inputState.isMouseButtonDown(button);
     }
     
+    public int getMouseX() {
+        return Gdx.input.getX();
+    }
+
+    public int getMouseY() {
+        return Gdx.input.getY();
+    }
 }
