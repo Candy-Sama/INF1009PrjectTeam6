@@ -50,50 +50,6 @@ public class DemoScene extends AbstractScene {
             gameMaster.getEntityManager().addEntity(testObject);
         }
 
-        // // A cleaner way: Grid Formation
-
-        // int rows = 10;
-        // int cols = 10;
-        // float startX = 100;
-        // float startY = 100;
-        // float gap = 40;
-
-        // for (int i = 0; i < rows; i++) {
-        //     for (int j = 0; j < cols; j++) {
-        //         Entity testObject = new TestEntity();
-                
-        //         // 1. Position them in a clean grid
-        //         testObject.addComponent(new TransformComponent(startX + (i * gap), startY + (j * gap)));
-                
-        //         // 2. Give them randomized speed to show the MovementManager is working
-        //         float vx = (float)(Math.random() * 100 - 50);
-        //         float vy = (float)(Math.random() * 100 - 50);
-        //         testObject.addComponent(new MovementComponent(vx, vy));
-                
-        //         // 3. Use your new SpriteComponent constructor
-        //         testObject.addComponent(new SpriteComponent("test_path", 15, 15));
-                
-        //         gameMaster.getEntityManager().addEntity(testObject);
-        //     }
-        // }
-
-        // // // A cleaner way: Grid Formation - Single Entity Example
-        // gameMaster.getEntityManager().getAllEntities().clear();
-        // // 1. Create just ONE entity instead of a loop
-        // Entity testObject = new TestEntity();
-        
-        // // 2. Position it in the center (assuming 800x600 window)
-        // testObject.addComponent(new TransformComponent(400, 300));
-        
-        // // 3. Give it a steady speed (moving right and down)
-        // testObject.addComponent(new MovementComponent(100, 100));
-        
-        // // 4. Use your SpriteComponent to make it visible
-        // testObject.addComponent(new SpriteComponent("test_path", 50, 50));
-        
-        // // 5. Register it with the manager
-        // gameMaster.getEntityManager().addEntity(testObject);
-
     }
 
     @Override
