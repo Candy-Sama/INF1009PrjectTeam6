@@ -3,6 +3,7 @@ package com.team6.arcadesim.managers;
 import java.util.List;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.team6.arcadesim.components.SpriteComponent;
 import com.team6.arcadesim.components.TransformComponent;
 import com.team6.arcadesim.ecs.Entity;
 
@@ -17,7 +18,7 @@ public class RenderManager {
     public void render(List<Entity> entitiesToDraw) {
         batch.begin();
         for (Entity e : entitiesToDraw) {
-            // Filter: Can only draw things with a position
+            // Filter: Can only draw things with a position and a sprite
             if (e.hasComponent(TransformComponent.class) && e.hasComponent(SpriteComponent.class)) {
                 drawEntity(e);
                 // Placeholder drawing logic
