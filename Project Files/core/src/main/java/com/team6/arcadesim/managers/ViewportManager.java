@@ -17,25 +17,19 @@ public class ViewportManager {
         camera = new OrthographicCamera();
         viewport = new FitViewport(baseResolutionWidth, baseResolutionHeight, camera);
         camera.position.set(baseResolutionWidth / 2f, baseResolutionHeight / 2f, 0);
+        camera.update();
     }
 
-    // Operations from UML
 
-    public void setVirtualResolution(int w, int h) {
-        this.baseResolutionWidth = w;
-        this.baseResolutionHeight = h;
-        viewport.setWorldSize(w, h);
-    }
-
-    /** * Resizes the internal viewport when the window size changes.
-     * This ensures the simulation scales correctly. 
-     */
-    public void resize(int screenW, int screenH) {
-        viewport.update(screenW, screenH, true);
+    public void resize(int w, int h) {
+        // Update viewport with new virtual resolution to be called from AbstractGameMaster.resize()
+        viewport.update (w, h, true);
+        camera.update();
     }
 
     public void apply() {
         viewport.apply(); // Standard libGDX call to set the GL viewport
+        camera.update();
     }
 
     public Vector2 screenToWorld(Vector2 screenCoords) {
