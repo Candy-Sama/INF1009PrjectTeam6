@@ -1,6 +1,12 @@
 package com.team6.arcadesim.scenes;
 
+import java.util.List;
+
 import com.team6.arcadesim.GameMaster;
+import com.team6.arcadesim.components.MovementComponent;
+import com.team6.arcadesim.components.SpriteComponent;
+import com.team6.arcadesim.components.TransformComponent;
+import com.team6.arcadesim.ecs.Entity;
 
 public class DemoScene extends AbstractScene {
 
@@ -12,10 +18,82 @@ public class DemoScene extends AbstractScene {
         this.gameMaster = gameMaster;
     }
 
+    public class TestEntity extends Entity {
+        public TestEntity() {
+            super(); 
+        }
+    }
+
     @Override
     public void onEnter() {
         // Initialize scene resources, entities, etc.
         System.out.println("Entering " + SCENE_NAME);
+
+        // // Naive way: Random Placement
+        for (int i = 0; i < 100; i++) {
+            Entity testObject = new TestEntity();
+            
+            // random positions
+            float randomX = (float) Math.random() * 800;
+            float randomY = (float) Math.random() * 600;
+            
+            testObject.addComponent(new TransformComponent(randomX, randomY));
+
+            // random speed so they move in different directions
+            float speedX = (float) (Math.random() * 200 - 100);
+            float speedY = (float) (Math.random() * 200 - 100);
+
+            testObject.addComponent(new MovementComponent(speedX, speedY));
+            testObject.addComponent(new SpriteComponent("pixel_square.png", 32, 32));
+            
+            // The manager handles the list
+            gameMaster.getEntityManager().addEntity(testObject);
+        }
+
+        // // A cleaner way: Grid Formation
+
+        // int rows = 10;
+        // int cols = 10;
+        // float startX = 100;
+        // float startY = 100;
+        // float gap = 40;
+
+        // for (int i = 0; i < rows; i++) {
+        //     for (int j = 0; j < cols; j++) {
+        //         Entity testObject = new TestEntity();
+                
+        //         // 1. Position them in a clean grid
+        //         testObject.addComponent(new TransformComponent(startX + (i * gap), startY + (j * gap)));
+                
+        //         // 2. Give them randomized speed to show the MovementManager is working
+        //         float vx = (float)(Math.random() * 100 - 50);
+        //         float vy = (float)(Math.random() * 100 - 50);
+        //         testObject.addComponent(new MovementComponent(vx, vy));
+                
+        //         // 3. Use your new SpriteComponent constructor
+        //         testObject.addComponent(new SpriteComponent("test_path", 15, 15));
+                
+        //         gameMaster.getEntityManager().addEntity(testObject);
+        //     }
+        // }
+
+        // // // A cleaner way: Grid Formation - Single Entity Example
+        // gameMaster.getEntityManager().getAllEntities().clear();
+        // // 1. Create just ONE entity instead of a loop
+        // Entity testObject = new TestEntity();
+        
+        // // 2. Position it in the center (assuming 800x600 window)
+        // testObject.addComponent(new TransformComponent(400, 300));
+        
+        // // 3. Give it a steady speed (moving right and down)
+        // testObject.addComponent(new MovementComponent(100, 100));
+        
+        // // 4. Use your SpriteComponent to make it visible
+        // testObject.addComponent(new SpriteComponent("test_path", 50, 50));
+        
+        // // 5. Register it with the manager
+        // gameMaster.getEntityManager().addEntity(testObject);
+
     }
 
     @Override
@@ -28,16 +106,34 @@ public class DemoScene extends AbstractScene {
     public void dispose() {
         // Dispose of any resources specific to this scene      
         System.out.println("Disposing " + SCENE_NAME);
+
+        for (Entity e : gameMaster.getEntityManager().getAllEntities()) {
+        SpriteComponent sc = e.getComponent(SpriteComponent.class);
+        if (sc != null && sc.getTexture() != null) {
+            sc.getTexture().dispose(); // Frees the GPU memory
+        }
+    }
     }
 
     @Override
     public void update(float deltaTime) {
-        // Update scene logic
-    }   
+        // Get the list of entities from the Entity Manager
+        List<Entity> entities = gameMaster.getEntityManager().getAllEntities();
+
+        // movement
+        gameMaster.getMovementManager().update(deltaTime, entities);
+
+        // collision
+        gameMaster.getCollisionManager().update(deltaTime, entities);
+    }
 
     @Override
     public void render(float deltaTime) {
-        // Render scene
+        // Get the entities again for the renderer
+        List<Entity> entities = gameMaster.getEntityManager().getAllEntities();
+        
+        // Tell the RenderManager (or IOManager) to draw them
+        gameMaster.getRenderManager().render(entities);
     }
 
 }

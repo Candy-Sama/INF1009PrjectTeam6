@@ -24,12 +24,19 @@ public class MovementManager {
             MovementComponent mc = entity.getComponent(MovementComponent.class);
             TransformComponent tc = entity.getComponent(TransformComponent.class);
 
-            // 2. Physics Math
-            // velocity += acceleration * dt
-            mc.getVelocity().mulAdd(mc.getAcceleration(), dt);
+            // // 2. Physics Math
+            // // velocity += acceleration * dt
+            // mc.getVelocity().mulAdd(mc.getAcceleration(), dt);
 
-            // position += velocity * dt
-            tc.getPosition().mulAdd(mc.getVelocity(), dt);
+            // // position += velocity * dt
+            // tc.getPosition().mulAdd(mc.getVelocity(), dt);
+
+            // 2. Math: New Position = Old Position + (Velocity * Time)
+            float newX = tc.getPosition().x + (mc.getVelocity().x * dt);
+            float newY = tc.getPosition().y + (mc.getVelocity().y * dt);
+
+            // 3. Update the data block
+            tc.setPosition(newX, newY);
         }
     }
 
