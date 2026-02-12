@@ -1,15 +1,17 @@
 package com.team6.arcadesim;
 
+import com.team6.arcadesim.scenes.DemoScene;
 /**
  * Concrete implementation of AbstractGameMaster.
- * This is a placeholder - you'll implement your actual game logic here.
+ * This is a placeholder class; actual game logic should be implemented here.
  */
 public class GameMaster extends AbstractGameMaster {
 
     @Override
     public void init() {
-        // Initialize your game here
+        // Initialize the game here
         // Example: Load initial scene, set up entities, etc.
+        sceneManager.setScene(new DemoScene(this));
     }
 
     @Override
