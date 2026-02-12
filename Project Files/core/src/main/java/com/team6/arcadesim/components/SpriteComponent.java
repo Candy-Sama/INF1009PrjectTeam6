@@ -10,6 +10,7 @@ public class SpriteComponent implements Component {
     private float height;
     private boolean flipX = false;
     private boolean flipY = false;
+    private String texturePath;
 
     public SpriteComponent(Texture texture, float width, float height) {
         this.texture = texture;
@@ -17,7 +18,21 @@ public class SpriteComponent implements Component {
         this.height = height;
     }
 
+    public SpriteComponent(String texturePath, float width, float height) {
+        this.texturePath = texturePath;
+        this.width = width;
+        this.height = height;
+
+        // Create a 1x1 white pixel texture programmatically
+        com.badlogic.gdx.graphics.Pixmap pixmap = new com.badlogic.gdx.graphics.Pixmap(1, 1, com.badlogic.gdx.graphics.Pixmap.Format.RGBA8888);
+        pixmap.setColor(com.badlogic.gdx.graphics.Color.WHITE);
+        pixmap.fill();
+        this.texture = new com.badlogic.gdx.graphics.Texture(pixmap);
+        pixmap.dispose();
+    }
+
     // --- Operations from UML ---
+    public String getTexturePath() { return texturePath; }
 
     public void setTexture(Texture t) { this.texture = t; }
     public Texture getTexture() { return texture; }
