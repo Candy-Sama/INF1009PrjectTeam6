@@ -1,14 +1,14 @@
 package com.team6.arcadesim.managers;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.team6.arcadesim.components.CollisionComponent;
 import com.team6.arcadesim.components.TransformComponent;
 import com.team6.arcadesim.ecs.Entity;
 import com.team6.arcadesim.interfaces.CollisionListener;
 import com.team6.arcadesim.interfaces.CollisionResolver;
-import com.badlogic.gdx.math.Rectangle;
-import java.util.ArrayList;
 
 public class CollisionManager {
 
@@ -33,6 +33,10 @@ public class CollisionManager {
         listeners.add(listener);
     }
 
+    public void removeCollisionListener(CollisionListener listener) {
+        listeners.remove(listener);
+    }
+
     public void update(float dt, List<Entity> entities) {
         // Simple N^2 check. For production games with 1000+ entities, use a QuadTree.
         for (int i = 0; i < entities.size(); i++) {
@@ -43,18 +47,25 @@ public class CollisionManager {
                 Entity b = entities.get(j);
                 if (!isValid(b)) continue;
 
+                CollisionComponent ca = a.getComponent(CollisionComponent.class);
+                CollisionComponent cb = b.getComponent(CollisionComponent.class);
+
+
                 if (checkCollision(a, b)) {
                     // 1. Notify Observers
                     for (CollisionListener listener : listeners) {
                         listener.onCollisionStart(a, b);
                     }
-
-                    // 2. Resolve Physics (if both are solid)
-                    CollisionComponent ca = a.getComponent(CollisionComponent.class);
-                    CollisionComponent cb = b.getComponent(CollisionComponent.class);
                     
-                    if (ca.isSolid() && cb.isSolid()) {
+                    // 2. Resolve Collision if both are solid and not triggers
+                    if (ca.isSolid() && cb.isSolid() && !ca.isTrigger() && !cb.isTrigger()) {
                         resolver.resolve(a, b);
+                    }
+                }
+                else {
+                    // Notify Observers about collision end
+                    for (CollisionListener listener : listeners) {
+                        listener.onCollisionEnd(a, b);
                     }
                 }
             }
