@@ -1,14 +1,15 @@
 package com.team6.arcadesim.managers;
 
-import com.team6.arcadesim.scenes.Scene;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.team6.arcadesim.scenes.AbstractScene;
+
 public class SceneManager {
 
-    private Scene currentScene;
+    private AbstractScene currentScene;
     // Optional: Keep a cache of scenes if you want to switch back and forth
-    private Map<String, Scene> sceneMap;
+    private Map<String, AbstractScene> sceneMap;
 
     public SceneManager() {
         this.sceneMap = new HashMap<>();
@@ -17,14 +18,14 @@ public class SceneManager {
     /**
      * Registers a scene so it can be loaded by string name later.
      */
-    public void addScene(Scene scene) {
+    public void addScene(AbstractScene scene) {
         sceneMap.put(scene.getName(), scene);
     }
 
     /**
      * Switches to a new scene immediately.
      */
-    public void setScene(Scene newScene) {
+    public void setScene(AbstractScene newScene) {
         // 1. Cleanup the old scene
         if (currentScene != null) {
             currentScene.onExit();
@@ -43,7 +44,7 @@ public class SceneManager {
      * Looks up a scene by name and switches to it.
      */
     public void loadScene(String sceneName) {
-        Scene scene = sceneMap.get(sceneName);
+        AbstractScene scene = sceneMap.get(sceneName);
         if (scene != null) {
             setScene(scene);
         } else {
@@ -51,7 +52,7 @@ public class SceneManager {
         }
     }
 
-    public Scene getCurrentScene() {
+    public AbstractScene getCurrentScene() {
         return currentScene;
     }
 
@@ -64,7 +65,7 @@ public class SceneManager {
 
     public void dispose() {
         // Dispose all cached scenes
-        for (Scene scene : sceneMap.values()) {
+        for (AbstractScene scene : sceneMap.values()) {
             scene.dispose();
         }
         sceneMap.clear();
