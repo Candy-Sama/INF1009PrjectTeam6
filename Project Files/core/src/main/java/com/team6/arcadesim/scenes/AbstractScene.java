@@ -1,16 +1,16 @@
 package com.team6.arcadesim.scenes;
 
-import com.team6.arcadesim.AbstractGameMaster;
 import com.badlogic.gdx.utils.Disposable;
+import com.team6.arcadesim.AbstractGameMaster;
 
-public abstract class Scene implements Disposable {
+public abstract class AbstractScene implements Disposable {
 
     private String sceneName;
     
     // We keep a reference to the Master so the Scene can access Managers
     protected AbstractGameMaster gameMaster;
 
-    public Scene(AbstractGameMaster gameMaster, String sceneName) {
+    public AbstractScene(AbstractGameMaster gameMaster, String sceneName) {
         this.gameMaster = gameMaster;
         this.sceneName = sceneName;
     }
