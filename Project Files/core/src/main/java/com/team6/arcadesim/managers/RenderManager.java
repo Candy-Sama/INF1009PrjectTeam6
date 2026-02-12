@@ -13,16 +13,13 @@ public class RenderManager {
         this.batch = new SpriteBatch();
     }
 
-    /**
-     * Now the Manager doesn't know WHERE the entities come from. 
-     * It just draws what it is given.
-     */
+    // Renders a list of entities to the screen
     public void render(List<Entity> entitiesToDraw) {
         batch.begin();
         for (Entity e : entitiesToDraw) {
             // Filter: Can only draw things with a position
-            if (e.hasComponent(TransformComponent.class)) {
-                TransformComponent tc = e.getComponent(TransformComponent.class);
+            if (e.hasComponent(TransformComponent.class) && e.hasComponent(SpriteComponent.class)) {
+                drawEntity(e);
                 // Placeholder drawing logic
                 // batch.draw(texture, tc.getPosition().x, tc.getPosition().y);
             }
@@ -30,7 +27,25 @@ public class RenderManager {
         batch.end();
     }
 
+    private void drawEntity(Entity e) {
+        TransformComponent tc = e.getComponent(TransformComponent.class);
+        SpriteComponent sc = e.getComponent(SpriteComponent.class);
+
+        // Drawing using the data defined in your UML SpriteComponent
+        if (sc.getTexture() != null) {
+            batch.draw(
+                sc.getTexture(),
+                tc.getPosition().x,
+                tc.getPosition().y,
+                sc.getWidth(),
+                sc.getHeight()
+            );
+        }
+    }
+    
     public void dispose() {
-        batch.dispose();
+        if (batch != null) {
+            batch.dispose(); // To clear up resources
+        }
     }
 }
