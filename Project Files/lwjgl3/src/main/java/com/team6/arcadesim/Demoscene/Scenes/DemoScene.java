@@ -139,9 +139,10 @@ public class DemoScene extends AbstractScene {
         // Entity-to-entity collision
         gameMaster.getCollisionManager().update(deltaTime, entities);
 
-        // To detect P key to pause
-        if (gameMaster.getInputManager().isKeyDown(com.badlogic.gdx.Input.Keys.P)) {
-            // Push Pause Scene onto the stack
+        //Check for P key to pause
+        if (gameMaster.getInputManager().isKeyJustPressed(com.badlogic.gdx.Input.Keys.P)) {
+            System.out.println("P pressed - Pausing Game");
+            // Push the pause scene on top of the demo scene
             gameMaster.getSceneManager().pushScene(new PauseScene(gameMaster));
         }
     }
