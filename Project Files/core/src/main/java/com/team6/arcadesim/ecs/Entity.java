@@ -5,11 +5,13 @@ import java.util.Map;
 
 public abstract class Entity {
 
+    // Static counter shared by ALL entities to ensure unique IDs
     private static int nextId = 0;
 
     private int id;
     private boolean active;
     
+    // The "Bag" of components. Key = Class Type, Value = The Component Instance
     private Map<Class<? extends Component>, Component> components;
 
     public Entity() {

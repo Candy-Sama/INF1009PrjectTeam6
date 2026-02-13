@@ -12,6 +12,7 @@ import com.team6.arcadesim.interfaces.CollisionResolver;
 
 public class CollisionManager {
 
+    //Sets up a list of collision listeners and a resolver to handle collisions
     private List<CollisionListener> listeners;
     private CollisionResolver resolver;
     
@@ -21,7 +22,8 @@ public class CollisionManager {
 
     public CollisionManager() {
         this.listeners = new ArrayList<>();
-        this.resolver = (a, b) -> { };
+        // Default resolver: Stop the entity
+        this.resolver = (a, b) -> { /* Default: Do nothing or implement simple stop */ };
     }
 
     public void setResolver(CollisionResolver resolver) {
@@ -51,15 +53,18 @@ public class CollisionManager {
 
 
                 if (checkCollision(a, b)) {
+                    // 1. Notify Observers
                     for (CollisionListener listener : listeners) {
                         listener.onCollisionStart(a, b);
                     }
                     
+                    // 2. Resolve Collision if both are solid and not triggers
                     if (ca.isSolid() && cb.isSolid() && !ca.isTrigger() && !cb.isTrigger()) {
                         resolver.resolve(a, b);
                     }
                 }
                 else {
+                    // Notify Observers about collision end
                     for (CollisionListener listener : listeners) {
                         listener.onCollisionEnd(a, b);
                     }
