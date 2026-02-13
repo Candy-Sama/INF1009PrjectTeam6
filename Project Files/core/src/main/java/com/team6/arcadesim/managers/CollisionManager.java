@@ -12,6 +12,7 @@ import com.team6.arcadesim.interfaces.CollisionResolver;
 
 public class CollisionManager {
 
+    //Sets up a list of collision listeners and a resolver to handle collisions
     private List<CollisionListener> listeners;
     private CollisionResolver resolver;
     

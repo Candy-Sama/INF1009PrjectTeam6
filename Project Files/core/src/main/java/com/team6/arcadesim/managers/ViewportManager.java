@@ -28,7 +28,7 @@ public class ViewportManager {
     }
 
     public void apply() {
-        viewport.apply(); // Standard libGDX call to set the GL viewport
+        viewport.apply(); // Standard libGDX call to set the GL viewport size via the Viewport
         camera.update();
     }
 

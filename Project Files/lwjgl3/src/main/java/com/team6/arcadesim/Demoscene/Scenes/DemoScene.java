@@ -14,6 +14,7 @@ public class DemoScene extends AbstractScene {
 
     private static final String SCENE_NAME = "DemoScene";
     private GameMaster gameMaster;
+    private com.team6.arcadesim.Demoscene.Managers.CubeCollision cubeCollision;
 
     public DemoScene(GameMaster gameMaster) {
         super(gameMaster, SCENE_NAME);
@@ -31,8 +32,12 @@ public class DemoScene extends AbstractScene {
         // Initialize scene resources, entities, etc.
         System.out.println("Entering " + SCENE_NAME);
 
-        // // Naive way: Random Placement
-        for (int i = 0; i < 100; i++) {
+        // Set up collision resolver
+        cubeCollision = new com.team6.arcadesim.Demoscene.Managers.CubeCollision(800, 600);
+        gameMaster.getCollisionManager().setResolver(cubeCollision);
+
+        // Random placement of entities
+        for (int i = 0; i < 10; i++) {
             Entity testObject = new TestEntity();
             
             // random positions
@@ -83,7 +88,12 @@ public class DemoScene extends AbstractScene {
         // movement
         gameMaster.getMovementManager().update(deltaTime, entities);
 
-        // collision
+        // Wall bouncing handled by CubeCollision
+        for (Entity entity : entities) {
+            cubeCollision.checkWallBounce(entity);
+        }
+
+        // Entity-to-entity collision
         gameMaster.getCollisionManager().update(deltaTime, entities);
     }
 
