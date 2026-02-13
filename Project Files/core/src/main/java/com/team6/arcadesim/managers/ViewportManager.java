@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class ViewportManager {
 
+    // --- LibGDX Internal Components ---
     private OrthographicCamera camera;
     private Viewport viewport;
 
@@ -26,6 +27,7 @@ public class ViewportManager {
         
         viewport = new FitViewport(baseResolutionWidth, baseResolutionHeight, camera);
         
+        // Center the camera by default
         camera.position.set(baseResolutionWidth / 2f, baseResolutionHeight / 2f, 0);
         camera.update();
     }
