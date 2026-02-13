@@ -3,50 +3,89 @@ package com.team6.arcadesim.managers;
 import java.util.List;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Disposable;
 import com.team6.arcadesim.components.SpriteComponent;
 import com.team6.arcadesim.components.TransformComponent;
 import com.team6.arcadesim.ecs.Entity;
+import com.badlogic.gdx.graphics.Texture;
 
-public class RenderManager {
+
+public class RenderManager implements Disposable {
+
     private SpriteBatch batch;
 
     public RenderManager() {
+        // The heavy GPU object. Created once, reused forever.
         this.batch = new SpriteBatch();
     }
 
-    // Renders a list of entities to the screen
-    public void render(List<Entity> entitiesToDraw) {
+    /**
+     * The Main Render Loop.
+     * Called by AbstractGameMaster inside render().
+     */
+    public void render(float dt, List<Entity> entities) {
         batch.begin();
-        for (Entity e : entitiesToDraw) {
-            // Filter: Can only draw things with a position and a sprite
-            if (e.hasComponent(TransformComponent.class) && e.hasComponent(SpriteComponent.class)) {
-                drawEntity(e);
-                // Placeholder drawing logic
-                // batch.draw(texture, tc.getPosition().x, tc.getPosition().y);
+
+        for (Entity entity : entities) {
+            // 1. Safety Check: Entity must have Position (Transform) AND Looks (Sprite)
+            if (!entity.hasComponent(TransformComponent.class) || 
+                !entity.hasComponent(SpriteComponent.class)) {
+                continue;
             }
-        }
-        batch.end();
-    }
 
-    private void drawEntity(Entity e) {
-        TransformComponent tc = e.getComponent(TransformComponent.class);
-        SpriteComponent sc = e.getComponent(SpriteComponent.class);
+            // 2. GetData
+            TransformComponent tc = entity.getComponent(TransformComponent.class);
+            SpriteComponent sc = entity.getComponent(SpriteComponent.class);
+            Texture texture = sc.getTexture();
 
-        // Drawing using the data defined in your UML SpriteComponent
-        if (sc.getTexture() != null) {
+            // Safety: Don't crash if texture isn't loaded yet
+            if (texture == null) continue;
+
+            // 3. Prepare Draw Variables
+            float x = tc.getPosition().x;
+            float y = tc.getPosition().y;
+            
+            float width = sc.getWidth();
+            float height = sc.getHeight();
+            
+            // Origins for rotation (Center of the sprite)
+            float originX = width / 2;
+            float originY = height / 2;
+            
+            float rotation = tc.getRotation();
+
+            // Source dimensions (Full image size)
+            int srcWidth = texture.getWidth();
+            int srcHeight = texture.getHeight();
+
+            // 4. Draw Call (The Complex One for Texture)
+            // This signature supports Rotation AND Flipping
             batch.draw(
-                sc.getTexture(),
-                tc.getPosition().x,
-                tc.getPosition().y,
-                sc.getWidth(),
-                sc.getHeight()
+                texture,
+                x, y,                  // Position on screen
+                originX, originY,      // Rotation Origin (Center)
+                width, height,         // Size to draw
+                1, 1,                  // Scale (1 = 100%)
+                rotation,              // Rotation in degrees
+                0, 0,                  // Source X, Source Y (Start of image)
+                srcWidth, srcHeight,   // Source Width, Source Height (Full image)
+                sc.isFlipX(),          // Flip Horizontal?
+                sc.isFlipY()           // Flip Vertical?
             );
         }
+
+        batch.end();
     }
     
+    // Allows Scene to use the batch for UI/Backgrounds
+    public SpriteBatch getBatch() {
+        return batch;
+    }
+
+    @Override
     public void dispose() {
         if (batch != null) {
-            batch.dispose(); // To clear up resources
+            batch.dispose();
         }
     }
 }
