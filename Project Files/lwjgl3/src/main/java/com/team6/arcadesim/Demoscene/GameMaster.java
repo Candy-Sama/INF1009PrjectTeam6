@@ -1,10 +1,12 @@
-package com.team6.arcadesim;
+package com.team6.arcadesim.Demoscene;
 
+import com.team6.arcadesim.AbstractGameMaster;
+import com.team6.arcadesim.Demoscene.Scenes.DemoScene;
 import com.team6.arcadesim.managers.CollisionManager;
 import com.team6.arcadesim.managers.EntityManager;
 import com.team6.arcadesim.managers.MovementManager;
 import com.team6.arcadesim.managers.RenderManager;
-import com.team6.arcadesim.scenes.DemoScene;
+
 /**
  * Concrete implementation of AbstractGameMaster.
  * This is a placeholder class; actual game logic should be implemented here.

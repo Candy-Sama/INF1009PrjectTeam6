@@ -2,7 +2,7 @@ package com.team6.arcadesim.lwjgl3;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.team6.arcadesim.GameMaster;
+import com.team6.arcadesim.Demoscene.GameMaster;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
