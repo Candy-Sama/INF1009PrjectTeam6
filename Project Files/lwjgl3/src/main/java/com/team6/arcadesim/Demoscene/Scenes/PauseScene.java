@@ -56,5 +56,17 @@ public class PauseScene extends AbstractScene {
 
     @Override
     public void render(float dt) {
+
+        //To set tranparency
+        com.badlogic.gdx.Gdx.gl.glEnable(com.badlogic.gdx.GLES20.GL_BLEND);
+        com.badlogic.gdx.Gdx.gl.glBlendFunc(
+            com.badlogic.gdx.GLES20.GL_SRC_ALPHA, 
+            com.badlogic.gdx.GLES20.GL_ONE_MINUS_SRC_ALPHA
+        );
+
+        //Draw semi-transparent overlay
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(new Color(0, 0, 0, 0.7f)); // Black wth 70% opacity
+
     }
 }
