@@ -1,10 +1,11 @@
 package com.team6.arcadesim.managers;
 
-import com.team6.arcadesim.interfaces.AudioHandler;
-import com.team6.arcadesim.ecs.AudioClip;
-import com.badlogic.gdx.utils.Disposable;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.badlogic.gdx.utils.Disposable;
+import com.team6.arcadesim.ecs.AudioClip;
+import com.team6.arcadesim.interfaces.AudioHandler;
 
 public class SoundManager implements Disposable {
 
@@ -15,6 +16,7 @@ public class SoundManager implements Disposable {
     private float musicVolume = 1.0f;
     private String playingMusicId;
 
+    // --- Storage (The Library) ---
     private Map<String, AudioClip> soundLibrary;
 
     public SoundManager() {
@@ -74,6 +76,7 @@ public class SoundManager implements Disposable {
     public void playSFX(String id) {
         AudioClip clip = soundLibrary.get(id);
         if (clip != null) {
+            // Calculate final volume: Master * SFX
             float finalVol = masterVolume * sfxVolume;
             audioHandler.playSFX(clip, finalVol);
         } else {

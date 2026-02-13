@@ -20,6 +20,7 @@ public class RenderManager implements Disposable {
     }
 
     public void render(float dt, List<Entity> entities, OrthographicCamera camera) {
+        // Ensure camera is set right before rendering
         if (camera != null) {
             batch.setProjectionMatrix(camera.combined);
         }
@@ -27,6 +28,7 @@ public class RenderManager implements Disposable {
         batch.begin();
 
         for (Entity entity : entities) {
+            // 1. Check: Entity must have Position (Transform) AND Looks (Sprite)
             if (!entity.hasComponent(TransformComponent.class) || 
                 !entity.hasComponent(SpriteComponent.class)) {
                 continue;
@@ -36,6 +38,7 @@ public class RenderManager implements Disposable {
             SpriteComponent sc = entity.getComponent(SpriteComponent.class);
             Texture texture = sc.getTexture();
 
+            // Safety: Don't crash if texture isn't loaded yet
             if (texture == null) continue;
 
             float centerX = tc.getPosition().x;
@@ -44,9 +47,11 @@ public class RenderManager implements Disposable {
             float width = sc.getWidth();
             float height = sc.getHeight();
             
+            // Calculate top-left corner from center position
             float x = centerX - width / 2;
             float y = centerY - height / 2;
             
+            // Origin for rotation (center of sprite)
             float originX = width / 2;
             float originY = height / 2;
             
@@ -72,6 +77,7 @@ public class RenderManager implements Disposable {
         batch.end();
     }
     
+    // Allows Scene to use the batch for UI/Backgrounds
     public SpriteBatch getBatch() {
         return batch;
     }
