@@ -2,6 +2,7 @@ package com.team6.arcadesim.Demoscene.Scenes;
 
 import java.util.List;
 
+import com.badlogic.gdx.math.Vector2;
 import com.team6.arcadesim.Demoscene.GameMaster;
 import com.team6.arcadesim.components.CollisionComponent;
 import com.team6.arcadesim.components.MovementComponent;
@@ -15,6 +16,7 @@ public class DemoScene extends AbstractScene {
     private static final String SCENE_NAME = "DemoScene";
     private GameMaster gameMaster;
     private com.team6.arcadesim.Demoscene.Managers.CubeCollision cubeCollision;
+    private Vector2 sceneResolution = new Vector2(1280, 720);
 
     public DemoScene(GameMaster gameMaster) {
         super(gameMaster, SCENE_NAME);
@@ -29,11 +31,15 @@ public class DemoScene extends AbstractScene {
 
     @Override
     public void onEnter() {
+
+        // Setup scene size
+        gameMaster.getViewportManager().setVirtualResolution((int) sceneResolution.x, (int) sceneResolution.y);
+
         // Initialize scene resources, entities, etc.
         System.out.println("Entering " + SCENE_NAME);
 
         // Set up collision resolver
-        cubeCollision = new com.team6.arcadesim.Demoscene.Managers.CubeCollision(1280, 720);
+        cubeCollision = new com.team6.arcadesim.Demoscene.Managers.CubeCollision(sceneResolution.x, sceneResolution.y);
         gameMaster.getCollisionManager().setResolver(cubeCollision);
 
         // Random placement of entities
@@ -41,8 +47,8 @@ public class DemoScene extends AbstractScene {
             Entity testObject = new TestEntity();
             
             // random positions
-            float randomX = (float) Math.random() * 1280;
-            float randomY = (float) Math.random() * 720;
+            float randomX = (float) Math.random() * sceneResolution.x;
+            float randomY = (float) Math.random() * sceneResolution.y;
             
             testObject.addComponent(new TransformComponent(randomX, randomY));
 

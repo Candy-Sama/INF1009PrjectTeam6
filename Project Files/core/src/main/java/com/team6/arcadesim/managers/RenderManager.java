@@ -48,13 +48,17 @@ public class RenderManager implements Disposable {
             if (texture == null) continue;
 
             // 3. Prepare Draw Variables
-            float x = tc.getPosition().x;
-            float y = tc.getPosition().y;
+            float centerX = tc.getPosition().x;
+            float centerY = tc.getPosition().y;
             
             float width = sc.getWidth();
             float height = sc.getHeight();
             
-            // Origins for rotation (Center of the sprite)
+            // Calculate top-left corner from center position
+            float x = centerX - width / 2;
+            float y = centerY - height / 2;
+            
+            // Origin for rotation (center of sprite)
             float originX = width / 2;
             float originY = height / 2;
             
@@ -66,14 +70,15 @@ public class RenderManager implements Disposable {
 
             // 4. Draw Call (The Complex One for Texture)
             // This signature supports Rotation AND Flipping
+            // Transform position represents the CENTER of the sprite
             batch.draw(
                 texture,
-                x, y,                  // Position on screen
-                originX, originY,      // Rotation Origin (Center)
+                x, y,                  // Position on screen (bottom-left corner)
+                originX, originY,      // Rotation origin (center)
                 width, height,         // Size to draw
-                1, 1,   // Scale (1 = 100%)
+                1, 1,                  // Scale (1 = 100%)
                 rotation,              // Rotation in degrees
-                0, 0,       // Source X, Source Y (Start of image)
+                0, 0,                  // Source X, Source Y (Start of image)
                 srcWidth, srcHeight,   // Source Width, Source Height (Full image)
                 sc.isFlipX(),          // Flip Horizontal?
                 sc.isFlipY()           // Flip Vertical?

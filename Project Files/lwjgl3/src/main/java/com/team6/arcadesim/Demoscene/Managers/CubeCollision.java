@@ -39,6 +39,7 @@ public class CubeCollision implements CollisionResolver {
 
     /**
      * Handles wall bouncing for a single entity
+     * Transform position represents the CENTER of the sprite
      */
     public void checkWallBounce(Entity entity) {
         TransformComponent tc = entity.getComponent(TransformComponent.class);
@@ -46,27 +47,36 @@ public class CubeCollision implements CollisionResolver {
         CollisionComponent cc = entity.getComponent(CollisionComponent.class);
         
         if (tc != null && mc != null && cc != null) {
-            float x = tc.getPosition().x;
-            float y = tc.getPosition().y;
+            float centerX = tc.getPosition().x;
+            float centerY = tc.getPosition().y;
             float width = cc.getWidth();
             float height = cc.getHeight();
             
+            // Calculate boundaries (transform position is center, so adjust by half width/height)
+            float halfWidth = width / 2;
+            float halfHeight = height / 2;
+            
+            float left = centerX - halfWidth;
+            float right = centerX + halfWidth;
+            float bottom = centerY - halfHeight;
+            float top = centerY + halfHeight;
+            
             // Check left and right walls
-            if (x <= 0) {
-                tc.setPosition(0, y);
+            if (left <= 0) {
+                tc.setPosition(halfWidth, centerY);
                 mc.setVelocity(Math.abs(mc.getVelocity().x), mc.getVelocity().y);
-            } else if (x + width >= worldWidth) {
-                tc.setPosition(worldWidth - width, y);
+            } else if (right >= worldWidth) {
+                tc.setPosition(worldWidth - halfWidth, centerY);
                 mc.setVelocity(-Math.abs(mc.getVelocity().x), mc.getVelocity().y);
             }
             
             // Check top and bottom walls
-            if (y <= 0) {
-                tc.setPosition(x, 0);
-                mc.setVelocity(mc.getVelocity().x, Math.abs(mc.getVelocity().y));
-            } else if (y + height >= worldHeight) {
-                tc.setPosition(x, worldHeight - height);
-                mc.setVelocity(mc.getVelocity().x, -Math.abs(mc.getVelocity().y));
+            if (bottom <= 0) { // Bottom wall
+                tc.setPosition(centerX, halfHeight);
+                mc.setVelocity(mc.getVelocity().x, Math.abs(mc.getVelocity().y)); // Bounce up
+            } else if (top >= worldHeight) { // Top wall
+                tc.setPosition(centerX, worldHeight - halfHeight);
+                mc.setVelocity(mc.getVelocity().x, -Math.abs(mc.getVelocity().y)); // Bounce down
             }
         }
     }
