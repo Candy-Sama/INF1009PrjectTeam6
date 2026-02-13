@@ -80,9 +80,16 @@ public class CollisionManager {
         TransformComponent tb = b.getComponent(TransformComponent.class);
         CollisionComponent cb = b.getComponent(CollisionComponent.class);
 
-        // Update reusable rectangles with current positions
-        rectA.set(ta.getPosition().x, ta.getPosition().y, ca.getWidth(), ca.getHeight());
-        rectB.set(tb.getPosition().x, tb.getPosition().y, cb.getWidth(), cb.getHeight());
+        // Transform position is CENTER, so calculate top-left corner for AABB
+        float aLeft = ta.getPosition().x - ca.getWidth() / 2;
+        float aBottom = ta.getPosition().y - ca.getHeight() / 2;
+        
+        float bLeft = tb.getPosition().x - cb.getWidth() / 2;
+        float bBottom = tb.getPosition().y - cb.getHeight() / 2;
+
+        // Update reusable rectangles with adjusted positions
+        rectA.set(aLeft, aBottom, ca.getWidth(), ca.getHeight());
+        rectB.set(bLeft, bBottom, cb.getWidth(), cb.getHeight());
 
         return rectA.overlaps(rectB);
     }
