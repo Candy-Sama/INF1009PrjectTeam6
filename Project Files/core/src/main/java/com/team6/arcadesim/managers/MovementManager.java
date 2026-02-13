@@ -9,6 +9,10 @@ import com.team6.arcadesim.ecs.Entity;
 
 public class MovementManager {
 
+    /**
+     * The Main Physics Loop.
+     * Called by AbstractGameMaster every frame.
+     */
     public void update(float dt, List<Entity> entities) {
         for (Entity entity : entities) {
             if (!entity.hasComponent(MovementComponent.class) || 
@@ -26,6 +30,10 @@ public class MovementManager {
         }
     }
 
+    /**
+     * External control method (e.g., called by Input logic).
+     * Sets the velocity immediately.
+     */
     public void moveEntity(Entity e, Vector2 direction) {
         if (e.hasComponent(MovementComponent.class)) {
             MovementComponent mc = e.getComponent(MovementComponent.class);

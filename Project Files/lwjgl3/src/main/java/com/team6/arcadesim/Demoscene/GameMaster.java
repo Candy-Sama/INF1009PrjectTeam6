@@ -4,8 +4,12 @@ import com.team6.arcadesim.AbstractGameMaster;
 import com.team6.arcadesim.Demoscene.Scenes.DemoScene;
 import com.team6.arcadesim.managers.CollisionManager;
 import com.team6.arcadesim.managers.EntityManager;
+import com.team6.arcadesim.managers.InputManager;
 import com.team6.arcadesim.managers.MovementManager;
 import com.team6.arcadesim.managers.RenderManager;
+import com.team6.arcadesim.managers.SceneManager;
+import com.team6.arcadesim.managers.SoundManager;
+import com.team6.arcadesim.managers.ViewportManager;
 
 public class GameMaster extends AbstractGameMaster {
 
@@ -17,7 +21,7 @@ public class GameMaster extends AbstractGameMaster {
     @Override
     public void update(float dt) {
         if (sceneManager.getCurrentScene() != null) {
-            sceneManager.getCurrentScene().update(dt);
+            sceneManager.getCurrentScene().update(dt); // Tells DemoScene to run Movement & Collision
         }
     }
 
@@ -37,12 +41,20 @@ public class GameMaster extends AbstractGameMaster {
         return renderManager; 
     }
 
-    public com.team6.arcadesim.managers.ViewportManager getViewportManager() {
+    public ViewportManager getViewportManager() {
         return viewportManager;
     }
 
-    public com.team6.arcadesim.managers.SoundManager getSoundManager() {
+    public SoundManager getSoundManager() {
         return soundManager;
+    }
+
+    public InputManager getInputManager() {
+        return inputManager;
+    }
+
+    public SceneManager getSceneManager() {
+        return sceneManager;
     }
 
     @Override
