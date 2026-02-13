@@ -15,19 +15,16 @@ public class SoundManager implements Disposable {
     private float musicVolume = 1.0f;
     private String playingMusicId;
 
-    // --- Storage (The Library) ---
     private Map<String, AudioClip> soundLibrary;
 
     public SoundManager() {
         this.soundLibrary = new HashMap<>();
         
-        // --- DEFAULT HANDLER (Bridge Implementation) ---
-        // In a full engine, this might be a separate class 'LibGDXAudioHandler'
         this.audioHandler = new AudioHandler() {
             private com.badlogic.gdx.audio.Music currentMusic;
 
             @Override
-            public void init() { /* LibGDX audio is static, no init needed */ }
+            public void init() { }
 
             @Override
             public void playSFX(AudioClip clip, float volume) {
@@ -38,7 +35,7 @@ public class SoundManager implements Disposable {
 
             @Override
             public void playMusic(AudioClip clip, boolean loop, float volume) {
-                stopMusic(); // Stop old music first
+                stopMusic();
                 if (clip != null && clip.isMusic()) {
                     currentMusic = clip.getMusic();
                     currentMusic.setLooping(loop);
@@ -56,7 +53,6 @@ public class SoundManager implements Disposable {
 
             @Override
             public void setVolume(AudioClip clip, float volume) {
-                // Not easily applicable to fire-and-forget SFX, mostly for music
                 if (currentMusic != null && clip.isMusic() && clip.getMusic() == currentMusic) {
                     currentMusic.setVolume(volume);
                 }
@@ -71,11 +67,6 @@ public class SoundManager implements Disposable {
         audioHandler.init();
     }
 
-    // --- Public API ---
-
-    /**
-     * Loads a sound into memory so it can be played by string ID.
-     */
     public void preload(String id, AudioClip clip) {
         soundLibrary.put(id, clip);
     }
@@ -83,7 +74,6 @@ public class SoundManager implements Disposable {
     public void playSFX(String id) {
         AudioClip clip = soundLibrary.get(id);
         if (clip != null) {
-            // Calculate final volume: Master * SFX
             float finalVol = masterVolume * sfxVolume;
             audioHandler.playSFX(clip, finalVol);
         } else {
@@ -110,8 +100,7 @@ public class SoundManager implements Disposable {
     // --- Volume Controls ---
 
     public void setMasterVolume(float v) {
-        this.masterVolume = Math.max(0, Math.min(1, v)); // Clamp 0.0 to 1.0
-        // Update currently playing music volume immediately
+        this.masterVolume = Math.max(0, Math.min(1, v));
         if (playingMusicId != null) {
             AudioClip clip = soundLibrary.get(playingMusicId);
             audioHandler.setVolume(clip, masterVolume * musicVolume);

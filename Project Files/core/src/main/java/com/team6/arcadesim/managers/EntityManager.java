@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 public class EntityManager {
 
-    // Thread-safe list to prevent crashes when removing entities during the game loop
     private List<Entity> entities;
 
     public EntityManager() {
@@ -35,11 +34,6 @@ public class EntityManager {
         return entities;
     }
 
-    /**
-     * The "Star Player" method for ECS performance.
-     * Returns only entities that have ALL the specified component types.
-     * Usage: getEntitiesFor(MovementComponent.class, TransformComponent.class)
-     */
     @SafeVarargs
     public final List<Entity> getEntitiesFor(Class<? extends Component>... componentTypes) {
         List<Entity> result = new ArrayList<>();

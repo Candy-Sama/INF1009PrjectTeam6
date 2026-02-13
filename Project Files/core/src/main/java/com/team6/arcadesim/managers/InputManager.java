@@ -17,15 +17,9 @@ public class InputManager {
         Gdx.input.setInputProcessor(inputHandler);
     }
 
-    /**
-     * Called at the end of every frame (in AbstractGameMaster.render)
-     * to clear the "JustPressed" flags.
-     */
     public void update() {
         inputState.reset();
     }
-
-    // --- Public API for Entities/Scenes ---
 
     public boolean isKeyDown(int keycode) {
         return inputState.isKeyDown(keycode);
