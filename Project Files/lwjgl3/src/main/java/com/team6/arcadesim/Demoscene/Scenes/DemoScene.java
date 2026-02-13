@@ -1,12 +1,14 @@
-package com.team6.arcadesim.scenes;
+package com.team6.arcadesim.Demoscene.Scenes;
 
 import java.util.List;
 
-import com.team6.arcadesim.GameMaster;
+import com.team6.arcadesim.Demoscene.GameMaster;
+import com.team6.arcadesim.components.CollisionComponent;
 import com.team6.arcadesim.components.MovementComponent;
 import com.team6.arcadesim.components.SpriteComponent;
 import com.team6.arcadesim.components.TransformComponent;
 import com.team6.arcadesim.ecs.Entity;
+import com.team6.arcadesim.scenes.AbstractScene;
 
 public class DemoScene extends AbstractScene {
 
@@ -45,6 +47,8 @@ public class DemoScene extends AbstractScene {
 
             testObject.addComponent(new MovementComponent(speedX, speedY));
             testObject.addComponent(new SpriteComponent("pixel_square.png", 32, 32));
+            testObject.addComponent(new CollisionComponent(32,32, true, false));
+            
             
             // The manager handles the list
             gameMaster.getEntityManager().addEntity(testObject);
@@ -89,7 +93,7 @@ public class DemoScene extends AbstractScene {
         List<Entity> entities = gameMaster.getEntityManager().getAllEntities();
         
         // Tell the RenderManager (or IOManager) to draw them
-        gameMaster.getRenderManager().render(entities, deltaTime);
+        gameMaster.getRenderManager().render(entities);
     }
 
 }
