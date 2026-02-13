@@ -21,15 +21,10 @@ public class CubeCollision implements CollisionResolver {
 
     @Override
     public void resolve(Entity a, Entity b) {
-        // Custom collision resolution logic for cubes
-        // For example, stop movement or bounce off each other
-
-        //Code to get the movement components and adjust positions/speeds accordingly
         MovementComponent ma = a.getComponent(MovementComponent.class);
         MovementComponent mb = b.getComponent(MovementComponent.class);
 
         if (ma != null && mb != null) {
-            // Example: simple bounce effect by reversing velocities
             Vector2 tempVelocity = ma.getVelocity().cpy();
 
             ma.setVelocity(mb.getVelocity());
@@ -37,10 +32,6 @@ public class CubeCollision implements CollisionResolver {
         }
     }
 
-    /**
-     * Handles wall bouncing for a single entity
-     * Transform position represents the CENTER of the sprite
-     */
     public void checkWallBounce(Entity entity) {
         TransformComponent tc = entity.getComponent(TransformComponent.class);
         MovementComponent mc = entity.getComponent(MovementComponent.class);
