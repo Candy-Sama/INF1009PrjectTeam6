@@ -7,25 +7,17 @@ import com.team6.arcadesim.managers.EntityManager;
 import com.team6.arcadesim.managers.MovementManager;
 import com.team6.arcadesim.managers.RenderManager;
 
-/**
- * Concrete implementation of AbstractGameMaster.
- * This is a placeholder class; actual game logic should be implemented here.
- */
 public class GameMaster extends AbstractGameMaster {
 
     @Override
     public void init() {
-        // Initialize the game here
-        // Example: Load initial scene, set up entities, etc.
         sceneManager.setScene(new DemoScene(this));
     }
 
     @Override
     public void update(float dt) {
-        // Game-specific update logic
-        // Example: Process input and convert to entity actions
         if (sceneManager.getCurrentScene() != null) {
-            sceneManager.getCurrentScene().update(dt); // Tells DemoScene to run Movement & Collision
+            sceneManager.getCurrentScene().update(dt);
         }
     }
 
@@ -51,10 +43,6 @@ public class GameMaster extends AbstractGameMaster {
 
     public com.team6.arcadesim.managers.SoundManager getSoundManager() {
         return soundManager;
-    }
-
-    public com.team6.arcadesim.managers.SceneManager getSceneManager() {
-        return sceneManager;
     }
 
     @Override
