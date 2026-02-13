@@ -125,6 +125,8 @@ public class DemoScene extends AbstractScene {
 
     @Override
     public void update(float deltaTime) {
+
+
         // Get the list of entities from the Entity Manager
         List<Entity> entities = gameMaster.getEntityManager().getAllEntities();
 
@@ -138,10 +140,11 @@ public class DemoScene extends AbstractScene {
 
         // Entity-to-entity collision
         gameMaster.getCollisionManager().update(deltaTime, entities);
+        
 
         //Check for P key to pause
         if (gameMaster.getInputManager().isKeyJustPressed(com.badlogic.gdx.Input.Keys.P)) {
-            System.out.println("P pressed - Pausing Game");
+           
             // Push the pause scene on top of the demo scene
             gameMaster.getSceneManager().pushScene(new PauseScene(gameMaster));
         }
