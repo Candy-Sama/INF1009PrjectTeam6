@@ -63,6 +63,7 @@ public class ViewportManager {
 
     public void apply() {
         viewport.apply();
+        camera.update();  // Update camera matrix every frame
         // Set the projection matrix for the RenderManager's batch if needed
         // (Usually handled in the RenderManager by calling batch.setProjectionMatrix(camera.combined))
     }

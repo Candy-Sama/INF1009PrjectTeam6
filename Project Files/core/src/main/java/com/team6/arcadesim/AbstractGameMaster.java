@@ -87,7 +87,7 @@ public abstract class AbstractGameMaster implements ApplicationListener {
         // Apply viewport (camera) settings
         viewportManager.apply();
         
-        // Render the current scene (which will call RenderManager internally)
+        // Render the current scene (which will call RenderManager with the camera)
         if (sceneManager.getCurrentScene() != null) {
             sceneManager.getCurrentScene().render(deltaTime);
         }
