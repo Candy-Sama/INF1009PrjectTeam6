@@ -103,7 +103,7 @@ public class DemoScene extends AbstractScene {
         List<Entity> entities = gameMaster.getEntityManager().getAllEntities();
         
         // Tell the RenderManager (or IOManager) to draw them
-        gameMaster.getRenderManager().render(deltaTime, entities);
+        gameMaster.getRenderManager().render(entities);
     }
 
 }
