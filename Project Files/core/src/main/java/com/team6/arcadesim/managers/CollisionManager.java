@@ -12,18 +12,16 @@ import com.team6.arcadesim.interfaces.CollisionResolver;
 
 public class CollisionManager {
 
-    //Sets up a list of collision listeners and a resolver to handle collisions
     private List<CollisionListener> listeners;
     private CollisionResolver resolver;
     
-    // Reusable rectangles to avoid creating "garbage" every frame (Memory Optimization)
+    // Reusable rectangles for collision checks
     private Rectangle rectA = new Rectangle();
     private Rectangle rectB = new Rectangle();
 
     public CollisionManager() {
         this.listeners = new ArrayList<>();
-        // Default resolver: Stop the entity
-        this.resolver = (a, b) -> { /* Default: Do nothing or implement simple stop */ };
+        this.resolver = (a, b) -> { };
     }
 
     public void setResolver(CollisionResolver resolver) {
@@ -39,7 +37,7 @@ public class CollisionManager {
     }
 
     public void update(float dt, List<Entity> entities) {
-        // Simple N^2 check. For production games with 1000+ entities, use a QuadTree.
+        // N^2 collision check
         for (int i = 0; i < entities.size(); i++) {
             Entity a = entities.get(i);
             if (!isValid(a)) continue;
@@ -53,18 +51,15 @@ public class CollisionManager {
 
 
                 if (checkCollision(a, b)) {
-                    // 1. Notify Observers
                     for (CollisionListener listener : listeners) {
                         listener.onCollisionStart(a, b);
                     }
                     
-                    // 2. Resolve Collision if both are solid and not triggers
                     if (ca.isSolid() && cb.isSolid() && !ca.isTrigger() && !cb.isTrigger()) {
                         resolver.resolve(a, b);
                     }
                 }
                 else {
-                    // Notify Observers about collision end
                     for (CollisionListener listener : listeners) {
                         listener.onCollisionEnd(a, b);
                     }
@@ -80,14 +75,13 @@ public class CollisionManager {
         TransformComponent tb = b.getComponent(TransformComponent.class);
         CollisionComponent cb = b.getComponent(CollisionComponent.class);
 
-        // Transform position is CENTER, so calculate top-left corner for AABB
+        // Calculate AABB from center position
         float aLeft = ta.getPosition().x - ca.getWidth() / 2;
         float aBottom = ta.getPosition().y - ca.getHeight() / 2;
         
         float bLeft = tb.getPosition().x - cb.getWidth() / 2;
         float bBottom = tb.getPosition().y - cb.getHeight() / 2;
 
-        // Update reusable rectangles with adjusted positions
         rectA.set(aLeft, aBottom, ca.getWidth(), ca.getHeight());
         rectB.set(bLeft, bBottom, cb.getWidth(), cb.getHeight());
 

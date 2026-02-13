@@ -111,6 +111,20 @@ public class DemoScene extends AbstractScene {
     }
 
     @Override
+    public void onPause() {
+        // Called when pause menu is pushed on top
+        System.out.println("Pausing " + SCENE_NAME);
+        // Could pause music here if needed
+    }
+
+    @Override
+    public void onResume() {
+        // Called when returning from pause menu
+        System.out.println("Resuming " + SCENE_NAME);
+        // Could resume music here if needed
+    }
+
+    @Override
     public void dispose() {
         // Dispose of any resources specific to this scene      
         System.out.println("Disposing " + SCENE_NAME);
@@ -125,6 +139,14 @@ public class DemoScene extends AbstractScene {
 
     @Override
     public void update(float deltaTime) {
+        // Check for pause input
+        if (com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.ESCAPE) ||
+            com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.P)) {
+            // Push pause menu on top of this scene
+            gameMaster.getSceneManager().pushScene(new PauseMenuScene(gameMaster));
+            return; // Don't update game while pausing
+        }
+
         // Get the list of entities from the Entity Manager
         List<Entity> entities = gameMaster.getEntityManager().getAllEntities();
 

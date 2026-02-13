@@ -53,6 +53,10 @@ public class GameMaster extends AbstractGameMaster {
         return soundManager;
     }
 
+    public com.team6.arcadesim.managers.SceneManager getSceneManager() {
+        return sceneManager;
+    }
+
     @Override
     public void render() {
         // Clear the screen
