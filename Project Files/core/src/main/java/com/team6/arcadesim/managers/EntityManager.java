@@ -26,6 +26,12 @@ public class EntityManager {
     public void removeEntity(Entity e) {
         entities.remove(e);
     }
+
+    public Entity createEntity() {
+        Entity e = new Entity() {};
+        entities.add(e);
+        return e;
+    }
     
     public void removeAll() {
         entities.clear();
