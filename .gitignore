@@ -168,3 +168,6 @@ Project Files/core/build/tmp/jar/MANIFEST.MF
 Project Files/lwjgl3/build/tmp/compileJava/previous-compilation-data.bin
 Project Files/core/build/libs/core-1.0.0.jar
 
+/Project Files/core/build/libs
+/Project Files/core/build
+/Project Files/core
