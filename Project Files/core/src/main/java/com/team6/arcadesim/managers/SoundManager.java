@@ -100,6 +100,24 @@ public class SoundManager implements Disposable {
         playingMusicId = null;
     }
 
+    public void pauseMusic() {
+        if (playingMusicId != null) {
+            AudioClip clip = soundLibrary.get(playingMusicId);
+            if (clip != null && clip.isMusic()) {
+                clip.getMusic().pause();
+            }
+        }
+    }
+
+    public void resumeMusic() {
+        if (playingMusicId != null) {
+            AudioClip clip = soundLibrary.get(playingMusicId);
+            if (clip != null && clip.isMusic()) {
+                clip.getMusic().play();
+            }
+        }
+    }
+
     // --- Volume Controls ---
 
     public void setMasterVolume(float v) {

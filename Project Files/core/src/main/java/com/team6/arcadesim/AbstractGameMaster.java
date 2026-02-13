@@ -1,7 +1,6 @@
 package com.team6.arcadesim;
 
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ApplicationListener;
 import com.team6.arcadesim.managers.CollisionManager;
 import com.team6.arcadesim.managers.EntityManager;
 import com.team6.arcadesim.managers.InputManager;
@@ -10,8 +9,6 @@ import com.team6.arcadesim.managers.RenderManager;
 import com.team6.arcadesim.managers.SceneManager;
 import com.team6.arcadesim.managers.SoundManager;
 import com.team6.arcadesim.managers.ViewportManager;
-import com.team6.arcadesim.ecs.Entity;
-import com.badlogic.gdx.ApplicationListener;
 
 public abstract class AbstractGameMaster implements ApplicationListener {
 
@@ -66,26 +63,19 @@ public abstract class AbstractGameMaster implements ApplicationListener {
 
         // Cap deltaTime to prevent "spiraling" physics on slow frames (max 0.1s)
         if (deltaTime > 0.1f) deltaTime = 0.1f;
-
-        // --- 2. Input Phase ---
-        // Clears "JustPressed" flags from the previous frame
-        inputManager.update(); 
         
-        // --- 3. Game Logic Phase ---
+        // --- 2. Game Logic Phase ---
         // a. Global game update (defined in subclass)
         update(deltaTime);
+
+        // --- 3. Input Phase ---
+        // Clears "JustPressed" flags from the previous frame
+        inputManager.update(); 
         
         // b. Active Scene update
         sceneManager.update(deltaTime);
 
-        // --- 4. Physics & Collision Phase ---
-        // Get all active entities once to save performance
-        java.util.List<Entity> entities = entityManager.getAllEntities();
-
-        movementManager.update(deltaTime, entities);
-        collisionManager.update(deltaTime, entities);
-
-        // --- 5. Render Phase ---
+        // --- 4. Render Phase ---
         // Apply viewport (camera) settings
         viewportManager.apply();
         
