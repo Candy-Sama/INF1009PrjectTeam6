@@ -8,7 +8,9 @@ import com.team6.arcadesim.components.CollisionComponent;
 import com.team6.arcadesim.components.MovementComponent;
 import com.team6.arcadesim.components.SpriteComponent;
 import com.team6.arcadesim.components.TransformComponent;
+import com.team6.arcadesim.ecs.AudioClip;
 import com.team6.arcadesim.ecs.Entity;
+import com.team6.arcadesim.interfaces.CollisionListener;
 import com.team6.arcadesim.scenes.AbstractScene;
 
 public class DemoScene extends AbstractScene {
@@ -38,9 +40,44 @@ public class DemoScene extends AbstractScene {
         // Initialize scene resources, entities, etc.
         System.out.println("Entering " + SCENE_NAME);
 
-        // Set up collision resolver
+        // Load boop sound effect with error handling
+        try {
+            com.badlogic.gdx.audio.Sound boopSound = com.badlogic.gdx.Gdx.audio.newSound(
+                com.badlogic.gdx.Gdx.files.internal("boop.mp3")
+            );
+            AudioClip boopClip = new AudioClip(boopSound);
+            gameMaster.getSoundManager().preload("boop", boopClip);
+            System.out.println("Boop sound loaded successfully!");
+        } catch (Exception e) {
+            System.err.println("Failed to load boop sound: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        com.badlogic.gdx.audio.Music demoMusic = com.badlogic.gdx.Gdx.audio.newMusic(
+            com.badlogic.gdx.Gdx.files.internal("ArcadeMusic.mp3")
+        );
+
+        // Set up collision resolver (handles physics only)
         cubeCollision = new com.team6.arcadesim.Demoscene.Managers.CubeCollision(sceneResolution.x, sceneResolution.y);
         gameMaster.getCollisionManager().setResolver(cubeCollision);
+
+        // Add collision listener for sound effects (separation of concerns)
+        gameMaster.getCollisionManager().addCollisionListener(new CollisionListener() {
+            @Override
+            public void onCollisionStart(Entity a, Entity b) {
+                // Play boop sound when collision starts
+                gameMaster.getSoundManager().playSFX("boop");
+            }
+
+            @Override
+            public void onCollisionEnd(Entity a, Entity b) {
+                // Optional: handle collision end if needed
+            }
+        });
+        // Play background music
+        AudioClip musicClip = new AudioClip(demoMusic);
+        gameMaster.getSoundManager().preload("demoMusic", musicClip);
+        gameMaster.getSoundManager().playMusic("demoMusic", true);
 
         // Random placement of entities
         for (int i = 0; i < 10; i++) {
@@ -59,7 +96,7 @@ public class DemoScene extends AbstractScene {
             testObject.addComponent(new MovementComponent(speedX, speedY));
             testObject.addComponent(new SpriteComponent("pixel_square.png", 32, 32));
             testObject.addComponent(new CollisionComponent(32,32, true, false));
-            
+                        
             
             // The manager handles the list
             gameMaster.getEntityManager().addEntity(testObject);

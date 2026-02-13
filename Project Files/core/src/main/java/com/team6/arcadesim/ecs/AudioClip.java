@@ -1,12 +1,11 @@
 package com.team6.arcadesim.ecs;
 
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.utils.Disposable;
 
 /**
  * A wrapper class that can hold either a Sound (SFX) or Music (Streaming).
- * Matches the "AudioClip" box in your UML.
  */
 public class AudioClip implements Disposable {
     private Sound sound;
