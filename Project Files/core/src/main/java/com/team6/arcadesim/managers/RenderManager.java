@@ -2,12 +2,13 @@ package com.team6.arcadesim.managers;
 
 import java.util.List;
 
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;
 import com.team6.arcadesim.components.SpriteComponent;
 import com.team6.arcadesim.components.TransformComponent;
 import com.team6.arcadesim.ecs.Entity;
-import com.badlogic.gdx.graphics.Texture;
 
 
 public class RenderManager implements Disposable {
@@ -21,13 +22,18 @@ public class RenderManager implements Disposable {
 
     /**
      * The Main Render Loop.
-     * Called by AbstractGameMaster inside render().
+     * Called by scenes with the camera passed from AbstractGameMaster via GameMaster.
      */
-    public void render(float dt, List<Entity> entities) {
+    public void render(float dt, List<Entity> entities, OrthographicCamera camera) {
+        // Ensure camera is set right before rendering
+        if (camera != null) {
+            batch.setProjectionMatrix(camera.combined);
+        }
+        
         batch.begin();
 
         for (Entity entity : entities) {
-            // 1. Safety Check: Entity must have Position (Transform) AND Looks (Sprite)
+            // 1. Check: Entity must have Position (Transform) AND Looks (Sprite)
             if (!entity.hasComponent(TransformComponent.class) || 
                 !entity.hasComponent(SpriteComponent.class)) {
                 continue;
@@ -65,9 +71,9 @@ public class RenderManager implements Disposable {
                 x, y,                  // Position on screen
                 originX, originY,      // Rotation Origin (Center)
                 width, height,         // Size to draw
-                1, 1,                  // Scale (1 = 100%)
+                1, 1,   // Scale (1 = 100%)
                 rotation,              // Rotation in degrees
-                0, 0,                  // Source X, Source Y (Start of image)
+                0, 0,       // Source X, Source Y (Start of image)
                 srcWidth, srcHeight,   // Source Width, Source Height (Full image)
                 sc.isFlipX(),          // Flip Horizontal?
                 sc.isFlipY()           // Flip Vertical?

@@ -33,7 +33,7 @@ public class DemoScene extends AbstractScene {
         System.out.println("Entering " + SCENE_NAME);
 
         // Set up collision resolver
-        cubeCollision = new com.team6.arcadesim.Demoscene.Managers.CubeCollision(800, 600);
+        cubeCollision = new com.team6.arcadesim.Demoscene.Managers.CubeCollision(1280, 720);
         gameMaster.getCollisionManager().setResolver(cubeCollision);
 
         // Random placement of entities
@@ -41,8 +41,8 @@ public class DemoScene extends AbstractScene {
             Entity testObject = new TestEntity();
             
             // random positions
-            float randomX = (float) Math.random() * 800;
-            float randomY = (float) Math.random() * 600;
+            float randomX = (float) Math.random() * 1280;
+            float randomY = (float) Math.random() * 720;
             
             testObject.addComponent(new TransformComponent(randomX, randomY));
 
@@ -102,8 +102,8 @@ public class DemoScene extends AbstractScene {
         // Get the entities again for the renderer
         List<Entity> entities = gameMaster.getEntityManager().getAllEntities();
         
-        // Tell the RenderManager (or IOManager) to draw them
-        gameMaster.getRenderManager().render(deltaTime, entities);
+        // Tell the RenderManager to draw them with the camera
+        gameMaster.getRenderManager().render(deltaTime, entities, gameMaster.getViewportManager().getCamera());
     }
 
 }

@@ -45,16 +45,17 @@ public class GameMaster extends AbstractGameMaster {
         return renderManager; 
     }
 
+    public com.team6.arcadesim.managers.ViewportManager getViewportManager() {
+        return viewportManager;
+    }
+
     @Override
     public void render() {
+        // Clear the screen
         com.badlogic.gdx.utils.ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-        float dt = com.badlogic.gdx.Gdx.graphics.getDeltaTime();
         
-        this.update(dt); 
-        
-        if (sceneManager.getCurrentScene() != null) {
-            sceneManager.getCurrentScene().render(dt);
-        }
+        // Let AbstractGameMaster handle the rest (camera setup, rendering, etc.)
+        super.render();
     }
 
 }
