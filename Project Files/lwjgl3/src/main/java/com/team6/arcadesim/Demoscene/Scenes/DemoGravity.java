@@ -1,23 +1,20 @@
 package com.team6.arcadesim.Demoscene.Scenes;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.team6.arcadesim.AbstractGameMaster;
+import com.team6.arcadesim.Demoscene.GameMaster;
+import com.team6.arcadesim.Demoscene.CollisionListener.DemoCollisionListener;
 import com.team6.arcadesim.components.CollisionComponent;
 import com.team6.arcadesim.components.MovementComponent;
 import com.team6.arcadesim.components.SpriteComponent;
 import com.team6.arcadesim.components.TransformComponent;
+import com.team6.arcadesim.ecs.AudioClip;
 import com.team6.arcadesim.ecs.Entity;
 import com.team6.arcadesim.interfaces.CollisionResolver;
-import com.team6.arcadesim.interfaces.CollisionListener;
 import com.team6.arcadesim.scenes.AbstractScene;
-import com.team6.arcadesim.Demoscene.GameMaster;
-import com.team6.arcadesim.Demoscene.CollisionListener.DemoCollisionListener;
-import com.team6.arcadesim.Demoscene.Managers.RubberCollision;
-import com.team6.arcadesim.AbstractGameMaster;
-import com.team6.arcadesim.ecs.AudioClip;
 
 public class DemoGravity extends AbstractScene {
     private Texture blockTexture;

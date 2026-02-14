@@ -2,13 +2,10 @@ package com.team6.arcadesim.managers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.team6.arcadesim.ecs.Component;
 import com.team6.arcadesim.ecs.Entity;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 public class EntityManager {
 
