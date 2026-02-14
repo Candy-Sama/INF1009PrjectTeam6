@@ -2,8 +2,12 @@ package com.team6.arcadesim.Demoscene.Scenes;
 
 import java.util.List;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Vector2;
 import com.team6.arcadesim.Demoscene.GameMaster;
+import com.team6.arcadesim.Demoscene.Managers.CubeCollision;
 import com.team6.arcadesim.components.CollisionComponent;
 import com.team6.arcadesim.components.MovementComponent;
 import com.team6.arcadesim.components.SpriteComponent;
@@ -17,7 +21,7 @@ public class DemoScene extends AbstractScene {
 
     private static final String SCENE_NAME = "DemoScene";
     private GameMaster gameMaster;
-    private com.team6.arcadesim.Demoscene.Managers.CubeCollision cubeCollision;
+    private CubeCollision cubeCollision;
     private Vector2 sceneResolution = new Vector2(1280, 720);
 
     public DemoScene(GameMaster gameMaster) {
@@ -42,8 +46,8 @@ public class DemoScene extends AbstractScene {
 
         // Load boop sound effect with error handling
         try {
-            com.badlogic.gdx.audio.Sound boopSound = com.badlogic.gdx.Gdx.audio.newSound(
-                com.badlogic.gdx.Gdx.files.internal("boop.mp3")
+            Sound boopSound = Gdx.audio.newSound(
+                Gdx.files.internal("boop.mp3")
             );
             AudioClip boopClip = new AudioClip(boopSound);
             gameMaster.getSoundManager().preload("boop", boopClip);
@@ -53,12 +57,12 @@ public class DemoScene extends AbstractScene {
             e.printStackTrace();
         }
 
-        com.badlogic.gdx.audio.Music demoMusic = com.badlogic.gdx.Gdx.audio.newMusic(
-            com.badlogic.gdx.Gdx.files.internal("ArcadeMusic.mp3")
+        Music demoMusic = Gdx.audio.newMusic(
+            Gdx.files.internal("ArcadeMusic.mp3")
         );
 
         // Set up collision resolver (handles physics only)
-        cubeCollision = new com.team6.arcadesim.Demoscene.Managers.CubeCollision(sceneResolution.x, sceneResolution.y);
+        cubeCollision = new CubeCollision(sceneResolution.x, sceneResolution.y);
         gameMaster.getCollisionManager().setResolver(cubeCollision);
 
         // Add collision listener for sound effects (separation of concerns)
