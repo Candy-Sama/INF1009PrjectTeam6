@@ -16,5 +16,6 @@
         "other": true,
         "comments": false,
         "strings": false
-    }
+    },
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
