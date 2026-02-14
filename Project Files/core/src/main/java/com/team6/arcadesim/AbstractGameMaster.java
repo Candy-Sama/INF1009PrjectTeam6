@@ -2,7 +2,6 @@ package com.team6.arcadesim;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.team6.arcadesim.managers.CollisionManager;
-import com.team6.arcadesim.managers.EntityManager;
 import com.team6.arcadesim.managers.InputManager;
 import com.team6.arcadesim.managers.MovementManager;
 import com.team6.arcadesim.managers.RenderManager;
@@ -12,31 +11,26 @@ import com.team6.arcadesim.managers.ViewportManager;
 
 public abstract class AbstractGameMaster implements ApplicationListener {
 
-    // --- State Variables ---
     private boolean isRunning;
     private float deltaTime;
     private long lastFrameTime;
 
-    // --- The Subsystems (Protected for inheritance) ---
+    // --- The Subsystems (Stateless Tools) ---
     protected SceneManager sceneManager;
     protected ViewportManager viewportManager;
-    protected EntityManager entityManager;
     protected InputManager inputManager;
     protected MovementManager movementManager;
     protected CollisionManager collisionManager;
     protected RenderManager renderManager;
     protected SoundManager soundManager;
 
-    // --- Abstract Hooks (For the specific game to implement) ---
     public abstract void init();
     public abstract void update(float dt);
 
     @Override
     public void create() {
-        // 1. Initialize all Managers
-        // Note: Order matters slightly (e.g., RenderManager needs to exist before we draw)
+        // 1. Initialize Tools
         viewportManager = new ViewportManager();
-        entityManager = new EntityManager();
         inputManager = new InputManager();
         movementManager = new MovementManager();
         collisionManager = new CollisionManager();
@@ -44,11 +38,9 @@ public abstract class AbstractGameMaster implements ApplicationListener {
         soundManager = new SoundManager();
         sceneManager = new SceneManager();
 
-        // 2. Initial State
         isRunning = true;
         lastFrameTime = System.nanoTime();
 
-        // 3. Call the abstract init() so the subclass can load assets/scenes
         init();
     }
 
@@ -56,59 +48,36 @@ public abstract class AbstractGameMaster implements ApplicationListener {
     public void render() {
         if (!isRunning) return;
 
-        // --- 1. Time Management ---
         long time = System.nanoTime();
-        deltaTime = (time - lastFrameTime) / 1_000_000_000.0f; // Convert ns to seconds
+        deltaTime = (time - lastFrameTime) / 1_000_000_000.0f;
         lastFrameTime = time;
-
-        // Cap deltaTime to prevent "spiraling" physics on slow frames (max 0.1s)
         if (deltaTime > 0.1f) deltaTime = 0.1f;
-        
-        // --- 2. Game Logic Phase ---
-        // a. Global game update (defined in subclass)
-        update(deltaTime);
 
-        // --- 3. Input Phase ---
-        // Clears "JustPressed" flags from the previous frame
-        inputManager.update(); 
-        
-        // b. Active Scene update
-        sceneManager.update(deltaTime);
+        // 1. Logic Phase
+        update(deltaTime); // Global update
+        sceneManager.update(deltaTime); // Updates ONLY the top scene
+        inputManager.update();
 
-        // --- 4. Render Phase ---
-        // Apply viewport (camera) settings
+        // 2. Render Phase
         viewportManager.apply();
         
-        // Render the current scene (which will call RenderManager with the camera)
-        if (sceneManager.getCurrentScene() != null) {
-            sceneManager.getCurrentScene().render(deltaTime);
-        }
+        // Delegate rendering entirely to SceneManager
+        // This allows it to draw the background scenes behind the pause menu
+        sceneManager.render(deltaTime);
     }
-
-    @Override
-    public void resize(int width, int height) {
-        if (viewportManager != null) {
-            viewportManager.resize(width, height);
-        }
-    }
-
-    @Override
-    public void pause() {
-        isRunning = false;
-    }
-
-    @Override
-    public void resume() {
-        isRunning = true;
-        lastFrameTime = System.nanoTime(); // Reset time to prevent huge delta jump
-    }
-
-    @Override
-    public void dispose() {
-        // Clean up all heavy resources
-        if (renderManager != null) renderManager.dispose();
-        if (sceneManager != null) sceneManager.dispose();
-        // SoundManager doesn't strictly need dispose if it just holds audio references, 
-        // but if you added one, call it here.
-    }
+    
+    // ... (Keep resize, pause, resume, dispose as they were) ...
+    @Override public void resize(int width, int height) { if (viewportManager != null) viewportManager.resize(width, height); }
+    @Override public void pause() { isRunning = false; }
+    @Override public void resume() { isRunning = true; lastFrameTime = System.nanoTime(); }
+    @Override public void dispose() { if (renderManager != null) renderManager.dispose(); if (sceneManager != null) sceneManager.dispose(); }
+    
+    // --- Getters for Tools (So Scenes can borrow them) ---
+    public MovementManager getMovementManager() { return movementManager; }
+    public CollisionManager getCollisionManager() { return collisionManager; }
+    public RenderManager getRenderManager() { return renderManager; }
+    public SoundManager getSoundManager() { return soundManager; }
+    public InputManager getInputManager() { return inputManager; }
+    public ViewportManager getViewportManager() { return viewportManager; }
+    public SceneManager getSceneManager() { return sceneManager; }
 }
