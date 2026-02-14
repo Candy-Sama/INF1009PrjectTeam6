@@ -97,4 +97,10 @@ public class CollisionManager {
         return e.hasComponent(TransformComponent.class) && 
                e.hasComponent(CollisionComponent.class);
     }
+
+    public void reset() {
+        listeners.clear();
+        // Reset to a safe default (do nothing)
+        this.resolver = (a, b) -> {}; 
+    }
 }

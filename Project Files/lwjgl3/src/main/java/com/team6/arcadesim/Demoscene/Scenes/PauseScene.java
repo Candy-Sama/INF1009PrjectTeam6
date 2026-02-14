@@ -1,112 +1,95 @@
 package com.team6.arcadesim.Demoscene.Scenes;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.team6.arcadesim.Demoscene.GameMaster;
+import com.team6.arcadesim.AbstractGameMaster; // Correct import
 import com.team6.arcadesim.scenes.AbstractScene;
-
 
 public class PauseScene extends AbstractScene {
 
-    private GameMaster gameMaster;
-
-    //For drawing pause menu
     private ShapeRenderer shapeRenderer;
     private BitmapFont font;
     private SpriteBatch spriteBatch;
-
     private boolean firstFrame = true;
 
-    // Constructor
-    public PauseScene(GameMaster gameMaster) {
+    public PauseScene(AbstractGameMaster gameMaster) {
         super(gameMaster, "PauseScene");
-        this.gameMaster = gameMaster;
     }
 
     @Override
     public void onEnter() {
-        System.out.println("Game Paused. Press P to Resume.");
-
-        //Initialize renderers and font
+        System.out.println("Game Paused.");
+        
         shapeRenderer = new ShapeRenderer();
         font = new BitmapFont();
         font.setColor(Color.WHITE);
-        font.getData().setScale(2f); // Make the font larger
+        font.getData().setScale(2f);
         spriteBatch = new SpriteBatch();
 
-        //Pause the music
         gameMaster.getSoundManager().pauseMusic();
-    }
-    @Override
-    public void onExit() {
-        System.out.println("Exiting Pause Scene.");
-
-        // Dispose of renderers and font
-        if (shapeRenderer != null) {shapeRenderer.dispose();}
-        if (font != null) {font.dispose();}
-        if (spriteBatch != null) {spriteBatch.dispose();}
-
-        //Resume the music
-        gameMaster.getSoundManager().resumeMusic();
+        firstFrame = true;
     }
 
     @Override
     public void update(float dt) {
-
-        //Skip first frame to avoid instant unpausing
         if (firstFrame) {
             firstFrame = false;
             return;
         }
         
-        //Check to see if player presses P.
-        if (com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.P)) {
-            //remove pause scene and return to demo scene
+        // Use Global Input Manager
+        if (gameMaster.getInputManager().isKeyJustPressed(Input.Keys.P)) {
             gameMaster.getSceneManager().popScene();
         }
-
-
     }
 
     @Override
     public void render(float dt) {
+        // Transparency Setup
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        //To set tranparency
-        com.badlogic.gdx.Gdx.gl.glEnable(com.badlogic.gdx.graphics.GL20.GL_BLEND);
-        com.badlogic.gdx.Gdx.gl.glBlendFunc(
-            com.badlogic.gdx.graphics.GL20.GL_SRC_ALPHA, 
-            com.badlogic.gdx.graphics.GL20.GL_ONE_MINUS_SRC_ALPHA
-        );
-
-        //Draw semi-transparent overlay
+        // Draw Overlay (Black 70%)
+        shapeRenderer.setProjectionMatrix(gameMaster.getViewportManager().getCamera().combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(new Color(0, 0, 0, 0.7f)); // Black wth 70% opacity
-        shapeRenderer.rect(0, 0, com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight());
+        shapeRenderer.setColor(new Color(0, 0, 0, 0.7f));
+        
+        // Fill the whole camera view
+        // Note: Using camera viewport size ensures it covers the game world correctly
+        float w = gameMaster.getViewportManager().getCamera().viewportWidth;
+        float h = gameMaster.getViewportManager().getCamera().viewportHeight;
+        shapeRenderer.rect(0, 0, w, h);
         shapeRenderer.end();
 
-        //Turn off transparency for text
-        com.badlogic.gdx.Gdx.gl.glDisable(com.badlogic.gdx.graphics.GL20.GL_BLEND);
+        Gdx.gl.glDisable(GL20.GL_BLEND);
 
-
+        // Draw Text
+        spriteBatch.setProjectionMatrix(gameMaster.getViewportManager().getCamera().combined);
         spriteBatch.begin();
+        
         String pauseText = "Game Paused\nPress P to Resume";
-
-        //get Screensize
-        float screenWidth = com.badlogic.gdx.Gdx.graphics.getWidth();
-        float screenHeight = com.badlogic.gdx.Gdx.graphics.getHeight();
-
-        //Measure text 
-        com.badlogic.gdx.graphics.g2d.GlyphLayout layout = new com.badlogic.gdx.graphics.g2d.GlyphLayout(font, pauseText);
-
-        //Calculate position to center text
-        float x = (screenWidth - layout.width) / 2;
-        float y = (screenHeight + layout.height) / 2;
+        GlyphLayout layout = new GlyphLayout(font, pauseText);
+        
+        // Center relative to camera
+        float x = (w - layout.width) / 2;
+        float y = (h + layout.height) / 2;
 
         font.draw(spriteBatch, pauseText, x, y);
-        
-
         spriteBatch.end();
+    }
+
+    @Override
+    public void onExit() {
+        if (shapeRenderer != null) shapeRenderer.dispose();
+        if (font != null) font.dispose();
+        if (spriteBatch != null) spriteBatch.dispose();
+
+        gameMaster.getSoundManager().resumeMusic();
     }
 }
