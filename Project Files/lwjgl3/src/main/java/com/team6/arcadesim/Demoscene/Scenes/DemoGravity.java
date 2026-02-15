@@ -93,14 +93,17 @@ public class DemoGravity extends AbstractScene {
         // Cap dt to prevent physics explosions on lag spikes
         if (dt > 0.05f) dt = 0.05f;
         
-        // Spawn falling block on SPACE press - spawn at top center for testing
+        // Spawn falling block on SPACE press - spawn at mouse cursor position
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            // Spawn at top center, above the floor
-            float spawnX = sceneResolution.x / 2; // Center X
-            float spawnY = sceneResolution.y - 50; // Near top of screen (720 - 50 = 670)
+            // Get mouse position in screen coordinates
+            float mouseX = Gdx.input.getX();
+            float mouseY = Gdx.input.getY();
             
-            createFallingBlock(spawnX, spawnY);
-            System.out.println("=== Created block at x=" + spawnX + ", y=" + spawnY + " ===");
+            // Convert screen coordinates to world coordinates
+            Vector2 worldPos = gameMaster.getViewportManager().screenToWorld(mouseX, mouseY);
+            
+            createFallingBlock(worldPos.x, worldPos.y);
+            System.out.println("=== Created block at mouse cursor: x=" + worldPos.x + ", y=" + worldPos.y + " ===");
         }
         
         // Debug: print all entity positions every frame
