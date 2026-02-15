@@ -6,7 +6,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.team6.arcadesim.AbstractGameMaster;
 import com.team6.arcadesim.components.CollisionComponent;
@@ -25,6 +28,8 @@ public class DemoScene extends AbstractScene {
     private com.team6.arcadesim.Demoscene.Managers.CubeCollision cubeCollision;
     private Vector2 sceneResolution = new Vector2(1280, 720);
     private Texture coinTex;
+    private BitmapFont font;
+    private SpriteBatch spriteBatch;
 
     public DemoScene(AbstractGameMaster gameMaster) {
         super(gameMaster, SCENE_NAME);
@@ -42,6 +47,14 @@ public class DemoScene extends AbstractScene {
         gameMaster.getViewportManager().setVirtualResolution((int) sceneResolution.x, (int) sceneResolution.y);
 
         // 2. Load Resources
+
+        //Adding text to show instructions
+        font = new BitmapFont();
+        font.setColor(Color.WHITE);
+        font.getData().setScale(2f);
+        spriteBatch = new SpriteBatch();
+
+        // Preload sound effects and music
         try {
             Sound boopSound = Gdx.audio.newSound(Gdx.files.internal("boop.mp3"));
             gameMaster.getSoundManager().preload("boop", new AudioClip(boopSound));
@@ -55,7 +68,7 @@ public class DemoScene extends AbstractScene {
 
         // 3. Setup Physics Tools (Collision)
         cubeCollision = new com.team6.arcadesim.Demoscene.Managers.CubeCollision(sceneResolution.x, sceneResolution.y);
-        // We configure the GLOBAL collision manager to use OUR logic
+        
         gameMaster.getCollisionManager().setResolver(cubeCollision);
 
         gameMaster.getCollisionManager().addCollisionListener(new CollisionListener() {
@@ -98,7 +111,6 @@ public class DemoScene extends AbstractScene {
         }
 
         // 2. Physics Update
-        // We pass OUR local entities to the global tools
         List<Entity> myEntities = this.getEntityManager().getAllEntities();
 
         gameMaster.getMovementManager().update(deltaTime, myEntities);
@@ -120,6 +132,13 @@ public class DemoScene extends AbstractScene {
             myEntities, 
             gameMaster.getViewportManager().getCamera()
         );
+
+        // Draw text instructions
+        spriteBatch.setProjectionMatrix(gameMaster.getViewportManager().getCamera().combined);
+        spriteBatch.begin();
+        String instructions = "Press P to Pause";
+        font.draw(spriteBatch, instructions, 10, sceneResolution.y - 10);
+        spriteBatch.end();
     }
 
     @Override

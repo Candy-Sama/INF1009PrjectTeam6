@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.team6.arcadesim.AbstractGameMaster; // Correct import
+import com.team6.arcadesim.AbstractGameMaster;
 import com.team6.arcadesim.scenes.AbstractScene;
 
 public class PauseScene extends AbstractScene {
