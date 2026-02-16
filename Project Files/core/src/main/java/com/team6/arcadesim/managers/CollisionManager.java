@@ -23,7 +23,9 @@ public class CollisionManager {
     public CollisionManager() {
         this.listeners = new ArrayList<>();
         // Default resolver: Stop the entity
-        this.resolver = (a, b) -> { /* Default: Do nothing or implement simple stop */ };
+        this.resolver = (a, b) -> { 
+            // Default: Do nothing  
+        };
     }
 
     public void setResolver(CollisionResolver resolver) {
