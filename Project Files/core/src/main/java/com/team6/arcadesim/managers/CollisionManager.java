@@ -41,10 +41,6 @@ public class CollisionManager {
     }
 
     public void update(float dt, List<Entity> entities) {
-        // Debug: Print entities being checked
-        if (entities.size() > 0) {
-            System.out.println("=== Collision check for " + entities.size() + " entities ===");
-        }
         
         // N^2 collision check
         for (int i = 0; i < entities.size(); i++) {
@@ -56,7 +52,6 @@ public class CollisionManager {
             
             CollisionComponent ca = a.getComponent(CollisionComponent.class);
             TransformComponent ta = a.getComponent(TransformComponent.class);
-            System.out.println("Entity A " + a.getClass().getSimpleName() + " at (" + ta.getPosition().x + "," + ta.getPosition().y + ") size (" + ca.getWidth() + "," + ca.getHeight() + ") solid=" + ca.isSolid());
 
             for (int j = i + 1; j < entities.size(); j++) {
                 Entity b = entities.get(j);
@@ -65,10 +60,7 @@ public class CollisionManager {
                 CollisionComponent cb = b.getComponent(CollisionComponent.class);
                 TransformComponent tb = b.getComponent(TransformComponent.class);
                 
-                System.out.println("  Checking against " + b.getClass().getSimpleName() + " at (" + tb.getPosition().x + "," + tb.getPosition().y + ") size (" + cb.getWidth() + "," + cb.getHeight() + ") solid=" + cb.isSolid());
-
                 if (checkCollision(a, b)) {
-                    System.out.println("Collision detected between " + a.getClass().getSimpleName() + " and " + b.getClass().getSimpleName());
                     
                     // 1. Notify Observers
                     for (CollisionListener listener : listeners) {
@@ -92,13 +84,16 @@ public class CollisionManager {
     }
 
     private boolean checkCollision(Entity a, Entity b) {
+        // Get components
         TransformComponent ta = a.getComponent(TransformComponent.class);
         CollisionComponent ca = a.getComponent(CollisionComponent.class);
         
+        // Get components for b
         TransformComponent tb = b.getComponent(TransformComponent.class);
         CollisionComponent cb = b.getComponent(CollisionComponent.class);
 
         // Calculate AABB from center position
+        // What is AABB? Axis-Aligned Bounding Box - a rectangle that is not rotated, defined by its left, bottom, width, and height.
         float aLeft = ta.getPosition().x - ca.getWidth() / 2;
         float aBottom = ta.getPosition().y - ca.getHeight() / 2;
         float aTop = ta.getPosition().y + ca.getHeight() / 2;
@@ -106,23 +101,11 @@ public class CollisionManager {
         float bLeft = tb.getPosition().x - cb.getWidth() / 2;
         float bBottom = tb.getPosition().y - cb.getHeight() / 2;
         float bTop = tb.getPosition().y + cb.getHeight() / 2;
-
-        // Debug: print the actual rectangles
-        System.out.println("    checkCollision: A(" + a.getClass().getSimpleName() + ") yRange=[" + aBottom + ", " + aTop + "], B(" + b.getClass().getSimpleName() + ") yRange=[" + bBottom + ", " + bTop + "]");
-        
+       
         rectA.set(aLeft, aBottom, ca.getWidth(), ca.getHeight());
         rectB.set(bLeft, bBottom, cb.getWidth(), cb.getHeight());
 
         boolean overlaps = rectA.overlaps(rectB);
-        
-        // Debug print
-        if (overlaps) {
-            System.out.println("=== COLLISION MATH ===");
-            System.out.println("A (" + a.getClass().getSimpleName() + "): left=" + aLeft + ", bottom=" + aBottom + ", w=" + ca.getWidth() + ", h=" + ca.getHeight());
-            System.out.println("B (" + b.getClass().getSimpleName() + "): left=" + bLeft + ", bottom=" + bBottom + ", w=" + cb.getWidth() + ", h=" + cb.getHeight());
-            System.out.println("A rect: " + rectA);
-            System.out.println("B rect: " + rectB);
-        }
         
         return overlaps;
     }

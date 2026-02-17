@@ -140,6 +140,18 @@ public class SoundManager implements Disposable {
         }
     }
 
+    public float getMasterVolume() {
+        return masterVolume;
+    }
+
+    public float getSFXVolume() {
+        return sfxVolume;
+    }
+
+    public float getMusicVolume() {
+        return musicVolume;
+    }
+
     @Override
     public void dispose() {
         audioHandler.shutdown();
