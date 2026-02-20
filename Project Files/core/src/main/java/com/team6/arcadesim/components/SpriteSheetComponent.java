@@ -1,9 +1,8 @@
 package com.team6.arcadesim.components;
 
-import com.team6.arcadesim.ecs.Component;
-
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.team6.arcadesim.ecs.Component;
 
 public class SpriteSheetComponent implements Component {
 
@@ -25,8 +24,6 @@ public class SpriteSheetComponent implements Component {
         this.flipX = false;
         this.flipY = false;
     }
-
-    // --- Getters & Setters ---
 
     public TextureRegion getRegion() { return region; }
     

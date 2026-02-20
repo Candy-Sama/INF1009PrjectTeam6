@@ -15,7 +15,6 @@ public abstract class AbstractGameMaster implements ApplicationListener {
     private float deltaTime;
     private long lastFrameTime;
 
-    // --- The Subsystems (Stateless Tools) ---
     protected SceneManager sceneManager;
     protected ViewportManager viewportManager;
     protected InputManager inputManager;
@@ -29,7 +28,6 @@ public abstract class AbstractGameMaster implements ApplicationListener {
 
     @Override
     public void create() {
-        // 1. Initialize Tools
         viewportManager = new ViewportManager();
         inputManager = new InputManager();
         movementManager = new MovementManager();
@@ -53,26 +51,19 @@ public abstract class AbstractGameMaster implements ApplicationListener {
         lastFrameTime = time;
         if (deltaTime > 0.1f) deltaTime = 0.1f;
 
-        // 1. Logic Phase
-        update(deltaTime); // Global update
-        sceneManager.update(deltaTime); // Updates ONLY the top scene
+        update(deltaTime);
+        sceneManager.update(deltaTime);
         inputManager.update();
 
-        // 2. Render Phase
         viewportManager.apply();
-        
-        // Delegate rendering entirely to SceneManager
-        // This allows it to draw the background scenes behind the pause menu
         sceneManager.render(deltaTime);
     }
     
-    // ... (Keep resize, pause, resume, dispose as they were) ...
     @Override public void resize(int width, int height) { if (viewportManager != null) viewportManager.resize(width, height); }
     @Override public void pause() { isRunning = false; }
     @Override public void resume() { isRunning = true; lastFrameTime = System.nanoTime(); }
     @Override public void dispose() { if (renderManager != null) renderManager.dispose(); if (sceneManager != null) sceneManager.dispose(); }
     
-    // --- Getters for Tools (So Scenes can borrow them) ---
     public MovementManager getMovementManager() { return movementManager; }
     public CollisionManager getCollisionManager() { return collisionManager; }
     public RenderManager getRenderManager() { return renderManager; }

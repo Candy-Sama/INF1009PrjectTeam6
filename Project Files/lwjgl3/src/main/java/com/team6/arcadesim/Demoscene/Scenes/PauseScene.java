@@ -65,13 +65,11 @@ public class PauseScene extends AbstractScene {
             return;
         }
         
-        // Use Global Input Manager
         if (gameMaster.getInputManager().isKeyJustPressed(Input.Keys.P)) {
             gameMaster.getSceneManager().popScene();
             return;
         }
         
-        // Handle mouse input for sliders
         if (Gdx.input.justTouched()) {
             Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             gameMaster.getViewportManager().getCamera().unproject(touchPos);
@@ -85,7 +83,6 @@ public class PauseScene extends AbstractScene {
             }
         }
         
-        // Update slider values while dragging
         if (Gdx.input.isTouched() && draggingSlider != -1) {
             Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             gameMaster.getViewportManager().getCamera().unproject(touchPos);
@@ -102,8 +99,7 @@ public class PauseScene extends AbstractScene {
                 case 2:
                     sfxSlider.updateValue(touchPos.x);
                     gameMaster.getSoundManager().setSFXVolume(sfxSlider.getValue());
-                    // Play a test sound effect when adjusting SFX volume
-                    if (Math.random() < 0.05) { // Play occasionally during drag
+                    if (Math.random() < 0.05) {
                         gameMaster.getSoundManager().playSFX("boop");
                     }
                     break;
@@ -118,29 +114,22 @@ public class PauseScene extends AbstractScene {
 
     @Override
     public void render(float dt) {
-        // Transparency Setup
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        // Draw Overlay (Black 70%)
         shapeRenderer.setProjectionMatrix(gameMaster.getViewportManager().getCamera().combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(new Color(0, 0, 0, 0.7f));
-        
-        // Fill the whole camera view
         float w = gameMaster.getViewportManager().getCamera().viewportWidth;
         float h = gameMaster.getViewportManager().getCamera().viewportHeight;
         shapeRenderer.rect(0, 0, w, h);
         shapeRenderer.end();
 
-        // Draw Text
         spriteBatch.setProjectionMatrix(gameMaster.getViewportManager().getCamera().combined);
         spriteBatch.begin();
         
         String pauseText = "Game Paused";
         GlyphLayout layout = new GlyphLayout(font, pauseText);
-        
-        // Center pause text at top
         float pauseX = (w - layout.width) / 2;
         float pauseY = h - 40;
 
@@ -149,7 +138,6 @@ public class PauseScene extends AbstractScene {
         font.getData().setScale(1.5f);
         spriteBatch.end();
         
-        // Draw volume sliders
         shapeRenderer.setProjectionMatrix(gameMaster.getViewportManager().getCamera().combined);
         spriteBatch.setProjectionMatrix(gameMaster.getViewportManager().getCamera().combined);
         
@@ -157,7 +145,6 @@ public class PauseScene extends AbstractScene {
         musicSlider.draw(shapeRenderer, font, spriteBatch);
         sfxSlider.draw(shapeRenderer, font, spriteBatch);
         
-        // Draw instructions at bottom
         spriteBatch.begin();
         String instructions = "Press P to Resume";
         GlyphLayout instrLayout = new GlyphLayout(font, instructions);
@@ -165,7 +152,6 @@ public class PauseScene extends AbstractScene {
         font.draw(spriteBatch, instructions, instrX, 40);
         spriteBatch.end();
 
-        // Disable blending after renderingop
         Gdx.gl.glDisable(GL20.GL_BLEND);
     }
 

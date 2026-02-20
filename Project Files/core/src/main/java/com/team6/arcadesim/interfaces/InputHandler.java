@@ -1,7 +1,6 @@
 package com.team6.arcadesim.interfaces;
-import com.team6.arcadesim.input.InputState;
-
 import com.badlogic.gdx.InputProcessor;
+import com.team6.arcadesim.input.InputState;
 
 public class InputHandler implements InputProcessor {
 
@@ -62,8 +61,4 @@ public class InputHandler implements InputProcessor {
     public boolean scrolled(float amountX, float amountY) {
         return false;
     }
-
-    
-    // Note: In newer LibGDX versions, scrolled signature might be different.
-    // Ensure you match your specific LibGDX version's Interface.
 }

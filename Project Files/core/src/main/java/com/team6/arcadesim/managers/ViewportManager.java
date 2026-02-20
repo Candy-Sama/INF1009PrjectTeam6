@@ -8,7 +8,6 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class ViewportManager {
 
-    // --- LibGDX Internal Components ---
     private OrthographicCamera camera;
     private Viewport viewport;
 

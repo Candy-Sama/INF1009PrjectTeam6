@@ -12,20 +12,14 @@ import com.team6.arcadesim.interfaces.CollisionResolver;
 
 public class CollisionManager {
 
-    //Sets up a list of collision listeners and a resolver to handle collisions
     private List<CollisionListener> listeners;
     private CollisionResolver resolver;
-    
-    // Reusable rectangles for collision checks
     private Rectangle rectA = new Rectangle();
     private Rectangle rectB = new Rectangle();
 
     public CollisionManager() {
         this.listeners = new ArrayList<>();
-        // Default resolver: Stop the entity
-        this.resolver = (a, b) -> { 
-            // Default: Do nothing  
-        };
+        this.resolver = (a, b) -> {};
     }
 
     public void setResolver(CollisionResolver resolver) {
@@ -41,8 +35,6 @@ public class CollisionManager {
     }
 
     public void update(float dt, List<Entity> entities) {
-        
-        // N^2 collision check
         for (int i = 0; i < entities.size(); i++) {
             Entity a = entities.get(i);
             if (!isValid(a)) {
@@ -61,20 +53,16 @@ public class CollisionManager {
                 TransformComponent tb = b.getComponent(TransformComponent.class);
                 
                 if (checkCollision(a, b)) {
-                    
-                    // 1. Notify Observers
                     for (CollisionListener listener : listeners) {
                         listener.onCollisionStart(a, b);
                     }
                     
-                    // 2. Resolve Collision if both are solid and not triggers
                     if (ca.isSolid() && cb.isSolid() && !ca.isTrigger() && !cb.isTrigger()) {
                         System.out.println("Calling resolver...");
                         resolver.resolve(a, b);
                     }
                 }
                 else {
-                    // Notify Observers about collision end
                     for (CollisionListener listener : listeners) {
                         listener.onCollisionEnd(a, b);
                     }
@@ -84,16 +72,11 @@ public class CollisionManager {
     }
 
     private boolean checkCollision(Entity a, Entity b) {
-        // Get components
         TransformComponent ta = a.getComponent(TransformComponent.class);
         CollisionComponent ca = a.getComponent(CollisionComponent.class);
-        
-        // Get components for b
         TransformComponent tb = b.getComponent(TransformComponent.class);
         CollisionComponent cb = b.getComponent(CollisionComponent.class);
 
-        // Calculate AABB from center position
-        // What is AABB? Axis-Aligned Bounding Box - a rectangle that is not rotated, defined by its left, bottom, width, and height.
         float aLeft = ta.getPosition().x - ca.getWidth() / 2;
         float aBottom = ta.getPosition().y - ca.getHeight() / 2;
         float aTop = ta.getPosition().y + ca.getHeight() / 2;
@@ -117,7 +100,6 @@ public class CollisionManager {
 
     public void reset() {
         listeners.clear();
-        // Reset to a safe default (do nothing)
-        this.resolver = (a, b) -> {}; 
+        this.resolver = (a, b) -> {};
     }
 }

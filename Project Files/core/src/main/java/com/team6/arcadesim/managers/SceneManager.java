@@ -29,35 +29,27 @@ public class SceneManager {
     
     public AbstractScene getCurrentScene() { return currentScene; }
 
-    // --- The Logic Loop ---
     public void update(float dt) {
-        // ONLY update the top-most scene (The "Active" one)
         if (currentScene != null) {
             currentScene.update(dt);
         }
     }
 
-    // --- The Render Loop ---
     public void render(float dt) {
-        // 1. Draw the frozen background scenes first (Bottom of stack)
         for (AbstractScene scene : sceneStack) {
             scene.render(dt);
         }
         
-        // 2. Draw the active top scene last (On top of everything)
         if (currentScene != null) {
             currentScene.render(dt);
         }
     }
 
-    // --- Stack Operations ---
     public void pushScene(AbstractScene overlayScene) {
         if (currentScene != null) {
-            // Push the current scene to background
             sceneStack.push(currentScene);
             currentScene.onPause();
         }
-        // Swap
         currentScene = overlayScene;
         currentScene.onEnter();
     }
@@ -71,7 +63,6 @@ public class SceneManager {
             currentScene = sceneStack.pop();
             currentScene.onResume();
         } else {
-            // Safety: Don't allow popping the last scene
             System.err.println("SceneManager: Cannot pop the last scene!");
         }
     }

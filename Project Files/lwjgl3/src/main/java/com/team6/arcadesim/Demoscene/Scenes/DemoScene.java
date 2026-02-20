@@ -43,18 +43,12 @@ public class DemoScene extends AbstractScene {
     public void onEnter() {
         System.out.println("Entering " + SCENE_NAME);
         
-        // 1. Setup Camera
         gameMaster.getViewportManager().setVirtualResolution((int) sceneResolution.x, (int) sceneResolution.y);
 
-        // 2. Load Resources
-
-        //Adding text to show instructions
         font = new BitmapFont();
         font.setColor(Color.WHITE);
         font.getData().setScale(2f);
         spriteBatch = new SpriteBatch();
-
-        // Preload sound effects and music
         try {
             Sound boopSound = Gdx.audio.newSound(Gdx.files.internal("boop.mp3"));
             gameMaster.getSoundManager().preload("boop", new AudioClip(boopSound));
@@ -66,7 +60,6 @@ public class DemoScene extends AbstractScene {
         gameMaster.getSoundManager().preload("demoMusic", new AudioClip(demoMusic));
         gameMaster.getSoundManager().playMusic("demoMusic", true);
 
-        // 3. Setup Physics Tools (Collision)
         cubeCollision = new com.team6.arcadesim.Demoscene.Managers.CubeCollision(sceneResolution.x, sceneResolution.y);
         
         gameMaster.getCollisionManager().setResolver(cubeCollision);
@@ -82,7 +75,6 @@ public class DemoScene extends AbstractScene {
 
         coinTex = new Texture(Gdx.files.internal("coin.png"));
 
-        // 4. Create Entities (Using LOCAL EntityManager)
         for (int i = 0; i < 10; i++) {
             Entity testObject = new TestEntity();
             
@@ -96,27 +88,22 @@ public class DemoScene extends AbstractScene {
             
             testObject.addComponent(new SpriteComponent(coinTex, 32, 32));
             testObject.addComponent(new CollisionComponent(32, 32, true, false));
-                        
-            // CRITICAL: Add to THIS scene's manager, not the global one
+            
             this.getEntityManager().addEntity(testObject);
         }
     }
 
     @Override
     public void update(float deltaTime) {
-        // 1. Input Check
         if (gameMaster.getInputManager().isKeyJustPressed(Input.Keys.P)) {
             gameMaster.getSceneManager().pushScene(new PauseScene(gameMaster));
-            return; // Stop processing this frame so we don't move entities while switching
+            return;
         }
 
-        // 2. Physics Update
         List<Entity> myEntities = this.getEntityManager().getAllEntities();
-
         gameMaster.getMovementManager().update(deltaTime, myEntities);
         gameMaster.getCollisionManager().update(deltaTime, myEntities);
 
-        // 3. Custom Logic (Wall Bounce)
         for (Entity entity : myEntities) {
             cubeCollision.checkWallBounce(entity);
         }
@@ -124,7 +111,6 @@ public class DemoScene extends AbstractScene {
 
     @Override
     public void render(float deltaTime) {
-        // 4. Render Update
         List<Entity> myEntities = this.getEntityManager().getAllEntities();
         
         gameMaster.getRenderManager().render(
@@ -133,7 +119,6 @@ public class DemoScene extends AbstractScene {
             gameMaster.getViewportManager().getCamera()
         );
 
-        // Draw text instructions
         spriteBatch.setProjectionMatrix(gameMaster.getViewportManager().getCamera().combined);
         spriteBatch.begin();
         String instructions = "Press P to Pause";
@@ -145,11 +130,7 @@ public class DemoScene extends AbstractScene {
     public void onExit() {
         System.out.println("Exiting " + SCENE_NAME);
         
-        // Clear LOCAL entities
         this.getEntityManager().removeAll();
-        
-        // Reset GLOBAL tools so they don't hold references to our dead entities
-        // (Assuming you added reset() to CollisionManager as discussed)
         gameMaster.getCollisionManager().reset(); 
 
         if (coinTex != null) coinTex.dispose();
