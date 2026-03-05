@@ -2,6 +2,7 @@
 .gradle/
 gradle-app.setting
 /build/
+**/build/
 /android/build/
 /core/build/
 /lwjgl2/build/
@@ -171,3 +172,4 @@ Project Files/core/build/libs/core-1.0.0.jar
 /Project Files/core/build/libs
 /Project Files/core/build
 /Project Files/core
+*.jar

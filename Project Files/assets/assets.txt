@@ -1,4 +1,5 @@
 .gitkeep
 ArcadeMusic.mp3
 boop.mp3
+coin.png
 rubberBlockBounce.mp3
