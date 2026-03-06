@@ -14,9 +14,7 @@ public abstract class AbstractPlayableScene extends AbstractScene {
         processLevelLogic(dt);
 
         // Automatically run engine managers for playable scenes.
-        // Todo: create a GravityManager
-        // gameMaster.getGravityManager().update(dt, getEntityManager().getAllEntities());
-
+        gameMaster.getGravityManager().update(dt, getEntityManager().getAllEntities());
         gameMaster.getMovementManager().update(dt, getEntityManager().getAllEntities());
         gameMaster.getCollisionManager().update(dt, getEntityManager().getAllEntities());
     }

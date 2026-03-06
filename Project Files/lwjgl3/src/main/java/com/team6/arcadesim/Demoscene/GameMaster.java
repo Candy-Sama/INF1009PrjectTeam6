@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.team6.arcadesim.AbstractGameMaster;
 import com.team6.arcadesim.Demoscene.Scenes.DemoScene;
 import com.team6.arcadesim.Demoscene.Scenes.PauseScene;
+import com.team6.arcadesim.Demoscene.Scenes.DemoSolar;
 
 public class GameMaster extends AbstractGameMaster {
 
@@ -11,8 +12,9 @@ public class GameMaster extends AbstractGameMaster {
     public void init() {
         sceneManager.registerScene("pause", () -> new PauseScene(this));
         sceneManager.registerScene("demo", () -> new DemoScene(this));
+        sceneManager.registerScene("solar", () -> new DemoSolar(this));
 
-        sceneManager.changeScene("demo");
+        sceneManager.changeScene("solar");
     }
 
     @Override

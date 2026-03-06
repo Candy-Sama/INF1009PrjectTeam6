@@ -158,7 +158,7 @@ import com.team6.arcadesim.components.TransformComponent;
 import com.team6.arcadesim.ecs.AudioClip;
 import com.team6.arcadesim.ecs.Entity;
 import com.team6.arcadesim.interfaces.CollisionListener;
-import com.team6.arcadesim.scenes.AbstractPlayableScene; // <-- IMPORT CHANGED
+import com.team6.arcadesim.scenes.AbstractPlayableScene;
 
 // Extends AbstractPlayableScene to inherit automatic physics loops
 public class DemoScene extends AbstractPlayableScene { 

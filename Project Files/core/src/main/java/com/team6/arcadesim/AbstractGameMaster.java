@@ -8,6 +8,7 @@ import com.team6.arcadesim.managers.RenderManager;
 import com.team6.arcadesim.managers.SceneManager;
 import com.team6.arcadesim.managers.SoundManager;
 import com.team6.arcadesim.managers.ViewportManager;
+import com.team6.arcadesim.managers.GravityManager;
 
 public abstract class AbstractGameMaster implements ApplicationListener {
 
@@ -22,6 +23,7 @@ public abstract class AbstractGameMaster implements ApplicationListener {
     protected CollisionManager collisionManager;
     protected RenderManager renderManager;
     protected SoundManager soundManager;
+    protected GravityManager gravityManager;
 
     public abstract void init();
     public abstract void update(float dt);
@@ -35,6 +37,7 @@ public abstract class AbstractGameMaster implements ApplicationListener {
         renderManager = new RenderManager();
         soundManager = new SoundManager();
         sceneManager = new SceneManager();
+        gravityManager = new GravityManager();
 
         isRunning = true;
         lastFrameTime = System.nanoTime();
@@ -71,4 +74,5 @@ public abstract class AbstractGameMaster implements ApplicationListener {
     public InputManager getInputManager() { return inputManager; }
     public ViewportManager getViewportManager() { return viewportManager; }
     public SceneManager getSceneManager() { return sceneManager; }
+    public GravityManager getGravityManager() { return gravityManager; }
 }
