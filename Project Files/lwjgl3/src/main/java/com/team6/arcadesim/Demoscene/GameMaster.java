@@ -3,12 +3,16 @@ package com.team6.arcadesim.Demoscene;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.team6.arcadesim.AbstractGameMaster;
 import com.team6.arcadesim.Demoscene.Scenes.DemoScene;
+import com.team6.arcadesim.Demoscene.Scenes.PauseScene;
 
 public class GameMaster extends AbstractGameMaster {
 
     @Override
     public void init() {
-        sceneManager.setScene(new DemoScene(this));
+        sceneManager.registerScene("pause", () -> new PauseScene(this));
+        sceneManager.registerScene("demo", () -> new DemoScene(this));
+
+        sceneManager.changeScene("demo");
     }
 
     @Override
