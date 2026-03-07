@@ -1,0 +1,281 @@
+// package com.team6.spacesim.Demoscene.Scenes;
+
+// import java.util.List;
+
+// import com.badlogic.gdx.Gdx;
+// import com.badlogic.gdx.Input;
+// import com.badlogic.gdx.audio.Music;
+// import com.badlogic.gdx.audio.Sound;
+// import com.badlogic.gdx.graphics.Color;
+// import com.badlogic.gdx.graphics.Texture;
+// import com.badlogic.gdx.graphics.g2d.BitmapFont;
+// import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+// import com.badlogic.gdx.math.Vector2;
+// import com.team6.spacesim.AbstractGameMaster;
+// import com.team6.spacesim.components.CollisionComponent;
+// import com.team6.spacesim.components.MovementComponent;
+// import com.team6.spacesim.components.SpriteComponent;
+// import com.team6.spacesim.components.TransformComponent;
+// import com.team6.spacesim.ecs.AudioClip;
+// import com.team6.spacesim.ecs.Entity;
+// import com.team6.spacesim.interfaces.CollisionListener;
+// import com.team6.spacesim.scenes.AbstractScene;
+
+
+// public class DemoScene extends AbstractScene {
+
+//     private static final String SCENE_NAME = "DemoScene";
+//     private com.team6.spacesim.Demoscene.Managers.CubeCollision cubeCollision;
+//     private Vector2 sceneResolution = new Vector2(1280, 720);
+//     private Texture coinTex;
+//     private BitmapFont font;
+//     private SpriteBatch spriteBatch;
+
+//     public DemoScene(AbstractGameMaster gameMaster) {
+//         super(gameMaster, SCENE_NAME);
+//     }
+
+//     public class TestEntity extends Entity {
+//         public TestEntity() { super(); }
+//     }
+
+//     @Override
+//     public void onEnter() {
+//         System.out.println("Entering " + SCENE_NAME);
+        
+//         gameMaster.getViewportManager().setVirtualResolution((int) sceneResolution.x, (int) sceneResolution.y);
+
+//         font = new BitmapFont();
+//         font.setColor(Color.WHITE);
+//         font.getData().setScale(2f);
+//         spriteBatch = new SpriteBatch();
+//         try {
+//             Sound boopSound = Gdx.audio.newSound(Gdx.files.internal("boop.mp3"));
+//             gameMaster.getSoundManager().preload("boop", new AudioClip(boopSound));
+//         } catch (Exception e) {
+//             System.err.println("Failed to load boop sound: " + e.getMessage());
+//         }
+
+//         Music demoMusic = Gdx.audio.newMusic(Gdx.files.internal("ArcadeMusic.mp3"));
+//         gameMaster.getSoundManager().preload("demoMusic", new AudioClip(demoMusic));
+//         gameMaster.getSoundManager().playMusic("demoMusic", true);
+
+//         cubeCollision = new com.team6.spacesim.Demoscene.Managers.CubeCollision(sceneResolution.x, sceneResolution.y);
+        
+//         gameMaster.getCollisionManager().setResolver(cubeCollision);
+
+//         gameMaster.getCollisionManager().addCollisionListener(new CollisionListener() {
+//             @Override
+//             public void onCollisionStart(Entity a, Entity b) {
+//                 gameMaster.getSoundManager().playSFX("boop");
+//             }
+//             @Override
+//             public void onCollisionEnd(Entity a, Entity b) { }
+//         });
+
+//         coinTex = new Texture(Gdx.files.internal("coin.png"));
+
+//         for (int i = 0; i < 10; i++) {
+//             Entity testObject = new TestEntity();
+            
+//             float randomX = (float) Math.random() * sceneResolution.x;
+//             float randomY = (float) Math.random() * sceneResolution.y;
+//             testObject.addComponent(new TransformComponent(randomX, randomY));
+
+//             float speedX = (float) (Math.random() * 200 - 100);
+//             float speedY = (float) (Math.random() * 200 - 100);
+//             testObject.addComponent(new MovementComponent(speedX, speedY));
+            
+//             testObject.addComponent(new SpriteComponent(coinTex, 32, 32));
+//             testObject.addComponent(new CollisionComponent(32, 32, true, false));
+            
+//             this.getEntityManager().addEntity(testObject);
+//         }
+//     }
+
+//     @Override
+//     public void update(float deltaTime) {
+//         if (gameMaster.getInputManager().isKeyJustPressed(Input.Keys.P)) {
+//             gameMaster.getSceneManager().pushScene(new PauseScene(gameMaster));
+//             return;
+//         }
+
+//         List<Entity> myEntities = this.getEntityManager().getAllEntities();
+//         gameMaster.getMovementManager().update(deltaTime, myEntities);
+//         gameMaster.getCollisionManager().update(deltaTime, myEntities);
+
+//         for (Entity entity : myEntities) {
+//             cubeCollision.checkWallBounce(entity);
+//         }
+//     }
+
+//     @Override
+//     public void render(float deltaTime) {
+//         List<Entity> myEntities = this.getEntityManager().getAllEntities();
+        
+//         gameMaster.getRenderManager().render(
+//             deltaTime, 
+//             myEntities, 
+//             gameMaster.getViewportManager().getCamera()
+//         );
+
+//         spriteBatch.setProjectionMatrix(gameMaster.getViewportManager().getCamera().combined);
+//         spriteBatch.begin();
+//         String instructions = "Press P to Pause";
+//         font.draw(spriteBatch, instructions, 10, sceneResolution.y - 10);
+//         spriteBatch.end();
+//     }
+
+//     @Override
+//     public void onExit() {
+//         System.out.println("Exiting " + SCENE_NAME);
+        
+//         this.getEntityManager().removeAll();
+//         gameMaster.getCollisionManager().reset(); 
+
+//         if (coinTex != null) coinTex.dispose();
+//     }
+// }
+
+package com.team6.spacesim.Demoscene.Scenes;
+
+import java.util.List;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
+import com.team6.spacesim.AbstractGameMaster;
+import com.team6.spacesim.components.CollisionComponent;
+import com.team6.spacesim.components.MovementComponent;
+import com.team6.spacesim.components.SpriteComponent;
+import com.team6.spacesim.components.TransformComponent;
+import com.team6.spacesim.ecs.AudioClip;
+import com.team6.spacesim.ecs.Entity;
+import com.team6.spacesim.interfaces.CollisionListener;
+import com.team6.spacesim.scenes.AbstractPlayableScene;
+
+// Extends AbstractPlayableScene to inherit automatic physics loops
+public class DemoScene extends AbstractPlayableScene { 
+
+    private static final String SCENE_NAME = "DemoScene";
+    private com.team6.spacesim.Demoscene.Managers.CubeCollision cubeCollision;
+    private Vector2 sceneResolution = new Vector2(1280, 720);
+    private Texture coinTex;
+    private BitmapFont font;
+    private SpriteBatch spriteBatch;
+
+    public DemoScene(AbstractGameMaster gameMaster) {
+        super(gameMaster, SCENE_NAME);
+    }
+
+    public class TestEntity extends Entity {
+        public TestEntity() { super(); }
+    }
+
+    @Override
+    public void onEnter() {
+        System.out.println("Entering " + SCENE_NAME);
+        
+        gameMaster.getViewportManager().setVirtualResolution((int) sceneResolution.x, (int) sceneResolution.y);
+
+        font = new BitmapFont();
+        font.setColor(Color.WHITE);
+        font.getData().setScale(2f);
+        spriteBatch = new SpriteBatch();
+        try {
+            Sound boopSound = Gdx.audio.newSound(Gdx.files.internal("boop.mp3"));
+            gameMaster.getSoundManager().preload("boop", new AudioClip(boopSound));
+        } catch (Exception e) {
+            System.err.println("Failed to load boop sound: " + e.getMessage());
+        }
+
+        Music demoMusic = Gdx.audio.newMusic(Gdx.files.internal("ArcadeMusic.mp3"));
+        gameMaster.getSoundManager().preload("demoMusic", new AudioClip(demoMusic));
+        gameMaster.getSoundManager().playMusic("demoMusic", true);
+
+        cubeCollision = new com.team6.spacesim.Demoscene.Managers.CubeCollision(sceneResolution.x, sceneResolution.y);
+        
+        gameMaster.getCollisionManager().setResolver(cubeCollision);
+
+        gameMaster.getCollisionManager().addCollisionListener(new CollisionListener() {
+            @Override
+            public void onCollisionStart(Entity a, Entity b) {
+                gameMaster.getSoundManager().playSFX("boop");
+            }
+            @Override
+            public void onCollisionEnd(Entity a, Entity b) { }
+        });
+
+        coinTex = new Texture(Gdx.files.internal("coin.png"));
+
+        for (int i = 0; i < 10; i++) {
+            Entity testObject = new TestEntity();
+            
+            float randomX = (float) Math.random() * sceneResolution.x;
+            float randomY = (float) Math.random() * sceneResolution.y;
+            testObject.addComponent(new TransformComponent(randomX, randomY));
+
+            float speedX = (float) (Math.random() * 200 - 100);
+            float speedY = (float) (Math.random() * 200 - 100);
+            testObject.addComponent(new MovementComponent(speedX, speedY));
+            
+            testObject.addComponent(new SpriteComponent(coinTex, 32, 32));
+            testObject.addComponent(new CollisionComponent(32, 32, true, false));
+            
+            this.getEntityManager().addEntity(testObject);
+        }
+    }
+
+    // Overriding processLevelLogic instead of update
+    @Override
+    protected void processLevelLogic(float deltaTime) {
+        if (gameMaster.getInputManager().isKeyJustPressed(Input.Keys.P)) {
+            // Dynamic Routing: No more 'new PauseScene()' tight coupling!
+            gameMaster.getSceneManager().pushScene("pause");
+            return;
+        }
+
+        List<Entity> myEntities = this.getEntityManager().getAllEntities();
+        
+        // NOTE: We REMOVED the MovementManager and CollisionManager update calls here!
+        // AbstractPlayableScene handles them automatically now.
+
+        // Custom local logic (wall bouncing)
+        for (Entity entity : myEntities) {
+            cubeCollision.checkWallBounce(entity);
+        }
+    }
+
+    @Override
+    public void render(float deltaTime) {
+        List<Entity> myEntities = this.getEntityManager().getAllEntities();
+        
+        gameMaster.getRenderManager().render(
+            deltaTime, 
+            myEntities, 
+            gameMaster.getViewportManager().getCamera()
+        );
+
+        spriteBatch.setProjectionMatrix(gameMaster.getViewportManager().getCamera().combined);
+        spriteBatch.begin();
+        String instructions = "Press P to Pause";
+        font.draw(spriteBatch, instructions, 10, sceneResolution.y - 10);
+        spriteBatch.end();
+    }
+
+    @Override
+    public void onExit() {
+        System.out.println("Exiting " + SCENE_NAME);
+        
+        this.getEntityManager().removeAll();
+        gameMaster.getCollisionManager().reset(); 
+
+        if (coinTex != null) coinTex.dispose();
+    }
+}

@@ -56,7 +56,7 @@ configure(subprojects) {
 
 subprojects {
   version = "$projectVersion"
-  ext.appName = 'Team6_ArcadeSim'
+  ext.appName = 'Team6_SpaceSim'
   repositories {
     mavenCentral()
     // You may want to remove the following line if you have errors downloading dependencies.
@@ -66,4 +66,4 @@ subprojects {
   }
 }
 
-eclipse.project.name = 'Team6_ArcadeSim' + '-parent'
+eclipse.project.name = 'Team6_SpaceSim' + '-parent'
