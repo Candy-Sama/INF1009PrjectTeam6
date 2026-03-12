@@ -12,14 +12,18 @@ import com.team6.arcadesim.interfaces.CollisionResolver;
 
 public class CollisionManager {
 
+    //Sets up a list of collision listeners and a resolver to handle collisions
     private List<CollisionListener> listeners;
     private CollisionResolver resolver;
+    
+    // Reusable rectangles for collision checks
     private Rectangle rectA = new Rectangle();
     private Rectangle rectB = new Rectangle();
 
     public CollisionManager() {
         this.listeners = new ArrayList<>();
-        this.resolver = (a, b) -> {};
+        // Default resolver: Stop the entity
+        this.resolver = (a, b) -> { /* Default: Do nothing or implement simple stop */ };
     }
 
     public void setResolver(CollisionResolver resolver) {
@@ -35,34 +39,32 @@ public class CollisionManager {
     }
 
     public void update(float dt, List<Entity> entities) {
+        // N^2 collision check
         for (int i = 0; i < entities.size(); i++) {
             Entity a = entities.get(i);
-            if (!isValid(a)) {
-                System.out.println("Skipping entity " + i + " (invalid): " + a.getClass().getSimpleName());
-                continue;
-            }
-            
-            CollisionComponent ca = a.getComponent(CollisionComponent.class);
-            TransformComponent ta = a.getComponent(TransformComponent.class);
+            if (!isValid(a)) continue;
 
             for (int j = i + 1; j < entities.size(); j++) {
                 Entity b = entities.get(j);
                 if (!isValid(b)) continue;
-                
+
+                CollisionComponent ca = a.getComponent(CollisionComponent.class);
                 CollisionComponent cb = b.getComponent(CollisionComponent.class);
-                TransformComponent tb = b.getComponent(TransformComponent.class);
-                
+
+
                 if (checkCollision(a, b)) {
+                    // 1. Notify Observers
                     for (CollisionListener listener : listeners) {
                         listener.onCollisionStart(a, b);
                     }
                     
+                    // 2. Resolve Collision if both are solid and not triggers
                     if (ca.isSolid() && cb.isSolid() && !ca.isTrigger() && !cb.isTrigger()) {
-                        System.out.println("Calling resolver...");
                         resolver.resolve(a, b);
                     }
                 }
                 else {
+                    // Notify Observers about collision end
                     for (CollisionListener listener : listeners) {
                         listener.onCollisionEnd(a, b);
                     }
@@ -74,32 +76,25 @@ public class CollisionManager {
     private boolean checkCollision(Entity a, Entity b) {
         TransformComponent ta = a.getComponent(TransformComponent.class);
         CollisionComponent ca = a.getComponent(CollisionComponent.class);
+        
         TransformComponent tb = b.getComponent(TransformComponent.class);
         CollisionComponent cb = b.getComponent(CollisionComponent.class);
 
+        // Calculate AABB from center position
         float aLeft = ta.getPosition().x - ca.getWidth() / 2;
         float aBottom = ta.getPosition().y - ca.getHeight() / 2;
-        float aTop = ta.getPosition().y + ca.getHeight() / 2;
         
         float bLeft = tb.getPosition().x - cb.getWidth() / 2;
         float bBottom = tb.getPosition().y - cb.getHeight() / 2;
-        float bTop = tb.getPosition().y + cb.getHeight() / 2;
-       
+
         rectA.set(aLeft, aBottom, ca.getWidth(), ca.getHeight());
         rectB.set(bLeft, bBottom, cb.getWidth(), cb.getHeight());
 
-        boolean overlaps = rectA.overlaps(rectB);
-        
-        return overlaps;
+        return rectA.overlaps(rectB);
     }
 
     private boolean isValid(Entity e) {
         return e.hasComponent(TransformComponent.class) && 
                e.hasComponent(CollisionComponent.class);
-    }
-
-    public void reset() {
-        listeners.clear();
-        this.resolver = (a, b) -> {};
     }
 }

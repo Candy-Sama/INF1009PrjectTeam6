@@ -9,11 +9,14 @@ import com.team6.arcadesim.interfaces.AudioHandler;
 
 public class SoundManager implements Disposable {
 
+    // --- State Variables ---
     private AudioHandler audioHandler;
     private float masterVolume = 1.0f;
     private float sfxVolume = 1.0f;
     private float musicVolume = 1.0f;
     private String playingMusicId;
+
+    // --- Storage (The Library) ---
     private Map<String, AudioClip> soundLibrary;
 
     public SoundManager() {
@@ -73,6 +76,7 @@ public class SoundManager implements Disposable {
     public void playSFX(String id) {
         AudioClip clip = soundLibrary.get(id);
         if (clip != null) {
+            // Calculate final volume: Master * SFX
             float finalVol = masterVolume * sfxVolume;
             audioHandler.playSFX(clip, finalVol);
         } else {
@@ -114,6 +118,8 @@ public class SoundManager implements Disposable {
         }
     }
 
+    // --- Volume Controls ---
+
     public void setMasterVolume(float v) {
         this.masterVolume = Math.max(0, Math.min(1, v));
         if (playingMusicId != null) {
@@ -132,18 +138,6 @@ public class SoundManager implements Disposable {
             AudioClip clip = soundLibrary.get(playingMusicId);
             audioHandler.setVolume(clip, masterVolume * musicVolume);
         }
-    }
-
-    public float getMasterVolume() {
-        return masterVolume;
-    }
-
-    public float getSFXVolume() {
-        return sfxVolume;
-    }
-
-    public float getMusicVolume() {
-        return musicVolume;
     }
 
     @Override
