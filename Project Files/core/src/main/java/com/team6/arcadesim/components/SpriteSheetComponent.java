@@ -26,6 +26,8 @@ public class SpriteSheetComponent implements Component {
         this.flipY = false;
     }
 
+    // --- Getters & Setters ---
+
     public TextureRegion getRegion() { return region; }
     
     public void setTexture(Texture texture) {
