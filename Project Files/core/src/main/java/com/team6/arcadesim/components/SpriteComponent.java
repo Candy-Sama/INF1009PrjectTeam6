@@ -31,6 +31,7 @@ public class SpriteComponent implements Component {
         pixmap.dispose();
     }
 
+    // --- Operations from UML ---
     public String getTexturePath() { return texturePath; }
 
     public void setTexture(Texture t) { this.texture = t; }

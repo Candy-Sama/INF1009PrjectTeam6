@@ -12,6 +12,8 @@ public class InputManager {
     public InputManager() {
         this.inputState = new InputState();
         this.inputHandler = new InputHandler(inputState);
+        
+        // Tells LibGDX to send all hardware events to OUR handler
         Gdx.input.setInputProcessor(inputHandler);
     }
 
