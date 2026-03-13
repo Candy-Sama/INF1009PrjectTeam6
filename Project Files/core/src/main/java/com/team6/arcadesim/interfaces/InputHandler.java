@@ -13,13 +13,13 @@ public class InputHandler implements InputProcessor {
     @Override
     public boolean keyDown(int keycode) {
         inputState.setKeyPressed(keycode);
-        return true;
+        return false;
     }
 
     @Override
     public boolean keyUp(int keycode) {
         inputState.setKeyReleased(keycode);
-        return true;
+        return false;
     }
 
     @Override
@@ -30,19 +30,19 @@ public class InputHandler implements InputProcessor {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         inputState.setMouseButtonPressed(button);
-        return true;
+        return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         inputState.setMouseButtonReleased(button);
-        return true;
+        return false;
     }
 
     @Override
     public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
         inputState.setMouseButtonReleased(button);
-        return true;
+        return false;
     }
 
     @Override

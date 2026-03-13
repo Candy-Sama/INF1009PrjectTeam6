@@ -18,6 +18,9 @@ public class GravityManager {
     public void update(float dt, List<Entity> entities) {
         List<Entity> massiveBodies = new ArrayList<>();
         for (Entity e : entities) {
+            if (!e.isActive()) {
+                continue;
+            }
             if (e.hasComponent(MassComponent.class) && e.hasComponent(TransformComponent.class)) {
                 massiveBodies.add(e);
             }

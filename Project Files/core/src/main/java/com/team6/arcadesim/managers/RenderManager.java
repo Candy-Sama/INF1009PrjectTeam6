@@ -1,6 +1,8 @@
 package com.team6.arcadesim.managers;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -17,10 +19,32 @@ public class RenderManager implements Disposable {
 
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;  // For drawing shapes
+    private Map<String, Texture> textureRegistry;
 
     public RenderManager() {
         this.batch = new SpriteBatch();
         this.shapeRenderer = new ShapeRenderer();  
+        this.textureRegistry = new HashMap<>();
+    }
+
+    public void registerTexture(String spriteId, Texture texture) {
+        if (spriteId != null && texture != null) {
+            textureRegistry.put(spriteId, texture);
+        }
+    }
+
+    public void unregisterTexture(String spriteId) {
+        if (spriteId != null) {
+            textureRegistry.remove(spriteId);
+        }
+    }
+
+    public Texture getTexture(String spriteId) {
+        return textureRegistry.get(spriteId);
+    }
+
+    public void clearTextureRegistry() {
+        textureRegistry.clear();
     }
 
     public void render(float dt, List<Entity> entities, OrthographicCamera camera) {
@@ -32,6 +56,9 @@ public class RenderManager implements Disposable {
         batch.begin();
 
         for (Entity entity : entities) {
+            if (!entity.isActive()) {
+                continue;
+            }
             if (!entity.hasComponent(TransformComponent.class) || 
                 !entity.hasComponent(SpriteComponent.class)) {
                 continue;
@@ -39,7 +66,7 @@ public class RenderManager implements Disposable {
 
             TransformComponent tc = entity.getComponent(TransformComponent.class);
             SpriteComponent sc = entity.getComponent(SpriteComponent.class);
-            Texture texture = sc.getTexture();
+            Texture texture = textureRegistry.get(sc.getSpriteId());
 
             if (texture == null) continue;
 
@@ -80,6 +107,9 @@ public class RenderManager implements Disposable {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         
         for (Entity entity : entities) {
+            if (!entity.isActive()) {
+                continue;
+            }
             // Skip if entity doesn't have Transform or CompositeShape
             if (!entity.hasComponent(TransformComponent.class) || 
                 !entity.hasComponent(CompositeShapeComponent.class)) {
@@ -107,6 +137,9 @@ public class RenderManager implements Disposable {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         
         for (Entity entity : entities) {
+            if (!entity.isActive()) {
+                continue;
+            }
             if (!entity.hasComponent(TransformComponent.class) || 
                 !entity.hasComponent(CompositeShapeComponent.class)) {
                 continue;
@@ -203,5 +236,6 @@ public class RenderManager implements Disposable {
         if (shapeRenderer != null) {
             shapeRenderer.dispose();  // NEW: Clean up ShapeRenderer too!
         }
+        textureRegistry.clear();
     }
 }
