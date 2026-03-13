@@ -3,7 +3,7 @@ package com.team6.arcadesim.ecs;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Entity {
+public class Entity {
 
     // Static counter shared by ALL entities to ensure unique IDs
     private static int nextId = 0;

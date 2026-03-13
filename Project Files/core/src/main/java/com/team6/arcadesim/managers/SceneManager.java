@@ -1,88 +1,129 @@
 package com.team6.arcadesim.managers;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
 import java.util.function.Supplier;
 
+import com.team6.arcadesim.events.EventBus;
+import com.team6.arcadesim.events.SceneLifecycleEvent;
+import com.team6.arcadesim.logging.EngineLogger;
+import com.team6.arcadesim.logging.NoOpEngineLogger;
 import com.team6.arcadesim.scenes.AbstractScene;
 
 public class SceneManager {
 
-    // The stack handles which scene is currently active, allowing for overlays and popups
-    private Stack<AbstractScene> sceneStack;
+    // The stack handles which scene is currently active, allowing for overlays and popups.
+    private final Deque<AbstractScene> sceneStack;
 
-    // The Register acts as a factory (Route Name -> Scene Supplier) for creating scenes on demand
-    private Map<String, Supplier<AbstractScene>> sceneRegistry;
+    // Route Name -> Scene Factory.
+    private final Map<String, Supplier<AbstractScene>> sceneRegistry;
+    private EngineLogger logger;
+    private EventBus eventBus;
 
     public SceneManager() {
-        sceneStack = new Stack<>();
-        sceneRegistry = new HashMap<>();
+        this.sceneStack = new ArrayDeque<>();
+        this.sceneRegistry = new HashMap<>();
+        this.logger = new NoOpEngineLogger();
+        this.eventBus = null;
     }
 
-    // Initialises the blueprint for a new scene without instantiating it immediately
-    // e.g., registry.put("MAIN_MENU", () -> new MainMenuScene(gameMaster));
+    public void setLogger(EngineLogger logger) {
+        this.logger = (logger == null) ? new NoOpEngineLogger() : logger;
+    }
+
+    public void setEventBus(EventBus eventBus) {
+        this.eventBus = eventBus;
+    }
+
     public void registerScene(String routeName, Supplier<AbstractScene> sceneFactory) {
         sceneRegistry.put(routeName, sceneFactory);
     }
 
-    // Swaps from old scene to new scene, this destroys the old scene to free memory 
-    // and creates the new scene on demand using the factory
     public void changeScene(String routeName) {
         Supplier<AbstractScene> factory = sceneRegistry.get(routeName);
-        if (factory != null) {
-            // Clean up old scene and stack
-            if (!sceneStack.isEmpty()) {
-                AbstractScene oldScene = sceneStack.pop();
-                oldScene.onExit();
-            }
-
-            // Build new scene on demand and push it to the stack
-            AbstractScene newScene = factory.get();
-            sceneStack.push(newScene);
-            newScene.onEnter();
-            System.out.println("SceneManager: Routed to scene '" + routeName + "'.");
-         } else {
-            System.err.println("SceneManager: No scene registered for route '" + routeName + "'!");
+        if (factory == null) {
+            logger.error("SceneManager: No scene registered for route '" + routeName + "'.");
+            return;
         }
+
+        String previousSceneName = sceneStack.isEmpty() ? null : sceneStack.peek().getName();
+
+        while (!sceneStack.isEmpty()) {
+            AbstractScene oldScene = sceneStack.pop();
+            oldScene.onExit();
+            oldScene.dispose();
+        }
+
+        AbstractScene newScene = factory.get();
+        sceneStack.push(newScene);
+        newScene.onEnter();
+        publishSceneEvent(SceneLifecycleEvent.Type.CHANGED, previousSceneName, newScene.getName());
     }
 
-    // Push a new scene on top of the current top scene
     public void pushScene(String routeName)  {
         Supplier<AbstractScene> factory = sceneRegistry.get(routeName);
-        if (factory != null) {
-            AbstractScene overlayScene = factory.get();
-            sceneStack.push(overlayScene);
-            overlayScene.onEnter();
+        if (factory == null) {
+            logger.error("SceneManager: No scene registered for route '" + routeName + "'.");
+            return;
         }
+
+        AbstractScene previousTop = sceneStack.peek();
+        if (previousTop != null) {
+            previousTop.onPause();
+        }
+
+        AbstractScene overlayScene = factory.get();
+        sceneStack.push(overlayScene);
+        overlayScene.onEnter();
+        publishSceneEvent(SceneLifecycleEvent.Type.PUSHED, previousTop == null ? null : previousTop.getName(), overlayScene.getName());
     }
 
-    // Pop and destroy the top scene off the stack
     public void popScene() {
         if (sceneStack.size() > 1) {
             AbstractScene topScene = sceneStack.pop();
             topScene.onExit();
+            topScene.dispose();
+            AbstractScene resumedScene = sceneStack.peek();
+            if (resumedScene != null) {
+                resumedScene.onResume();
+            }
+            publishSceneEvent(SceneLifecycleEvent.Type.POPPED, topScene.getName(), resumedScene == null ? null : resumedScene.getName());
         } else {
-            System.err.println("SceneManager: Cannot pop the last scene!");
+            logger.warn("SceneManager: Cannot pop the last scene.");
         }
     }
 
-    // Standard game loop
     public void update(float dt) {
         if (!sceneStack.isEmpty()) {
-            // Only update the top scene of the stack, allowing for overlays to render but not update
-            sceneStack.peek().update(dt);
+            AbstractScene currentScene = sceneStack.peek();
+            currentScene.getEntityManager().beginUpdate();
+            try {
+                currentScene.update(dt);
+            } finally {
+                currentScene.getEntityManager().endUpdate();
+            }
         }
     }
 
     public void render(float dt) {
-        // Renders from bottom to top of the stack, allowing for overlays to render on top of the main scene
-        for (AbstractScene scene : sceneStack) {
-            scene.render(dt);
+        for (java.util.Iterator<AbstractScene> it = sceneStack.descendingIterator(); it.hasNext();) {
+            it.next().render(dt);
         }
     }
     
     public void dispose() {
-        for (AbstractScene s : sceneStack) s.dispose();
+        while (!sceneStack.isEmpty()) {
+            AbstractScene scene = sceneStack.pop();
+            scene.onExit();
+            scene.dispose();
+        }
+    }
+
+    private void publishSceneEvent(SceneLifecycleEvent.Type type, String fromScene, String toScene) {
+        if (eventBus != null) {
+            eventBus.publish(new SceneLifecycleEvent(type, fromScene, toScene));
+        }
     }
 }

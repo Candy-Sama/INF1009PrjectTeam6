@@ -19,6 +19,8 @@ import com.team6.arcadesim.scenes.AbstractScene;
 public class DemoGravity extends AbstractScene {
 
     private static final String SCENE_NAME = "DemoGravity";
+    private static final String BLOCK_SPRITE_ID = "gravity.block";
+    private static final String FLOOR_SPRITE_ID = "gravity.floor";
     
     private Texture blockTexture;
     private Texture floorTexture;
@@ -49,6 +51,8 @@ public class DemoGravity extends AbstractScene {
 
         blockTexture = createColorTexture(32, 32, 0xFF0000FF);
         floorTexture = createColorTexture((int) sceneResolution.x, 50, 0x00FF00FF);
+        gameMaster.getRenderManager().registerTexture(BLOCK_SPRITE_ID, blockTexture);
+        gameMaster.getRenderManager().registerTexture(FLOOR_SPRITE_ID, floorTexture);
 
 
         try {
@@ -86,9 +90,9 @@ public class DemoGravity extends AbstractScene {
     public void update(float dt) {
         if (dt > 0.05f) dt = 0.05f;
         
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            float mouseX = Gdx.input.getX();
-            float mouseY = Gdx.input.getY();
+        if (gameMaster.getInputManager().isKeyJustPressed(Input.Keys.SPACE)) {
+            float mouseX = gameMaster.getInputManager().getMouseX();
+            float mouseY = gameMaster.getInputManager().getMouseY();
             Vector2 worldPos = gameMaster.getViewportManager().screenToWorld(mouseX, mouseY);
             
             createFallingBlock(worldPos.x, worldPos.y);
@@ -146,6 +150,8 @@ public class DemoGravity extends AbstractScene {
         
         if (blockTexture != null) blockTexture.dispose();
         if (floorTexture != null) floorTexture.dispose();
+        gameMaster.getRenderManager().unregisterTexture(BLOCK_SPRITE_ID);
+        gameMaster.getRenderManager().unregisterTexture(FLOOR_SPRITE_ID);
         
         this.getEntityManager().removeAll();
         gameMaster.getCollisionManager().reset();
@@ -154,7 +160,7 @@ public class DemoGravity extends AbstractScene {
     public void createFallingBlock(float x, float y) {
         Entity block = new FallingBlock();
         block.addComponent(new TransformComponent(x, y));
-        block.addComponent(new SpriteComponent(blockTexture, 32, 32));
+        block.addComponent(new SpriteComponent(BLOCK_SPRITE_ID, 32, 32));
         MovementComponent movement = new MovementComponent();
         movement.setVelocity(0, 0);
         block.addComponent(movement);
@@ -168,7 +174,7 @@ public class DemoGravity extends AbstractScene {
         float floorY = 25;
         float floorX = sceneResolution.x / 2;
         floor.addComponent(new TransformComponent(floorX, floorY));
-        floor.addComponent(new SpriteComponent(floorTexture, sceneResolution.x, 50));
+        floor.addComponent(new SpriteComponent(FLOOR_SPRITE_ID, sceneResolution.x, 50));
         floor.addComponent(new CollisionComponent((int) sceneResolution.x, 50, true, false));
         this.getEntityManager().addEntity(floor);
         System.out.println("Created floor at (" + floorX + ", " + floorY + ")");
@@ -183,4 +189,3 @@ public class DemoGravity extends AbstractScene {
         return t;
     }
 }
-

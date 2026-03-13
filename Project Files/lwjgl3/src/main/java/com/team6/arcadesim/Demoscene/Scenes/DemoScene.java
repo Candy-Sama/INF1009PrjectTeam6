@@ -159,11 +159,15 @@ import com.team6.arcadesim.ecs.AudioClip;
 import com.team6.arcadesim.ecs.Entity;
 import com.team6.arcadesim.interfaces.CollisionListener;
 import com.team6.arcadesim.scenes.AbstractPlayableScene;
+import com.team6.arcadesim.systems.CollisionSystem;
+import com.team6.arcadesim.systems.MovementSystem;
+import com.team6.arcadesim.systems.SystemPipeline;
 
 // Extends AbstractPlayableScene to inherit automatic physics loops
 public class DemoScene extends AbstractPlayableScene { 
 
     private static final String SCENE_NAME = "DemoScene";
+    private static final String COIN_SPRITE_ID = "demo.coin";
     private com.team6.arcadesim.Demoscene.Managers.CubeCollision cubeCollision;
     private Vector2 sceneResolution = new Vector2(1280, 720);
     private Texture coinTex;
@@ -176,6 +180,12 @@ public class DemoScene extends AbstractPlayableScene {
 
     public class TestEntity extends Entity {
         public TestEntity() { super(); }
+    }
+
+    @Override
+    protected void configureSystems(SystemPipeline pipeline) {
+        pipeline.addSystem(new MovementSystem());
+        pipeline.addSystem(new CollisionSystem());
     }
 
     @Override
@@ -213,6 +223,7 @@ public class DemoScene extends AbstractPlayableScene {
         });
 
         coinTex = new Texture(Gdx.files.internal("coin.png"));
+        gameMaster.getRenderManager().registerTexture(COIN_SPRITE_ID, coinTex);
 
         for (int i = 0; i < 10; i++) {
             Entity testObject = new TestEntity();
@@ -225,7 +236,7 @@ public class DemoScene extends AbstractPlayableScene {
             float speedY = (float) (Math.random() * 200 - 100);
             testObject.addComponent(new MovementComponent(speedX, speedY));
             
-            testObject.addComponent(new SpriteComponent(coinTex, 32, 32));
+            testObject.addComponent(new SpriteComponent(COIN_SPRITE_ID, 32, 32));
             testObject.addComponent(new CollisionComponent(32, 32, true, false));
             
             this.getEntityManager().addEntity(testObject);
@@ -275,7 +286,10 @@ public class DemoScene extends AbstractPlayableScene {
         
         this.getEntityManager().removeAll();
         gameMaster.getCollisionManager().reset(); 
+        gameMaster.getRenderManager().unregisterTexture(COIN_SPRITE_ID);
 
         if (coinTex != null) coinTex.dispose();
+        if (font != null) font.dispose();
+        if (spriteBatch != null) spriteBatch.dispose();
     }
 }
