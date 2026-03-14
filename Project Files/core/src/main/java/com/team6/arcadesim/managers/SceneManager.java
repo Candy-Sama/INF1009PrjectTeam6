@@ -52,6 +52,7 @@ public class SceneManager {
 
         while (!sceneStack.isEmpty()) {
             AbstractScene oldScene = sceneStack.pop();
+            oldScene.detachSceneInputProcessors();
             oldScene.onExit();
             oldScene.dispose();
         }
@@ -59,6 +60,7 @@ public class SceneManager {
         AbstractScene newScene = factory.get();
         sceneStack.push(newScene);
         newScene.onEnter();
+        newScene.attachSceneInputProcessors();
         publishSceneEvent(SceneLifecycleEvent.Type.CHANGED, previousSceneName, newScene.getName());
     }
 
@@ -72,22 +74,26 @@ public class SceneManager {
         AbstractScene previousTop = sceneStack.peek();
         if (previousTop != null) {
             previousTop.onPause();
+            previousTop.detachSceneInputProcessors();
         }
 
         AbstractScene overlayScene = factory.get();
         sceneStack.push(overlayScene);
         overlayScene.onEnter();
+        overlayScene.attachSceneInputProcessors();
         publishSceneEvent(SceneLifecycleEvent.Type.PUSHED, previousTop == null ? null : previousTop.getName(), overlayScene.getName());
     }
 
     public void popScene() {
         if (sceneStack.size() > 1) {
             AbstractScene topScene = sceneStack.pop();
+            topScene.detachSceneInputProcessors();
             topScene.onExit();
             topScene.dispose();
             AbstractScene resumedScene = sceneStack.peek();
             if (resumedScene != null) {
                 resumedScene.onResume();
+                resumedScene.attachSceneInputProcessors();
             }
             publishSceneEvent(SceneLifecycleEvent.Type.POPPED, topScene.getName(), resumedScene == null ? null : resumedScene.getName());
         } else {
@@ -116,6 +122,7 @@ public class SceneManager {
     public void dispose() {
         while (!sceneStack.isEmpty()) {
             AbstractScene scene = sceneStack.pop();
+            scene.detachSceneInputProcessors();
             scene.onExit();
             scene.dispose();
         }

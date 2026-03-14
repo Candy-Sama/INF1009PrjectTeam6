@@ -6,16 +6,32 @@ import com.team6.arcadesim.components.MassComponent;
 import com.team6.arcadesim.components.MovementComponent;
 import com.team6.arcadesim.components.TransformComponent;
 import com.team6.arcadesim.ecs.Entity;
+import com.team6.arcadesim.physics.GravityConfig;
 
 public class GravityManager {
-    // The gravitational constant (in m^3 kg^-1 s^-2)
-    private static final double G = 5000.0; // Adjusted to fit the scale of the simulation
-    
-    // Minimum distance to prevent division by zero and excessive forces
-    // If Entities perfectly overlap, we can set a small minimum distance to avoid infinite forces
-    private static final double MIN_DISTANCE_SQ = 2500; // Adjust as needed for the scale of the simulation
+
+    private GravityConfig gravityConfig;
+
+    public GravityManager() {
+        this(new GravityConfig());
+    }
+
+    public GravityManager(GravityConfig gravityConfig) {
+        setGravityConfig(gravityConfig);
+    }
+
+    public void setGravityConfig(GravityConfig gravityConfig) {
+        this.gravityConfig = (gravityConfig == null) ? new GravityConfig() : gravityConfig;
+    }
+
+    public GravityConfig getGravityConfig() {
+        return gravityConfig;
+    }
 
     public void update(float dt, List<Entity> entities) {
+        float gravityConstant = gravityConfig.getGravityConstant();
+        float minDistanceSq = gravityConfig.getMinDistanceSq();
+
         List<Entity> massiveBodies = new ArrayList<>();
         for (Entity e : entities) {
             if (!e.isActive()) {
@@ -47,16 +63,16 @@ public class GravityManager {
                 // Calculate the vector from A to B
                 float dx = transB.getPosition().x - transA.getPosition().x;
                 float dy = transB.getPosition().y - transA.getPosition().y;
-                double distanceSq = dx * dx + dy * dy;
+                float distanceSq = dx * dx + dy * dy;
 
-                if (distanceSq < MIN_DISTANCE_SQ) {
-                    distanceSq = MIN_DISTANCE_SQ; // Prevent excessive forces
+                if (distanceSq < minDistanceSq) {
+                    distanceSq = minDistanceSq; // Prevent excessive forces
                 }
 
                 float distance = (float) Math.sqrt(distanceSq);
 
                 // Calculate the gravitational force magnitude
-                float force = (float) (G * massB.getMass() / distanceSq);
+                float force = gravityConstant * massB.getMass() / distanceSq;
 
                 // Calculate the acceleration components
                 totalAccX += force * (dx / distance);
