@@ -61,7 +61,7 @@ public class DemoSolar extends AbstractPlayableScene {
 
     @Override
     public void render(float dt) {
-        // Our RenderManager automatically handles the CompositeShapeComponents!
+        // Our RenderManager automatically handles the CompositeShapeComponents
         gameMaster.getRenderManager().render(
             dt,
             this.getEntityManager().getAllEntities(),
