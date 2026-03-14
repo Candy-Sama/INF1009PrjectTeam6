@@ -238,8 +238,8 @@ public class PauseScene extends AbstractScene {
             return;
         }
         
-        if (Gdx.input.justTouched()) {
-            Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        if (gameMaster.getInputManager().isMouseButtonJustPressed(Input.Buttons.LEFT)) {
+            Vector3 touchPos = new Vector3(gameMaster.getInputManager().getMouseX(), gameMaster.getInputManager().getMouseY(), 0);
             gameMaster.getViewportManager().getCamera().unproject(touchPos);
             
             if (masterSlider.isMouseOver(touchPos.x, touchPos.y)) {
@@ -251,8 +251,8 @@ public class PauseScene extends AbstractScene {
             }
         }
         
-        if (Gdx.input.isTouched() && draggingSlider != -1) {
-            Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        if (gameMaster.getInputManager().isMouseButtonDown(Input.Buttons.LEFT) && draggingSlider != -1) {
+            Vector3 touchPos = new Vector3(gameMaster.getInputManager().getMouseX(), gameMaster.getInputManager().getMouseY(), 0);
             gameMaster.getViewportManager().getCamera().unproject(touchPos);
             
             switch (draggingSlider) {
@@ -275,7 +275,7 @@ public class PauseScene extends AbstractScene {
         }
         
         // Stop dragging when mouse released
-        if (!Gdx.input.isTouched()) {
+        if (!gameMaster.getInputManager().isMouseButtonDown(Input.Buttons.LEFT)) {
             draggingSlider = -1;
         }
     }

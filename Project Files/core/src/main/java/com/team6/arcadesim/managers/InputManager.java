@@ -1,21 +1,38 @@
 package com.team6.arcadesim.managers;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.InputMultiplexer;
 import com.team6.arcadesim.input.InputState;
 import com.team6.arcadesim.interfaces.InputHandler;
 
 public class InputManager {
 
-    private InputState inputState;
-    private InputHandler inputHandler;
+    private final InputState inputState;
+    private final InputHandler inputHandler;
+    private final InputMultiplexer inputMultiplexer;
 
     public InputManager() {
         this.inputState = new InputState();
         this.inputHandler = new InputHandler(inputState);
-        Gdx.input.setInputProcessor(inputHandler);
+        this.inputMultiplexer = new InputMultiplexer();
+        this.inputMultiplexer.addProcessor(inputHandler);
+        Gdx.input.setInputProcessor(inputMultiplexer);
     }
 
-    public void update() {
+    public void addInputProcessor(InputProcessor processor) {
+        if (processor != null) {
+            inputMultiplexer.addProcessor(processor);
+        }
+    }
+
+    public void removeInputProcessor(InputProcessor processor) {
+        if (processor != null) {
+            inputMultiplexer.removeProcessor(processor);
+        }
+    }
+
+    public void clearTransientInputs() {
         inputState.reset();
     }
 
@@ -29,6 +46,10 @@ public class InputManager {
 
     public boolean isMouseButtonDown(int button) {
         return inputState.isMouseButtonDown(button);
+    }
+
+    public boolean isMouseButtonJustPressed(int button) {
+        return inputState.isMouseButtonJustPressed(button);
     }
     
     public int getMouseX() {

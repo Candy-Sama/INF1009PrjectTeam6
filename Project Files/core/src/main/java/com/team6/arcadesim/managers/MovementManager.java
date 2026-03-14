@@ -15,6 +15,9 @@ public class MovementManager {
      */
     public void update(float dt, List<Entity> entities) {
         for (Entity entity : entities) {
+            if (!entity.isActive()) {
+                continue;
+            }
             if (!entity.hasComponent(MovementComponent.class) || 
                 !entity.hasComponent(TransformComponent.class)) {
                 continue;

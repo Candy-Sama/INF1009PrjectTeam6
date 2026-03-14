@@ -8,11 +8,13 @@ public class InputState {
     private Set<Integer> keysPressed;
     private Set<Integer> keysJustPressed;
     private Set<Integer> mouseButtonsPressed;
+    private Set<Integer> mouseButtonsJustPressed;
 
     public InputState() {
         this.keysPressed = new HashSet<>();
         this.keysJustPressed = new HashSet<>();
         this.mouseButtonsPressed = new HashSet<>();
+        this.mouseButtonsJustPressed = new HashSet<>();
     }
 
     public void setKeyPressed(int keycode) {
@@ -27,10 +29,12 @@ public class InputState {
 
     public void setMouseButtonPressed(int button) {
         mouseButtonsPressed.add(button);
+        mouseButtonsJustPressed.add(button);
     }
 
     public void setMouseButtonReleased(int button) {
         mouseButtonsPressed.remove(button);
+        mouseButtonsJustPressed.remove(button);
     }
 
     public boolean isKeyDown(int keycode) {
@@ -45,7 +49,12 @@ public class InputState {
         return mouseButtonsPressed.contains(button);
     }
 
+    public boolean isMouseButtonJustPressed(int button) {
+        return mouseButtonsJustPressed.contains(button);
+    }
+
     public void reset() {
         keysJustPressed.clear();
+        mouseButtonsJustPressed.clear();
     }
 }

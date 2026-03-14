@@ -1,6 +1,5 @@
 package com.team6.arcadesim.Demoscene.Scenes;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.team6.arcadesim.AbstractGameMaster;
@@ -10,6 +9,10 @@ import com.team6.arcadesim.components.MovementComponent;
 import com.team6.arcadesim.components.TransformComponent;
 import com.team6.arcadesim.ecs.Entity;
 import com.team6.arcadesim.scenes.AbstractPlayableScene;
+import com.team6.arcadesim.systems.CollisionSystem;
+import com.team6.arcadesim.systems.GravitySystem;
+import com.team6.arcadesim.systems.MovementSystem;
+import com.team6.arcadesim.systems.SystemPipeline;
 
 public class DemoSolar extends AbstractPlayableScene {
 
@@ -19,6 +22,13 @@ public class DemoSolar extends AbstractPlayableScene {
 
     public class TestEntity extends Entity {
         public TestEntity() { super(); }
+    }
+
+    @Override
+    protected void configureSystems(SystemPipeline pipeline) {
+        pipeline.addSystem(new GravitySystem());
+        pipeline.addSystem(new MovementSystem());
+        pipeline.addSystem(new CollisionSystem());
     }
 
     @Override
@@ -37,19 +47,15 @@ public class DemoSolar extends AbstractPlayableScene {
 
     @Override
     protected void processLevelLogic(float dt) {
-        
-        // Cap the delta time to prevent physics explosions if the window is dragged
-        if (dt > 0.05f) dt = 0.05f;
-
         // Test Pause Overlay
-        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+        if (gameMaster.getInputManager().isKeyJustPressed(Input.Keys.P)) {
             System.out.println("Requesting Pause Overlay...");
             gameMaster.getSceneManager().pushScene("pause");
             return;
         }
 
         // Press Space to spawn a random planet!
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+        if (gameMaster.getInputManager().isKeyJustPressed(Input.Keys.SPACE)) {
             float randomX = (float) (Math.random() * 400) + 200;
             float randomY = (float) (Math.random() * 200) + 400;
             // Give it a random horizontal speed so it orbits uniquely

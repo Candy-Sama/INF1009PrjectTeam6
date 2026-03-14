@@ -6,6 +6,8 @@ import java.util.Map;
 import com.badlogic.gdx.utils.Disposable;
 import com.team6.arcadesim.ecs.AudioClip;
 import com.team6.arcadesim.interfaces.AudioHandler;
+import com.team6.arcadesim.logging.EngineLogger;
+import com.team6.arcadesim.logging.NoOpEngineLogger;
 
 public class SoundManager implements Disposable {
 
@@ -15,9 +17,11 @@ public class SoundManager implements Disposable {
     private float musicVolume = 1.0f;
     private String playingMusicId;
     private Map<String, AudioClip> soundLibrary;
+    private EngineLogger logger;
 
     public SoundManager() {
         this.soundLibrary = new HashMap<>();
+        this.logger = new NoOpEngineLogger();
         
         this.audioHandler = new AudioHandler() {
             private com.badlogic.gdx.audio.Music currentMusic;
@@ -66,8 +70,15 @@ public class SoundManager implements Disposable {
         audioHandler.init();
     }
 
+    public void setLogger(EngineLogger logger) {
+        this.logger = (logger == null) ? new NoOpEngineLogger() : logger;
+    }
+
     public void preload(String id, AudioClip clip) {
-        soundLibrary.put(id, clip);
+        AudioClip previousClip = soundLibrary.put(id, clip);
+        if (previousClip != null && previousClip != clip) {
+            previousClip.dispose();
+        }
     }
 
     public void playSFX(String id) {
@@ -76,7 +87,7 @@ public class SoundManager implements Disposable {
             float finalVol = masterVolume * sfxVolume;
             audioHandler.playSFX(clip, finalVol);
         } else {
-            System.err.println("SoundManager: SFX not found - " + id);
+            logger.warn("SoundManager: SFX not found - " + id);
         }
     }
 
@@ -87,7 +98,7 @@ public class SoundManager implements Disposable {
             float finalVol = masterVolume * musicVolume;
             audioHandler.playMusic(clip, loop, finalVol);
         } else {
-            System.err.println("SoundManager: Music not found - " + id);
+            logger.warn("SoundManager: Music not found - " + id);
         }
     }
 
@@ -118,7 +129,9 @@ public class SoundManager implements Disposable {
         this.masterVolume = Math.max(0, Math.min(1, v));
         if (playingMusicId != null) {
             AudioClip clip = soundLibrary.get(playingMusicId);
-            audioHandler.setVolume(clip, masterVolume * musicVolume);
+            if (clip != null) {
+                audioHandler.setVolume(clip, masterVolume * musicVolume);
+            }
         }
     }
 
@@ -130,7 +143,9 @@ public class SoundManager implements Disposable {
         this.musicVolume = Math.max(0, Math.min(1, v));
         if (playingMusicId != null) {
             AudioClip clip = soundLibrary.get(playingMusicId);
-            audioHandler.setVolume(clip, masterVolume * musicVolume);
+            if (clip != null) {
+                audioHandler.setVolume(clip, masterVolume * musicVolume);
+            }
         }
     }
 
