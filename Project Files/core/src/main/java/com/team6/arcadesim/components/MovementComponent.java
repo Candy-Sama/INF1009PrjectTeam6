@@ -7,9 +7,6 @@ public class MovementComponent implements Component {
 
     private Vector2 velocity;
     private Vector2 acceleration;
-    
-    // Optional: Max speed to prevent infinite acceleration glitches
-    private float maxSpeed = 500f;
 
     public MovementComponent() {
         this(0, 0);
