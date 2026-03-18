@@ -54,12 +54,12 @@ public class SimulationController extends InputAdapter{
         //Debug log for touch coordinates
         System.out.println("Click world position: (" + worldCoordinates.x + ", " + worldCoordinates.y + ")");
 
-        // Create a new entity at the clicked position with the provided spawn values
+        // Find if there is an entity at the clicked position with the provided spawn values
         Entity hit = findEntityAt(worldCoordinates.x, worldCoordinates.y);
         if (hit != null) {
             onEntitySelected.accept(hit); // Notify the game master about the selected entity. How? By calling the provided Consumer with the selected entity as an argument.
         } else {
-
+            //If not, spawn a new entity at the clicked position using the provided spawn values
             float mass = clampMin(spawnValuesProvider.getMass(), 0.1f);
             float radius = clampMin(spawnValuesProvider.getRadius(), 1f);
             float speedX = spawnValuesProvider.getSpeedX();

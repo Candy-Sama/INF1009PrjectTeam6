@@ -49,14 +49,15 @@ public class DemoSolar extends AbstractPlayableScene {
         // 2. Spawn the first orbiting Planet
         spawnPlanet(640, 500, 189f, 0f, Color.CYAN);
 
+        // 3. Setup the SimulationController to handle user input for spawning new planets and selecting entities
         simulationController = new SimulationController(
             gameMaster,
             this.getEntityManager(),
-            entity -> {
+            entity -> { //when an entity is selected, store it in selectedEntity and print its ID
                 selectedEntity = entity;
                 System.out.println("Selected entity: " + entity.getId());
             },
-            new SimulationController.SpawnValuesProvider() {
+            new SimulationController.SpawnValuesProvider() { //provides default values for spawning new planets when the user clicks on empty space
                 @Override
                 public float getMass() {
                     return 10f;
@@ -104,6 +105,21 @@ public class DemoSolar extends AbstractPlayableScene {
             float randomSpeedX = (float) (Math.random() * 100) + 100; 
             spawnPlanet(randomX, randomY, randomSpeedX, 0f, Color.GREEN);
             System.out.println("Spawned a new planet!");
+        }
+
+        // On leaving the scene boundary, delete the entity and print a message
+        if (entityManager.getAllEntities().size() > 0) {
+            for (Entity entity : entityManager.getAllEntities()) {
+                TransformComponent transform = entity.getComponent(TransformComponent.class);
+                if (transform != null) {
+                    float x = transform.getPosition().x;
+                    float y = transform.getPosition().y;
+                    if (x < -100 || x > 1380 || y < -100 || y > 820) { // Allow some buffer before deletion
+                        System.out.println("Entity " + entity.getId() + " left the scene and was removed.");
+                        entityManager.removeEntity(entity);
+                    }
+                }
+            }
         }
     }
 
