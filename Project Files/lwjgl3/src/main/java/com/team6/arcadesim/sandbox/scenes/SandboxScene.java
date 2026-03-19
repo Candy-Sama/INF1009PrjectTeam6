@@ -19,7 +19,10 @@ import com.team6.arcadesim.components.TransformComponent;
 import com.team6.arcadesim.ecs.Entity;
 import com.team6.arcadesim.scenes.AbstractPlayableScene;
 import com.team6.arcadesim.sandbox.BodyType;
+import com.team6.arcadesim.sandbox.audio.SandboxAudioService;
 import com.team6.arcadesim.sandbox.config.SandboxConfig;
+import com.team6.arcadesim.sandbox.controllers.SimulationController;
+import com.team6.arcadesim.sandbox.events.SandboxAudioEvent;
 import com.team6.arcadesim.sandbox.factory.CelestialEntityFactory;
 import com.team6.arcadesim.sandbox.render.TrajectoryRenderer;
 import com.team6.arcadesim.sandbox.simulation.MutualDestructionResolver;
@@ -43,6 +46,8 @@ public class SandboxScene extends AbstractPlayableScene {
     private final MutualDestructionResolver mutualDestructionResolver;
     private final SandboxTrajectoryService trajectoryService;
     private final TrajectoryRenderer trajectoryRenderer;
+    private SandboxAudioService audioService;
+    private SimulationController simulationController;
     private SandboxMode currentMode;
     private boolean toggleSimulationRequested;
     private boolean clearBoardRequested;
@@ -52,9 +57,10 @@ public class SandboxScene extends AbstractPlayableScene {
     public SandboxScene(AbstractGameMaster gameMaster) {
         super(gameMaster, "SandboxScene", false);
         this.celestialEntityFactory = new CelestialEntityFactory();
-        this.mutualDestructionResolver = new MutualDestructionResolver();
+        this.mutualDestructionResolver = new MutualDestructionResolver(gameMaster.getEventBus());
         this.trajectoryService = new SandboxTrajectoryService();
         this.trajectoryRenderer = new TrajectoryRenderer();
+        this.audioService = null;
         this.currentMode = SandboxMode.BLUEPRINT;
         this.toggleSimulationRequested = false;
         this.clearBoardRequested = false;
@@ -78,11 +84,31 @@ public class SandboxScene extends AbstractPlayableScene {
         controlPanel = new SandboxControlPanel(uiSkin);
         uiStage.addActor(controlPanel.getRootTable());
         wireControlPanelEvents();
-        bindUiToSelectedEntity();
+        bindLiveEditListeners();
         setMode(SandboxMode.BLUEPRINT);
+
+        audioService = new SandboxAudioService(gameMaster);
+        if (gameMaster.getEventBus() != null) {
+            gameMaster.getEventBus().subscribe(SandboxAudioEvent.class, audioService);
+        }
+        audioService.playSandboxBgm();
 
         gameMaster.getCollisionManager().setResolver(mutualDestructionResolver);
         registerSceneInputProcessorFirst(uiStage);
+        simulationController = new SimulationController(
+            gameMaster,
+            getEntityManager(),
+            celestialEntityFactory,
+            entity -> {
+                selectedEntity = entity;
+                bindUiToSelectedEntity();
+                trajectoryService.markDirty();
+            },
+            () -> selectedEntity = null,
+            this::isPointerOverUi,
+            this::getSpawnRequestFromUi
+        );
+        registerSceneInputProcessor(simulationController);
     }
 
     @Override
@@ -90,12 +116,24 @@ public class SandboxScene extends AbstractPlayableScene {
         getEntityManager().removeAll();
         trajectoryService.clear();
         selectedEntity = null;
+        if (audioService != null) {
+            audioService.stopSandboxBgm();
+            if (gameMaster.getEventBus() != null) {
+                gameMaster.getEventBus().unsubscribe(SandboxAudioEvent.class, audioService);
+            }
+        }
         gameMaster.getCollisionManager().setResolver(null);
+        unregisterSceneInputProcessor(simulationController);
         unregisterSceneInputProcessor(uiStage);
     }
 
     @Override
     protected void processLevelLogic(float dt) {
+        if (gameMaster.getInputManager().isKeyJustPressed(Input.Keys.P)) {
+            gameMaster.getSceneManager().pushScene("sandbox_pause");
+            return;
+        }
+
         if (uiStage != null) {
             uiStage.act(dt);
         }
@@ -113,11 +151,6 @@ public class SandboxScene extends AbstractPlayableScene {
         pruneInactiveEntities();
 
         if (currentMode == SandboxMode.BLUEPRINT) {
-            boolean handledClick = handleBodyPlacementInput();
-            if (handledClick) {
-                trajectoryService.markDirty();
-            }
-
             trajectoryService.updatePredictions(
                 getEntityManager().getAllEntities(),
                 gameMaster.getEngineTimingConfig(),
@@ -159,6 +192,10 @@ public class SandboxScene extends AbstractPlayableScene {
     public void dispose() {
         super.dispose();
         trajectoryRenderer.dispose();
+        if (audioService != null) {
+            audioService.dispose();
+            audioService = null;
+        }
         if (uiStage != null) {
             uiStage.dispose();
             uiStage = null;
@@ -168,6 +205,7 @@ public class SandboxScene extends AbstractPlayableScene {
             uiSkin = null;
         }
         controlPanel = null;
+        simulationController = null;
         selectedEntity = null;
     }
 
@@ -186,7 +224,7 @@ public class SandboxScene extends AbstractPlayableScene {
         });
     }
 
-    private void bindUiToSelectedEntity() {
+    private void bindLiveEditListeners() {
         bindField(controlPanel.getMassField(), value -> {
             if (selectedEntity == null || !selectedEntity.hasComponent(MassComponent.class)) {
                 return;
@@ -288,79 +326,7 @@ public class SandboxScene extends AbstractPlayableScene {
         }
     }
 
-    private boolean handleBodyPlacementInput() {
-        if (uiStage == null || controlPanel == null) {
-            return false;
-        }
-
-        int mouseX = gameMaster.getInputManager().getMouseX();
-        int mouseY = gameMaster.getInputManager().getMouseY();
-
-        boolean pointerOverUi = isPointerOverUi(mouseX, mouseY);
-        boolean worldClick = gameMaster.getInputManager().consumeWorldClick(Input.Buttons.LEFT, pointerOverUi);
-        if (!worldClick) {
-            return false;
-        }
-
-        Vector2 worldPosition = gameMaster.getViewportManager().screenToWorld(mouseX, mouseY);
-
-        Entity clickedEntity = findEntityUnderCursor(worldPosition);
-        if (clickedEntity != null) {
-            selectedEntity = clickedEntity;
-            syncUiFromSelectedEntity();
-            return true;
-        }
-
-        if (countActiveEntities() >= SandboxConfig.MAX_ACTIVE_BODIES) {
-            return false;
-        }
-
-        BodyType bodyType = controlPanel.getSelectedBodyType();
-        float radius = controlPanel.getRadiusValue();
-        float mass = controlPanel.getMassValue();
-        float velocityX = controlPanel.getVelocityXValue();
-        float velocityY = controlPanel.getVelocityYValue();
-
-        Entity spawnedEntity = celestialEntityFactory.createBody(
-            bodyType,
-            worldPosition.x,
-            worldPosition.y,
-            radius,
-            mass,
-            velocityX,
-            velocityY
-        );
-        getEntityManager().addEntity(spawnedEntity);
-        selectedEntity = spawnedEntity;
-        syncUiFromSelectedEntity();
-        return true;
-    }
-
-    private Entity findEntityUnderCursor(Vector2 worldPosition) {
-        Entity nearestEntity = null;
-        float nearestDistance = Float.MAX_VALUE;
-
-        for (Entity entity : getEntityManager().getAllEntities()) {
-            if (entity == null || !entity.isActive()) {
-                continue;
-            }
-            if (!entity.hasComponent(TransformComponent.class) || !entity.hasComponent(RadiusComponent.class)) {
-                continue;
-            }
-
-            Vector2 entityPosition = entity.getComponent(TransformComponent.class).getPosition();
-            float radius = entity.getComponent(RadiusComponent.class).getRadius();
-            float distance = Vector2.dst(worldPosition.x, worldPosition.y, entityPosition.x, entityPosition.y);
-            if (distance <= radius && distance < nearestDistance) {
-                nearestDistance = distance;
-                nearestEntity = entity;
-            }
-        }
-
-        return nearestEntity;
-    }
-
-    private void syncUiFromSelectedEntity() {
+    private void bindUiToSelectedEntity() {
         if (controlPanel == null || selectedEntity == null || !selectedEntity.isActive()) {
             return;
         }
@@ -412,16 +378,6 @@ public class SandboxScene extends AbstractPlayableScene {
         }
     }
 
-    private int countActiveEntities() {
-        int activeCount = 0;
-        for (Entity entity : getEntityManager().getAllEntities()) {
-            if (entity != null && entity.isActive()) {
-                activeCount++;
-            }
-        }
-        return activeCount;
-    }
-
     private void clearBoard() {
         getEntityManager().removeAll();
         selectedEntity = null;
@@ -439,10 +395,27 @@ public class SandboxScene extends AbstractPlayableScene {
         }
     }
 
-    private boolean isPointerOverUi(int screenX, int screenY) {
+    private boolean isPointerOverUi() {
+        if (uiStage == null) {
+            return false;
+        }
+        int screenX = gameMaster.getInputManager().getMouseX();
+        int screenY = gameMaster.getInputManager().getMouseY();
         Vector2 stageCoords = uiStage.screenToStageCoordinates(new Vector2(screenX, screenY));
         Actor hit = uiStage.hit(stageCoords.x, stageCoords.y, true);
         return hit != null;
+    }
+
+    private SimulationController.SpawnRequest getSpawnRequestFromUi() {
+        if (controlPanel == null) {
+            return null;
+        }
+        BodyType bodyType = controlPanel.getSelectedBodyType();
+        float mass = SandboxConfig.clampMass(controlPanel.getMassValue());
+        float radius = SandboxConfig.clampRadius(controlPanel.getRadiusValue());
+        float velocityX = SandboxConfig.clampVelocity(controlPanel.getVelocityXValue());
+        float velocityY = SandboxConfig.clampVelocity(controlPanel.getVelocityYValue());
+        return new SimulationController.SpawnRequest(bodyType, mass, radius, velocityX, velocityY);
     }
 
     private interface FloatConsumer {

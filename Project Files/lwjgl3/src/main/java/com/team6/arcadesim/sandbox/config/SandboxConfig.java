@@ -23,6 +23,10 @@ public final class SandboxConfig {
     public static final int PREDICTION_SAMPLE_INTERVAL = 8;
     public static final int MAX_PREDICTION_BODIES = 500;
 
+    public static final float CAMERA_MIN_ZOOM = 0.25f;
+    public static final float CAMERA_MAX_ZOOM = 4.0f;
+    public static final float CAMERA_ZOOM_STEP = 0.10f;
+
     public static float clampRadius(float value) {
         if (Float.isNaN(value) || Float.isInfinite(value)) {
             return DEFAULT_RADIUS;

@@ -3,6 +3,7 @@ package com.team6.arcadesim.sandbox;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.team6.arcadesim.AbstractGameMaster;
 import com.team6.arcadesim.sandbox.scenes.MainMenuScene;
+import com.team6.arcadesim.sandbox.scenes.SandboxPauseScene;
 import com.team6.arcadesim.sandbox.scenes.SandboxScene;
 
 public class SandboxGameMaster extends AbstractGameMaster {
@@ -11,6 +12,7 @@ public class SandboxGameMaster extends AbstractGameMaster {
     public void init() {
         sceneManager.registerScene("main_menu", () -> new MainMenuScene(this));
         sceneManager.registerScene("sandbox", () -> new SandboxScene(this));
+        sceneManager.registerScene("sandbox_pause", () -> new SandboxPauseScene(this));
         sceneManager.changeScene("main_menu");
     }
 

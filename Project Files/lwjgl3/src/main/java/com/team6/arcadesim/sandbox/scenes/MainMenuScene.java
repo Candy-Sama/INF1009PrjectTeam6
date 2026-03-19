@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.team6.arcadesim.AbstractGameMaster;
 import com.team6.arcadesim.scenes.AbstractScene;
+import com.team6.arcadesim.sandbox.audio.SandboxAudioService;
 
 public class MainMenuScene extends AbstractScene {
 
@@ -30,6 +31,7 @@ public class MainMenuScene extends AbstractScene {
     private Texture buttonUpTexture;
     private Texture buttonOverTexture;
     private Texture buttonDownTexture;
+    private SandboxAudioService audioService;
     private boolean startRequested;
     private boolean exitRequested;
 
@@ -46,6 +48,9 @@ public class MainMenuScene extends AbstractScene {
         uiStage = new Stage(new FitViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT));
         registerSceneInputProcessorFirst(uiStage);
 
+        audioService = new SandboxAudioService(gameMaster);
+        audioService.playMenuBgm();
+
         createSkin();
         buildLayout();
     }
@@ -53,6 +58,9 @@ public class MainMenuScene extends AbstractScene {
     @Override
     public void onExit() {
         getEntityManager().removeAll();
+        if (audioService != null) {
+            audioService.stopMenuBgm();
+        }
         unregisterSceneInputProcessor(uiStage);
     }
 
@@ -87,6 +95,10 @@ public class MainMenuScene extends AbstractScene {
         if (skin != null) {
             skin.dispose();
             skin = null;
+        }
+        if (audioService != null) {
+            audioService.dispose();
+            audioService = null;
         }
         if (panelTexture != null) {
             panelTexture.dispose();
