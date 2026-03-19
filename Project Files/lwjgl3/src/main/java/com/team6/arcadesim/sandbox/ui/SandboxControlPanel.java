@@ -5,20 +5,26 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.utils.Align;
+import com.team6.arcadesim.sandbox.BodyType;
+import com.team6.arcadesim.sandbox.config.SandboxConfig;
 
 public class SandboxControlPanel {
 
     private final Table rootTable;
     private final TextButton starButton;
     private final TextButton planetButton;
+    private final ButtonGroup<TextButton> bodyTypeGroup;
     private final TextField radiusField;
     private final TextField massField;
-    private final TextField accelerationXField;
-    private final TextField accelerationYField;
+    private final TextField velocityXField;
+    private final TextField velocityYField;
     private final TextField positionXField;
     private final TextField positionYField;
     private final TextButton startSimulationButton;
+    private final TextButton clearBoardButton;
 
     public SandboxControlPanel(Skin skin) {
         rootTable = new Table();
@@ -28,10 +34,11 @@ public class SandboxControlPanel {
 
         Table panel = new Table();
         panel.setBackground(skin.getDrawable("panel-bg"));
+        panel.setTouchable(Touchable.enabled);
         panel.pad(18f);
         panel.defaults().padBottom(10f).left();
 
-        rootTable.add(panel).width(360f).growY();
+        rootTable.add(panel).width(280f).growY();
 
         Label headingLabel = new Label("Sandbox Control Panel", skin, "heading");
         panel.add(headingLabel).padBottom(16f);
@@ -43,6 +50,10 @@ public class SandboxControlPanel {
         Table bodyTypeRow = new Table();
         starButton = new TextButton("Star", skin);
         planetButton = new TextButton("Planet", skin);
+        bodyTypeGroup = new ButtonGroup<>(starButton, planetButton);
+        bodyTypeGroup.setMinCheckCount(1);
+        bodyTypeGroup.setMaxCheckCount(1);
+        starButton.setChecked(true);
         bodyTypeRow.add(starButton).width(155f).height(42f).padRight(8f);
         bodyTypeRow.add(planetButton).width(155f).height(42f);
         panel.add(bodyTypeRow).padBottom(14f);
@@ -50,26 +61,26 @@ public class SandboxControlPanel {
 
         panel.add(new Label("Radius", skin));
         panel.row();
-        radiusField = createNumericField("20", skin);
+        radiusField = createNumericField(String.valueOf((int) SandboxConfig.DEFAULT_RADIUS), skin);
         panel.add(radiusField).width(320f).height(40f);
         panel.row();
 
         panel.add(new Label("Mass", skin));
         panel.row();
-        massField = createNumericField("150", skin);
+        massField = createNumericField(String.valueOf((int) SandboxConfig.DEFAULT_MASS), skin);
         panel.add(massField).width(320f).height(40f);
         panel.row();
 
-        panel.add(new Label("Initial Acceleration Vector", skin));
+        panel.add(new Label("Initial Velocity Vector", skin));
         panel.row();
-        Table accelerationRow = new Table();
-        accelerationXField = createNumericField("0", skin);
-        accelerationYField = createNumericField("0", skin);
-        accelerationRow.add(new Label("X", skin)).width(16f);
-        accelerationRow.add(accelerationXField).width(132f).height(40f).padRight(8f);
-        accelerationRow.add(new Label("Y", skin)).width(16f);
-        accelerationRow.add(accelerationYField).width(132f).height(40f);
-        panel.add(accelerationRow);
+        Table velocityRow = new Table();
+        velocityXField = createNumericField(String.valueOf((int) SandboxConfig.DEFAULT_VELOCITY), skin);
+        velocityYField = createNumericField(String.valueOf((int) SandboxConfig.DEFAULT_VELOCITY), skin);
+        velocityRow.add(new Label("X", skin)).width(16f);
+        velocityRow.add(velocityXField).width(132f).height(40f).padRight(8f);
+        velocityRow.add(new Label("Y", skin)).width(16f);
+        velocityRow.add(velocityYField).width(132f).height(40f);
+        panel.add(velocityRow);
         panel.row();
 
         panel.add(new Label("Initial Position Vector", skin));
@@ -84,8 +95,12 @@ public class SandboxControlPanel {
         panel.add(positionRow).padBottom(20f);
         panel.row();
 
+        Table actionsRow = new Table();
         startSimulationButton = new TextButton("Start Simulation", skin);
-        panel.add(startSimulationButton).width(320f).height(50f).padTop(4f);
+        clearBoardButton = new TextButton("Clear Board", skin);
+        actionsRow.add(startSimulationButton).width(155f).height(50f).padRight(10f);
+        actionsRow.add(clearBoardButton).width(155f).height(50f);
+        panel.add(actionsRow).padTop(4f);
         panel.row();
         panel.add().growY();
     }
@@ -102,6 +117,37 @@ public class SandboxControlPanel {
         return planetButton;
     }
 
+    public BodyType getSelectedBodyType() {
+        if (starButton.isChecked()) {
+            return BodyType.STAR;
+        }
+        return BodyType.PLANET;
+    }
+
+    public float getRadiusValue() {
+        return parseOrDefault(radiusField.getText(), SandboxConfig.DEFAULT_RADIUS);
+    }
+
+    public float getMassValue() {
+        return parseOrDefault(massField.getText(), SandboxConfig.DEFAULT_MASS);
+    }
+
+    public float getVelocityXValue() {
+        return parseOrDefault(velocityXField.getText(), SandboxConfig.DEFAULT_VELOCITY);
+    }
+
+    public float getVelocityYValue() {
+        return parseOrDefault(velocityYField.getText(), SandboxConfig.DEFAULT_VELOCITY);
+    }
+
+    public float getPositionXValue() {
+        return parseOrDefault(positionXField.getText(), 640f);
+    }
+
+    public float getPositionYValue() {
+        return parseOrDefault(positionYField.getText(), 360f);
+    }
+
     public TextField getRadiusField() {
         return radiusField;
     }
@@ -110,12 +156,12 @@ public class SandboxControlPanel {
         return massField;
     }
 
-    public TextField getAccelerationXField() {
-        return accelerationXField;
+    public TextField getVelocityXField() {
+        return velocityXField;
     }
 
-    public TextField getAccelerationYField() {
-        return accelerationYField;
+    public TextField getVelocityYField() {
+        return velocityYField;
     }
 
     public TextField getPositionXField() {
@@ -130,9 +176,36 @@ public class SandboxControlPanel {
         return startSimulationButton;
     }
 
+    public TextButton getClearBoardButton() {
+        return clearBoardButton;
+    }
+
+    public void setSimulationRunning(boolean running) {
+        startSimulationButton.setText(running ? "Pause Simulation" : "Start Simulation");
+    }
+
+    public void setSelectedBodyType(BodyType type) {
+        if (type == BodyType.STAR) {
+            starButton.setChecked(true);
+        } else {
+            planetButton.setChecked(true);
+        }
+    }
+
     private TextField createNumericField(String initialValue, Skin skin) {
         TextField field = new TextField(initialValue, skin);
         field.setAlignment(Align.center);
         return field;
+    }
+
+    private float parseOrDefault(String text, float fallback) {
+        if (text == null) {
+            return fallback;
+        }
+        try {
+            return Float.parseFloat(text.trim());
+        } catch (NumberFormatException ex) {
+            return fallback;
+        }
     }
 }
