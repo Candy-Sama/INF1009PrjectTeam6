@@ -361,7 +361,7 @@ public class SandboxScene extends AbstractPlayableScene {
 
     private void updateEducationalHud() {
         if (selectedEntity == null) {
-            sandboxUI.setEducationalStats("None", 0f, 0f, -1f);
+            sandboxUI.setEducationalStats("None", 0f, 0f, -1f, "N/A");
             return;
         }
 
@@ -380,6 +380,7 @@ public class SandboxScene extends AbstractPlayableScene {
 
         float nearestStarDistance = -1f;
         float acceleration = 0f;
+        float nearestStarMass = -1f;
         if (selectedEntity.hasComponent(TransformComponent.class)) {
             Vector2 selectedPos = selectedEntity.getComponent(TransformComponent.class).getPosition();
 
@@ -401,6 +402,7 @@ public class SandboxScene extends AbstractPlayableScene {
                 if (nearestStarDistance < 0f || distance < nearestStarDistance) {
                     nearestStarDistance = distance;
                     float starMass = entity.getComponent(MassComponent.class).getMass();
+                    nearestStarMass = starMass;
                     if (distance > 0.001f) {
                         acceleration = (G * starMass) / (distance * distance);
                     }
@@ -408,7 +410,32 @@ public class SandboxScene extends AbstractPlayableScene {
             }
         }
 
-        sandboxUI.setEducationalStats(selectedType, speed, acceleration, nearestStarDistance);
+        String orbitType = classifyOrbitType(selectedType, speed, nearestStarDistance, nearestStarMass);
+        sandboxUI.setEducationalStats(selectedType, speed, acceleration, nearestStarDistance, orbitType);
+    }
+
+    private String classifyOrbitType(String selectedType, float speed, float nearestStarDistance, float nearestStarMass) {
+        if ("Star".equals(selectedType)) {
+            return "Anchor";
+        }
+
+        if (nearestStarDistance <= 0f || nearestStarMass <= 0f) {
+            return "Free Drift";
+        }
+
+        float circularSpeed = (float) Math.sqrt((G * nearestStarMass) / nearestStarDistance);
+        float escapeSpeed = (float) Math.sqrt(2f) * circularSpeed;
+
+        if (speed < circularSpeed * 0.4f) {
+            return "Falling In";
+        }
+        if (Math.abs(speed - circularSpeed) <= circularSpeed * 0.15f) {
+            return "Near Circular";
+        }
+        if (speed < escapeSpeed) {
+            return "Elliptical";
+        }
+        return "Escape";
     }
 
     /**

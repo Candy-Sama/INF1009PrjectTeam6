@@ -49,6 +49,7 @@ public class SandboxUI implements Disposable {
     private final Label speedValueLabel;
     private final Label accelValueLabel;
     private final Label nearestStarValueLabel;
+    private final Label orbitTypeValueLabel;
     private final Label selectedTypeValueLabel;
 
     private Runnable onRemovePressed;
@@ -81,6 +82,7 @@ public class SandboxUI implements Disposable {
         this.speedValueLabel = new Label("-", skin);
         this.accelValueLabel = new Label("-", skin);
         this.nearestStarValueLabel = new Label("-", skin);
+        this.orbitTypeValueLabel = new Label("-", skin);
         this.selectedTypeValueLabel = new Label("None", skin);
 
         configureFields();
@@ -130,15 +132,18 @@ public class SandboxUI implements Disposable {
 
         controlsPanel.add(new Label("Mass", skin)).left().row();
         controlsPanel.add(massField).row();
+        controlsPanel.add(createHintLabel("Higher mass gives stronger gravity pull.")).left().padTop(-4f).row();
 
         controlsPanel.add(new Label("Radius", skin)).left().row();
         controlsPanel.add(radiusField).row();
+        controlsPanel.add(createHintLabel("Radius affects body size and collision area.")).left().padTop(-4f).row();
 
         controlsPanel.add(new Label("Speed X", skin)).left().row();
         controlsPanel.add(speedXField).row();
 
         controlsPanel.add(new Label("Speed Y", skin)).left().row();
         controlsPanel.add(speedYField).row();
+        controlsPanel.add(createHintLabel("Initial velocity shapes orbit path.")).left().padTop(-4f).row();
 
         Table row = new Table();
         row.defaults().expandX().fillX().padRight(8f);
@@ -166,6 +171,7 @@ public class SandboxUI implements Disposable {
         addHudRow(hudTable, "Speed |v|", speedValueLabel);
         addHudRow(hudTable, "Accel |a|", accelValueLabel);
         addHudRow(hudTable, "Nearest Star", nearestStarValueLabel);
+        addHudRow(hudTable, "Orbit Type", orbitTypeValueLabel);
 
         hudPanel.add(hudTable).row();
 
@@ -328,6 +334,13 @@ public class SandboxUI implements Disposable {
         table.row();
     }
 
+    private Label createHintLabel(String text) {
+        Label hintLabel = new Label(text, skin);
+        hintLabel.setWrap(true);
+        hintLabel.setColor(0.72f, 0.76f, 0.84f, 1f);
+        return hintLabel;
+    }
+
     private float parse(String raw, float fallback) {
         if (raw == null) {
             return fallback;
@@ -399,10 +412,11 @@ public class SandboxUI implements Disposable {
         }
     }
 
-    public void setEducationalStats(String selectedType, float speed, float acceleration, float nearestStarDistance) {
+    public void setEducationalStats(String selectedType, float speed, float acceleration, float nearestStarDistance, String orbitType) {
         selectedTypeValueLabel.setText(selectedType == null ? "None" : selectedType);
         speedValueLabel.setText(String.format("%.2f u/s", speed));
         accelValueLabel.setText(String.format("%.2f u/s^2", acceleration));
+        orbitTypeValueLabel.setText((orbitType == null || orbitType.isBlank()) ? "N/A" : orbitType);
 
         if (nearestStarDistance < 0f) {
             nearestStarValueLabel.setText("N/A");
