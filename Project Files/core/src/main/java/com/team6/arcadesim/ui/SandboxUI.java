@@ -26,7 +26,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 public class SandboxUI implements Disposable {
 
     private static final float CONTROL_PANEL_WIDTH = 320f;
-    private static final float HUD_PANEL_WIDTH = 250f;
+    private static final float HUD_PANEL_WIDTH = 230f;
     private static final float DEFAULT_MASS = 10f;
     private static final float DEFAULT_RADIUS = 12f;
     private static final float DEFAULT_SPEED = 0f;
