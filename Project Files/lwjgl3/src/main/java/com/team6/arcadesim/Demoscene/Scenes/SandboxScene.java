@@ -1,6 +1,7 @@
 package com.team6.arcadesim.Demoscene.Scenes;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.team6.arcadesim.AbstractGameMaster;
 import com.team6.arcadesim.Demoscene.CollisionListener.DestructionListener;
@@ -9,6 +10,7 @@ import com.team6.arcadesim.components.CompositeShapeComponent;
 import com.team6.arcadesim.components.MassComponent;
 import com.team6.arcadesim.components.MovementComponent;
 import com.team6.arcadesim.components.RadiusComponent;
+import com.team6.arcadesim.components.TransformComponent;
 import com.team6.arcadesim.ecs.Entity;
 import com.team6.arcadesim.scenes.AbstractPlayableScene;
 import com.team6.arcadesim.systems.CollisionSystem;
@@ -18,6 +20,8 @@ import com.team6.arcadesim.systems.SystemPipeline;
 import com.team6.arcadesim.ui.SandboxUI;
 
 public class SandboxScene extends AbstractPlayableScene {
+
+    private static final float G = 50f;
 
     private SandboxUI sandboxUI;
     private SimulationController simulationController;
@@ -120,6 +124,7 @@ public class SandboxScene extends AbstractPlayableScene {
         );
 
         // Render UI on top
+        updateEducationalHud();
         sandboxUI.update(dt);
     }
 
@@ -245,6 +250,58 @@ public class SandboxScene extends AbstractPlayableScene {
         }
 
         onEntitySelected(entityType, mass, radius, speedX, speedY);
+    }
+
+    private void updateEducationalHud() {
+        if (selectedEntity == null) {
+            sandboxUI.setEducationalStats("None", 0f, 0f, -1f);
+            return;
+        }
+
+        String selectedType = "Planet";
+        if (selectedEntity.hasComponent(CompositeShapeComponent.class)) {
+            CompositeShapeComponent shape = selectedEntity.getComponent(CompositeShapeComponent.class);
+            if (!shape.getShapes().isEmpty() && Color.YELLOW.equals(shape.getShapes().get(0).getColor())) {
+                selectedType = "Star";
+            }
+        }
+
+        float speed = 0f;
+        if (selectedEntity.hasComponent(MovementComponent.class)) {
+            speed = selectedEntity.getComponent(MovementComponent.class).getVelocity().len();
+        }
+
+        float nearestStarDistance = -1f;
+        float acceleration = 0f;
+        if (selectedEntity.hasComponent(TransformComponent.class)) {
+            Vector2 selectedPos = selectedEntity.getComponent(TransformComponent.class).getPosition();
+
+            for (Entity entity : this.getEntityManager().getAllEntities()) {
+                if (entity == selectedEntity || !entity.hasComponent(TransformComponent.class)
+                    || !entity.hasComponent(MassComponent.class)
+                    || !entity.hasComponent(CompositeShapeComponent.class)) {
+                    continue;
+                }
+
+                CompositeShapeComponent shape = entity.getComponent(CompositeShapeComponent.class);
+                if (shape.getShapes().isEmpty() || !Color.YELLOW.equals(shape.getShapes().get(0).getColor())) {
+                    continue;
+                }
+
+                Vector2 starPos = entity.getComponent(TransformComponent.class).getPosition();
+                float distance = selectedPos.dst(starPos);
+
+                if (nearestStarDistance < 0f || distance < nearestStarDistance) {
+                    nearestStarDistance = distance;
+                    float starMass = entity.getComponent(MassComponent.class).getMass();
+                    if (distance > 0.001f) {
+                        acceleration = (G * starMass) / (distance * distance);
+                    }
+                }
+            }
+        }
+
+        sandboxUI.setEducationalStats(selectedType, speed, acceleration, nearestStarDistance);
     }
 
     /**

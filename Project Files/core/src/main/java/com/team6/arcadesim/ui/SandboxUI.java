@@ -42,6 +42,10 @@ public class SandboxUI implements Disposable {
     private final TextButton resetButton;
     private final TextButton startPauseButton;
     private final TextButton returnButton;
+    private final Label speedValueLabel;
+    private final Label accelValueLabel;
+    private final Label nearestStarValueLabel;
+    private final Label selectedTypeValueLabel;
 
     private Runnable onRemovePressed;
     private Runnable onResetPressed;
@@ -65,6 +69,10 @@ public class SandboxUI implements Disposable {
         this.resetButton = new TextButton("Reset", skin);
         this.startPauseButton = new TextButton("Start", skin);
         this.returnButton = new TextButton("Return", skin);
+        this.speedValueLabel = new Label("-", skin);
+        this.accelValueLabel = new Label("-", skin);
+        this.nearestStarValueLabel = new Label("-", skin);
+        this.selectedTypeValueLabel = new Label("None", skin);
 
         configureFields();
         buildLayout();
@@ -126,6 +134,20 @@ public class SandboxUI implements Disposable {
 
         panel.add(startPauseButton).padTop(4f).row();
         panel.add(returnButton).padTop(4f).padBottom(0f).row();
+
+        panel.add(new Label("Learning HUD", skin)).left().padTop(12f).row();
+
+        panel.add(new Label("Selected", skin)).left().row();
+        panel.add(selectedTypeValueLabel).left().row();
+
+        panel.add(new Label("Speed |v|", skin)).left().row();
+        panel.add(speedValueLabel).left().row();
+
+        panel.add(new Label("Accel |a|", skin)).left().row();
+        panel.add(accelValueLabel).left().row();
+
+        panel.add(new Label("Nearest Star", skin)).left().row();
+        panel.add(nearestStarValueLabel).left().row();
 
         root.add(panel).width(PANEL_WIDTH).top().right();
         stage.addActor(root);
@@ -317,6 +339,18 @@ public class SandboxUI implements Disposable {
 
     public void setSimulationRunning(boolean running) {
         startPauseButton.setText(running ? "Pause" : "Start");
+    }
+
+    public void setEducationalStats(String selectedType, float speed, float acceleration, float nearestStarDistance) {
+        selectedTypeValueLabel.setText(selectedType == null ? "None" : selectedType);
+        speedValueLabel.setText(String.format("%.2f u/s", speed));
+        accelValueLabel.setText(String.format("%.2f u/s^2", acceleration));
+
+        if (nearestStarDistance < 0f) {
+            nearestStarValueLabel.setText("N/A");
+        } else {
+            nearestStarValueLabel.setText(String.format("%.2f u", nearestStarDistance));
+        }
     }
 
     public void setOnRemovePressed(Runnable onRemovePressed) {
