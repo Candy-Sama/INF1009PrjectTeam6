@@ -25,7 +25,8 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class SandboxUI implements Disposable {
 
-    private static final float PANEL_WIDTH = 320f;
+    private static final float CONTROL_PANEL_WIDTH = 320f;
+    private static final float HUD_PANEL_WIDTH = 250f;
     private static final float DEFAULT_MASS = 10f;
     private static final float DEFAULT_RADIUS = 12f;
     private static final float DEFAULT_SPEED = 0f;
@@ -107,49 +108,56 @@ public class SandboxUI implements Disposable {
     private void buildLayout() {
         Table root = new Table();
         root.setFillParent(true);
-        root.top().right().pad(20f);
+        root.top().left().pad(20f);
 
-        Table panel = new Table();
-        panel.setBackground(skin.getDrawable("panel-bg"));
-        panel.pad(18f);
-        panel.defaults().width(PANEL_WIDTH - 36f).padBottom(10f);
+        Table controlsPanel = new Table();
+        controlsPanel.setBackground(skin.getDrawable("panel-bg"));
+        controlsPanel.pad(18f);
+        controlsPanel.defaults().width(CONTROL_PANEL_WIDTH - 36f).padBottom(10f);
 
         Label title = new Label("Sandbox Controls", skin);
         title.setAlignment(Align.center);
-        panel.add(title).padBottom(16f).row();
+        controlsPanel.add(title).padBottom(16f).row();
 
-        panel.add(new Label("Entity Type", skin)).left().row();
+        controlsPanel.add(new Label("Entity Type", skin)).left().row();
         entitySelector.setItems("Star", "Planet");
-        panel.add(entitySelector).row();
+        controlsPanel.add(entitySelector).row();
 
-        panel.add(new Label("Preset Scenario", skin)).left().row();
+        controlsPanel.add(new Label("Preset Scenario", skin)).left().row();
         presetSelector.setItems("Sun-Earth", "Binary Stars");
-        panel.add(presetSelector).row();
-        panel.add(loadPresetButton).row();
+        controlsPanel.add(presetSelector).row();
+        controlsPanel.add(loadPresetButton).row();
 
-        panel.add(new Label("Mass", skin)).left().row();
-        panel.add(massField).row();
+        controlsPanel.add(new Label("Mass", skin)).left().row();
+        controlsPanel.add(massField).row();
 
-        panel.add(new Label("Radius", skin)).left().row();
-        panel.add(radiusField).row();
+        controlsPanel.add(new Label("Radius", skin)).left().row();
+        controlsPanel.add(radiusField).row();
 
-        panel.add(new Label("Speed X", skin)).left().row();
-        panel.add(speedXField).row();
+        controlsPanel.add(new Label("Speed X", skin)).left().row();
+        controlsPanel.add(speedXField).row();
 
-        panel.add(new Label("Speed Y", skin)).left().row();
-        panel.add(speedYField).row();
+        controlsPanel.add(new Label("Speed Y", skin)).left().row();
+        controlsPanel.add(speedYField).row();
 
         Table row = new Table();
         row.defaults().expandX().fillX().padRight(8f);
         row.add(removeButton);
         row.add(resetButton).padRight(0f);
-        panel.add(row).padTop(8f).row();
+        controlsPanel.add(row).padTop(8f).row();
 
-        panel.add(startPauseButton).padTop(4f).row();
-        panel.add(timeScaleButton).padTop(4f).row();
-        panel.add(returnButton).padTop(4f).padBottom(0f).row();
+        controlsPanel.add(startPauseButton).padTop(4f).row();
+        controlsPanel.add(timeScaleButton).padTop(4f).row();
+        controlsPanel.add(returnButton).padTop(4f).padBottom(0f).row();
 
-        panel.add(new Label("Learning HUD", skin)).left().padTop(12f).row();
+        Table hudPanel = new Table();
+        hudPanel.setBackground(skin.getDrawable("panel-bg"));
+        hudPanel.pad(18f);
+        hudPanel.defaults().width(HUD_PANEL_WIDTH - 36f).padBottom(10f);
+
+        Label hudTitle = new Label("Learning HUD", skin);
+        hudTitle.setAlignment(Align.center);
+        hudPanel.add(hudTitle).padBottom(16f).row();
 
         Table hudTable = new Table();
         hudTable.defaults().padBottom(6f);
@@ -159,9 +167,11 @@ public class SandboxUI implements Disposable {
         addHudRow(hudTable, "Accel |a|", accelValueLabel);
         addHudRow(hudTable, "Nearest Star", nearestStarValueLabel);
 
-        panel.add(hudTable).row();
+        hudPanel.add(hudTable).row();
 
-        root.add(panel).width(PANEL_WIDTH).top().right();
+        root.add(hudPanel).width(HUD_PANEL_WIDTH).top().left();
+        root.add().expandX();
+        root.add(controlsPanel).width(CONTROL_PANEL_WIDTH).top().right();
         stage.addActor(root);
     }
 
