@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
@@ -185,16 +186,16 @@ public class SandboxUI implements Disposable {
         BitmapFont font = new BitmapFont();
         uiSkin.add("default-font", font);
 
-        uiSkin.add("button-up", solid(0.22f, 0.24f, 0.30f, 1f));
-        uiSkin.add("button-over", solid(0.30f, 0.33f, 0.40f, 1f));
-        uiSkin.add("button-down", solid(0.16f, 0.18f, 0.24f, 1f));
-        uiSkin.add("field-bg", solid(0.14f, 0.15f, 0.19f, 1f));
-        uiSkin.add("field-focus", solid(0.20f, 0.22f, 0.28f, 1f));
-        uiSkin.add("panel-bg", solid(0.07f, 0.08f, 0.11f, 0.94f));
-        uiSkin.add("select-bg", solid(0.14f, 0.15f, 0.19f, 1f));
-        uiSkin.add("select-open", solid(0.18f, 0.20f, 0.26f, 1f));
-        uiSkin.add("list-select", solid(0.30f, 0.34f, 0.45f, 1f));
-        uiSkin.add("list-bg", solid(0.12f, 0.13f, 0.17f, 0.98f));
+        uiSkin.add("button-up", solid(0.22f, 0.24f, 0.30f, 1f), Drawable.class);
+        uiSkin.add("button-over", solid(0.30f, 0.33f, 0.40f, 1f), Drawable.class);
+        uiSkin.add("button-down", solid(0.16f, 0.18f, 0.24f, 1f), Drawable.class);
+        uiSkin.add("field-bg", solid(0.14f, 0.15f, 0.19f, 1f), Drawable.class);
+        uiSkin.add("field-focus", solid(0.20f, 0.22f, 0.28f, 1f), Drawable.class);
+        uiSkin.add("panel-bg", solid(0.07f, 0.08f, 0.11f, 0.94f), Drawable.class);
+        uiSkin.add("select-bg", solid(0.14f, 0.15f, 0.19f, 1f), Drawable.class);
+        uiSkin.add("select-open", solid(0.18f, 0.20f, 0.26f, 1f), Drawable.class);
+        uiSkin.add("list-select", solid(0.30f, 0.34f, 0.45f, 1f), Drawable.class);
+        uiSkin.add("list-bg", solid(0.12f, 0.13f, 0.17f, 0.98f), Drawable.class);
 
         Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
         uiSkin.add("default", labelStyle);
