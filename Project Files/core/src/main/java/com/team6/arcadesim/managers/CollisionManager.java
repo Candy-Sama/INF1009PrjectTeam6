@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.team6.arcadesim.components.CollisionComponent;
+import com.team6.arcadesim.components.RadiusComponent;
 import com.team6.arcadesim.components.TransformComponent;
 import com.team6.arcadesim.ecs.Entity;
 import com.team6.arcadesim.events.CollisionEvent;
@@ -136,23 +137,63 @@ public class CollisionManager {
 
     private boolean broadphaseOverlap(Entity a, Entity b) {
         TransformComponent ta = a.getComponent(TransformComponent.class);
-        CollisionComponent ca = a.getComponent(CollisionComponent.class);
         TransformComponent tb = b.getComponent(TransformComponent.class);
-        CollisionComponent cb = b.getComponent(CollisionComponent.class);
+        float halfWidthA = getHalfWidth(a);
+        float halfHeightA = getHalfHeight(a);
+        float halfWidthB = getHalfWidth(b);
+        float halfHeightB = getHalfHeight(b);
 
-        float aLeft = ta.getPosition().x - ca.getWidth() / 2f;
-        float aBottom = ta.getPosition().y - ca.getHeight() / 2f;
-        float bLeft = tb.getPosition().x - cb.getWidth() / 2f;
-        float bBottom = tb.getPosition().y - cb.getHeight() / 2f;
+        float aLeft = ta.getPosition().x - halfWidthA;
+        float aBottom = ta.getPosition().y - halfHeightA;
+        float bLeft = tb.getPosition().x - halfWidthB;
+        float bBottom = tb.getPosition().y - halfHeightB;
 
-        rectA.set(aLeft, aBottom, ca.getWidth(), ca.getHeight());
-        rectB.set(bLeft, bBottom, cb.getWidth(), cb.getHeight());
-        return rectA.overlaps(rectB);
+        float aRight = aLeft + halfWidthA * 2f;
+        float aTop = aBottom + halfHeightA * 2f;
+        float bRight = bLeft + halfWidthB * 2f;
+        float bTop = bBottom + halfHeightB * 2f;
+
+        // Inclusive bounds to avoid missing edge-touching contacts.
+        return aLeft <= bRight && aRight >= bLeft && aBottom <= bTop && aTop >= bBottom;
     }
 
     private boolean narrowphaseOverlap(Entity a, Entity b) {
-        // Default narrowphase is AABB overlap; shape-specific narrowphase can replace this later.
+        if (isCircle(a) && isCircle(b)) {
+            return circleOverlap(a, b);
+        }
+        // Default narrowphase for non-circles remains AABB overlap.
         return broadphaseOverlap(a, b);
+    }
+
+    private boolean circleOverlap(Entity a, Entity b) {
+        TransformComponent ta = a.getComponent(TransformComponent.class);
+        TransformComponent tb = b.getComponent(TransformComponent.class);
+        RadiusComponent ra = a.getComponent(RadiusComponent.class);
+        RadiusComponent rb = b.getComponent(RadiusComponent.class);
+
+        float dx = tb.getPosition().x - ta.getPosition().x;
+        float dy = tb.getPosition().y - ta.getPosition().y;
+        float combinedRadius = Math.max(0f, ra.getRadius()) + Math.max(0f, rb.getRadius());
+        float distanceSq = dx * dx + dy * dy;
+        return distanceSq <= combinedRadius * combinedRadius;
+    }
+
+    private boolean isCircle(Entity entity) {
+        return entity.hasComponent(RadiusComponent.class);
+    }
+
+    private float getHalfWidth(Entity entity) {
+        if (isCircle(entity)) {
+            return Math.max(0f, entity.getComponent(RadiusComponent.class).getRadius());
+        }
+        return entity.getComponent(CollisionComponent.class).getWidth() / 2f;
+    }
+
+    private float getHalfHeight(Entity entity) {
+        if (isCircle(entity)) {
+            return Math.max(0f, entity.getComponent(RadiusComponent.class).getRadius());
+        }
+        return entity.getComponent(CollisionComponent.class).getHeight() / 2f;
     }
 
     private long toPairKey(Entity a, Entity b) {

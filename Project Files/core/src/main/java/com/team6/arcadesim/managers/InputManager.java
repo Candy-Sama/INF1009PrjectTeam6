@@ -26,6 +26,16 @@ public class InputManager {
         }
     }
 
+    /**
+     * Registers an input processor at highest priority.
+     * Use this for UI stages so they can consume events before world logic sees them.
+     */
+    public void addInputProcessorFirst(InputProcessor processor) {
+        if (processor != null) {
+            inputMultiplexer.addProcessor(0, processor);
+        }
+    }
+
     public void removeInputProcessor(InputProcessor processor) {
         if (processor != null) {
             inputMultiplexer.removeProcessor(processor);
@@ -50,6 +60,21 @@ public class InputManager {
 
     public boolean isMouseButtonJustPressed(int button) {
         return inputState.isMouseButtonJustPressed(button);
+    }
+
+    public boolean consumeMouseButtonJustPressed(int button) {
+        return inputState.consumeMouseButtonJustPressed(button);
+    }
+
+    /**
+     * Convenience guard for scene logic: only react to click if UI is not currently targeted.
+     */
+    public boolean consumeWorldClick(int button, boolean pointerOverUi) {
+        if (pointerOverUi) {
+            consumeMouseButtonJustPressed(button);
+            return false;
+        }
+        return consumeMouseButtonJustPressed(button);
     }
     
     public int getMouseX() {

@@ -53,6 +53,18 @@ public class InputState {
         return mouseButtonsJustPressed.contains(button);
     }
 
+    /**
+     * Returns true once for the button in the current frame and consumes the just-pressed flag.
+     * Useful when only one layer (UI or world) should react to the click.
+     */
+    public boolean consumeMouseButtonJustPressed(int button) {
+        if (!mouseButtonsJustPressed.contains(button)) {
+            return false;
+        }
+        mouseButtonsJustPressed.remove(button);
+        return true;
+    }
+
     public void reset() {
         keysJustPressed.clear();
         mouseButtonsJustPressed.clear();

@@ -1,6 +1,7 @@
 package com.team6.arcadesim;
 
 import com.badlogic.gdx.ApplicationListener;
+import com.team6.arcadesim.config.EngineTimingConfig;
 import com.team6.arcadesim.events.EventBus;
 import com.team6.arcadesim.logging.ConsoleEngineLogger;
 import com.team6.arcadesim.logging.EngineLogger;
@@ -12,12 +13,9 @@ import com.team6.arcadesim.managers.RenderManager;
 import com.team6.arcadesim.managers.SceneManager;
 import com.team6.arcadesim.managers.SoundManager;
 import com.team6.arcadesim.managers.ViewportManager;
+import com.team6.arcadesim.physics.GravityConfig;
 
 public abstract class AbstractGameMaster implements ApplicationListener {
-
-    private static final float MAX_FRAME_TIME = 0.1f;
-    private static final float FIXED_TIME_STEP = 1f / 60f;
-    private static final int MAX_SIMULATION_STEPS = 5;
 
     private boolean isRunning;
     private long lastFrameTime;
@@ -31,6 +29,7 @@ public abstract class AbstractGameMaster implements ApplicationListener {
     protected RenderManager renderManager;
     protected SoundManager soundManager;
     protected GravityManager gravityManager;
+    protected EngineTimingConfig engineTimingConfig;
     protected EventBus eventBus;
     protected EngineLogger logger;
 
@@ -49,7 +48,8 @@ public abstract class AbstractGameMaster implements ApplicationListener {
         renderManager = new RenderManager();
         soundManager = new SoundManager();
         sceneManager = new SceneManager();
-        gravityManager = new GravityManager();
+        engineTimingConfig = new EngineTimingConfig();
+        gravityManager = new GravityManager(new GravityConfig());
 
         sceneManager.setLogger(logger);
         sceneManager.setEventBus(eventBus);
@@ -71,16 +71,18 @@ public abstract class AbstractGameMaster implements ApplicationListener {
         long time = System.nanoTime(); // Get current time in nanoseconds
         float deltaTime = (time - lastFrameTime) / 1_000_000_000.0f; // Convert to seconds
         lastFrameTime = time;
-        if (deltaTime > MAX_FRAME_TIME) deltaTime = MAX_FRAME_TIME; // Cap deltaTime to avoid spiral of death -> https://www.gafferongames.com/post/fix_your_timestep/
+        if (deltaTime > engineTimingConfig.getMaxFrameTime()) deltaTime = engineTimingConfig.getMaxFrameTime(); // Cap deltaTime to avoid spiral of death -> https://www.gafferongames.com/post/fix_your_timestep/
 
         accumulator += deltaTime; // Accumulate elapsed time
         update(deltaTime); // Allow game-specific logic to run every frame (e.g. input handling, UI updates)
 
+        float fixedTimeStep = engineTimingConfig.getFixedTimeStep();
+        int maxSimulationSteps = engineTimingConfig.getMaxSimulationSteps();
         int simulationSteps = 0;
         boolean transientInputsCleared = false; // Track if transient inputs have been cleared during this update cycle
-        while (accumulator >= FIXED_TIME_STEP && simulationSteps < MAX_SIMULATION_STEPS) {
-            sceneManager.update(FIXED_TIME_STEP); // Update the current scene with a fixed time step for consistent physics and game logic
-            accumulator -= FIXED_TIME_STEP;
+        while (accumulator >= fixedTimeStep && simulationSteps < maxSimulationSteps) {
+            sceneManager.update(fixedTimeStep); // Update the current scene with a fixed time step for consistent physics and game logic
+            accumulator -= fixedTimeStep;
             simulationSteps++;
 
             if (!transientInputsCleared) { // Clear transient inputs after the first simulation step to ensure they are processed for the current frame but not carried over to the next frame
@@ -89,7 +91,7 @@ public abstract class AbstractGameMaster implements ApplicationListener {
             }
         }
 
-        if (simulationSteps == MAX_SIMULATION_STEPS) { // If we've hit the maximum number of simulation steps, we may be falling behind. Log a warning and reset the accumulator to avoid spiraling out of control.
+        if (simulationSteps == maxSimulationSteps) { // If we've hit the maximum number of simulation steps, we may be falling behind. Log a warning and reset the accumulator to avoid spiraling out of control.
             accumulator = 0f;
             logger.warn("Simulation fell behind; dropping accumulated time to recover.");
         }
@@ -119,6 +121,10 @@ public abstract class AbstractGameMaster implements ApplicationListener {
     public ViewportManager getViewportManager() { return viewportManager; }
     public SceneManager getSceneManager() { return sceneManager; }
     public GravityManager getGravityManager() { return gravityManager; }
+    public EngineTimingConfig getEngineTimingConfig() { return engineTimingConfig; }
+    public void setEngineTimingConfig(EngineTimingConfig engineTimingConfig) {
+        this.engineTimingConfig = (engineTimingConfig == null) ? new EngineTimingConfig() : engineTimingConfig;
+    }
     public EventBus getEventBus() { return eventBus; }
     public EngineLogger getLogger() { return logger; }
 }
