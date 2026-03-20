@@ -1,5 +1,7 @@
 package com.team6.arcadesim.Demoscene.Scenes;
 
+import java.util.function.Consumer;
+
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.team6.arcadesim.AbstractGameMaster;
@@ -29,6 +31,41 @@ public class DemoSolar extends AbstractPlayableScene {
         public TestEntity() { super(); }
     }
 
+    private class EntitySelectionHandler implements Consumer<Entity> {
+        @Override
+        public void accept(Entity entity) {
+            selectedEntity = entity;
+            System.out.println("Selected entity: " + entity.getId());
+        }
+    }
+
+    private class DefaultSpawnValuesProvider implements SimulationController.SpawnValuesProvider {
+        @Override
+        public float getMass() {
+            return 10f;
+        }
+
+        @Override
+        public float getRadius() {
+            return 10f;
+        }
+
+        @Override
+        public float getSpeedX() {
+            return 120f;
+        }
+
+        @Override
+        public float getSpeedY() {
+            return 0f;
+        }
+
+        @Override
+        public String getType() {
+            return "planet";
+        }
+    }
+
     @Override
     protected void configureSystems(SystemPipeline pipeline) {
         pipeline.addSystem(new GravitySystem());
@@ -53,36 +90,8 @@ public class DemoSolar extends AbstractPlayableScene {
         simulationController = new SimulationController(
             gameMaster,
             this.getEntityManager(),
-            entity -> { //when an entity is selected, store it in selectedEntity and print its ID
-                selectedEntity = entity;
-                System.out.println("Selected entity: " + entity.getId());
-            },
-            new SimulationController.SpawnValuesProvider() { //provides default values for spawning new planets when the user clicks on empty space
-                @Override
-                public float getMass() {
-                    return 10f;
-                }
-
-                @Override
-                public float getRadius() {
-                    return 10f;
-                }
-
-                @Override
-                public float getSpeedX() {
-                    return 120f;
-                }
-
-                @Override
-                public float getSpeedY() {
-                    return 0f;
-                }
-
-                @Override
-                public String getType() {
-                    return "planet";
-                }
-            }
+            new EntitySelectionHandler(),
+            new DefaultSpawnValuesProvider()
         );
 
         gameMaster.getInputManager().addInputProcessor(simulationController);
