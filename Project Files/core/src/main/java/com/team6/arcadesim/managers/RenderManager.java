@@ -7,9 +7,11 @@ import java.util.Map;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
 import com.team6.arcadesim.components.CompositeShapeComponent;
+import com.team6.arcadesim.components.RadiusComponent;
 import com.team6.arcadesim.components.SpriteComponent;
 import com.team6.arcadesim.components.TransformComponent;
 import com.team6.arcadesim.ecs.Entity;
@@ -66,22 +68,33 @@ public class RenderManager implements Disposable {
 
             TransformComponent tc = entity.getComponent(TransformComponent.class);
             SpriteComponent sc = entity.getComponent(SpriteComponent.class);
-            Texture texture = textureRegistry.get(sc.getSpriteId());
-
-            if (texture == null) continue;
-
             float centerX = tc.getPosition().x;
             float centerY = tc.getPosition().y;
-            
+
+            // New abstract-engine path: region-based sprite centered and scaled by RadiusComponent.
+            if (sc.getRegion() != null && entity.hasComponent(RadiusComponent.class)) {
+                RadiusComponent rc = entity.getComponent(RadiusComponent.class);
+                TextureRegion region = sc.getRegion();
+                float drawSize = Math.max(0f, rc.getRadius()) * 2f;
+                float x = centerX - drawSize / 2f;
+                float y = centerY - drawSize / 2f;
+                batch.draw(region, x, y, drawSize, drawSize);
+                continue;
+            }
+
+            // Legacy sprite-id path for existing demos.
+            Texture texture = textureRegistry.get(sc.getSpriteId());
+            if (texture == null) {
+                continue;
+            }
+
             float width = sc.getWidth();
             float height = sc.getHeight();
-            float x = centerX - width / 2;
-            float y = centerY - height / 2;
-            float originX = width / 2;
-            float originY = height / 2;
-            
+            float x = centerX - width / 2f;
+            float y = centerY - height / 2f;
+            float originX = width / 2f;
+            float originY = height / 2f;
             float rotation = tc.getRotation();
-
             int srcWidth = texture.getWidth();
             int srcHeight = texture.getHeight();
 
@@ -90,7 +103,7 @@ public class RenderManager implements Disposable {
                 x, y,
                 originX, originY,
                 width, height,
-                1, 1,
+                1f, 1f,
                 rotation,
                 0, 0,
                 srcWidth, srcHeight,
