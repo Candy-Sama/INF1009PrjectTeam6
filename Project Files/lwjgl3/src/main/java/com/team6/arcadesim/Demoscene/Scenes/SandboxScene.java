@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.team6.arcadesim.AbstractGameMaster;
 import com.team6.arcadesim.Demoscene.CollisionListener.DestructionListener;
 import com.team6.arcadesim.Demoscene.Managers.SimulationController;
+import com.team6.arcadesim.components.CollisionComponent;
 import com.team6.arcadesim.components.CompositeShapeComponent;
 import com.team6.arcadesim.components.MassComponent;
 import com.team6.arcadesim.components.MovementComponent;
@@ -223,6 +224,8 @@ public class SandboxScene extends AbstractPlayableScene {
 
         sandboxUI.setOnTimeScalePressed(this::toggleTimeScale);
 
+        sandboxUI.setOnPresetLoadRequested(this::loadPresetScenario);
+
         // Return button
         sandboxUI.setOnReturnPressed(() -> {
             // Go back to main menu or previous scene
@@ -266,6 +269,51 @@ public class SandboxScene extends AbstractPlayableScene {
         } else {
             setTimeScale(1f);
         }
+    }
+
+    private void loadPresetScenario(String presetName) {
+        this.getEntityManager().removeAll();
+        gameMaster.getCollisionManager().reset();
+        selectedEntity = null;
+        onEntityDeselected();
+
+        Entity focusEntity;
+        if ("Binary Stars".equalsIgnoreCase(presetName)) {
+            Entity starA = createPresetEntity(520f, 360f, 0f, 45f, 1200f, 28f, Color.YELLOW);
+            Entity starB = createPresetEntity(760f, 360f, 0f, -45f, 1200f, 28f, Color.YELLOW);
+            createPresetEntity(900f, 360f, 0f, 145f, 18f, 10f, Color.CYAN);
+            this.getEntityManager().addEntity(starA);
+            this.getEntityManager().addEntity(starB);
+            focusEntity = starA;
+        } else {
+            Entity sun = createPresetEntity(640f, 360f, 0f, 0f, 1800f, 36f, Color.YELLOW);
+            Entity earth = createPresetEntity(860f, 360f, 0f, 195f, 20f, 12f, Color.CYAN);
+            this.getEntityManager().addEntity(sun);
+            this.getEntityManager().addEntity(earth);
+            focusEntity = earth;
+        }
+
+        setSimulating(true);
+        handleEntitySelected(focusEntity);
+    }
+
+    private Entity createPresetEntity(float x, float y, float vx, float vy, float mass, float radius, Color color) {
+        Entity entity = new Entity();
+        entity.addComponent(new TransformComponent(x, y));
+        entity.addComponent(new MassComponent(mass));
+
+        MovementComponent movement = new MovementComponent();
+        movement.setVelocity(vx, vy);
+        entity.addComponent(movement);
+
+        entity.addComponent(new RadiusComponent(radius));
+
+        CompositeShapeComponent shape = new CompositeShapeComponent();
+        shape.addShape(CompositeShapeComponent.SubShape.createCircle(0, 0, radius, color, true));
+        entity.addComponent(shape);
+
+        entity.addComponent(new CollisionComponent(radius * 2f, radius * 2f, true, false));
+        return entity;
     }
 
     /**

@@ -34,6 +34,7 @@ public class SandboxUI implements Disposable {
     private final Skin skin;
 
     private final SelectBox<String> entitySelector;
+    private final SelectBox<String> presetSelector;
     private final TextField massField;
     private final TextField radiusField;
     private final TextField speedXField;
@@ -42,6 +43,7 @@ public class SandboxUI implements Disposable {
     private final TextButton resetButton;
     private final TextButton startPauseButton;
     private final TextButton timeScaleButton;
+    private final TextButton loadPresetButton;
     private final TextButton returnButton;
     private final Label speedValueLabel;
     private final Label accelValueLabel;
@@ -52,6 +54,7 @@ public class SandboxUI implements Disposable {
     private Runnable onResetPressed;
     private Runnable onStartPausePressed;
     private Runnable onTimeScalePressed;
+    private Consumer<String> onPresetLoadRequested;
     private Runnable onReturnPressed;
     private Consumer<String> onEntityTypeChanged;
     private BiConsumer<Float, Float> onVelocityChanged;
@@ -63,6 +66,7 @@ public class SandboxUI implements Disposable {
         this.stage = new Stage(new ScreenViewport());
 
         this.entitySelector = new SelectBox<>(skin);
+        this.presetSelector = new SelectBox<>(skin);
         this.massField = new TextField(Float.toString(DEFAULT_MASS), skin);
         this.radiusField = new TextField(Float.toString(DEFAULT_RADIUS), skin);
         this.speedXField = new TextField(Float.toString(DEFAULT_SPEED), skin);
@@ -71,6 +75,7 @@ public class SandboxUI implements Disposable {
         this.resetButton = new TextButton("Reset", skin);
         this.startPauseButton = new TextButton("Start", skin);
         this.timeScaleButton = new TextButton("Speed x1", skin);
+        this.loadPresetButton = new TextButton("Load Preset", skin);
         this.returnButton = new TextButton("Return", skin);
         this.speedValueLabel = new Label("-", skin);
         this.accelValueLabel = new Label("-", skin);
@@ -116,6 +121,11 @@ public class SandboxUI implements Disposable {
         panel.add(new Label("Entity Type", skin)).left().row();
         entitySelector.setItems("Star", "Planet");
         panel.add(entitySelector).row();
+
+        panel.add(new Label("Preset Scenario", skin)).left().row();
+        presetSelector.setItems("Sun-Earth", "Binary Stars");
+        panel.add(presetSelector).row();
+        panel.add(loadPresetButton).row();
 
         panel.add(new Label("Mass", skin)).left().row();
         panel.add(massField).row();
@@ -197,6 +207,15 @@ public class SandboxUI implements Disposable {
             public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
                 if (onTimeScalePressed != null) {
                     onTimeScalePressed.run();
+                }
+            }
+        });
+
+        loadPresetButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+                if (onPresetLoadRequested != null) {
+                    onPresetLoadRequested.accept(presetSelector.getSelected());
                 }
             }
         });
@@ -396,6 +415,10 @@ public class SandboxUI implements Disposable {
 
     public void setOnTimeScalePressed(Runnable onTimeScalePressed) {
         this.onTimeScalePressed = onTimeScalePressed;
+    }
+
+    public void setOnPresetLoadRequested(Consumer<String> onPresetLoadRequested) {
+        this.onPresetLoadRequested = onPresetLoadRequested;
     }
 
     public void setOnReturnPressed(Runnable onReturnPressed) {
