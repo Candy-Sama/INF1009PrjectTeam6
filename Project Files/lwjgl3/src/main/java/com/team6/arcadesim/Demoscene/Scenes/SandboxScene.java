@@ -4,13 +4,13 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.team6.arcadesim.AbstractGameMaster;
 import com.team6.arcadesim.Demoscene.Controller.SimulationController;
 import com.team6.arcadesim.Demoscene.CollisionListener.DestructionListener;
-import com.team6.arcadesim.Demoscene.UI.SandboxUI;
 import com.team6.arcadesim.ecs.Entity;
 import com.team6.arcadesim.scenes.AbstractPlayableScene;
 import com.team6.arcadesim.systems.CollisionSystem;
 import com.team6.arcadesim.systems.GravitySystem;
 import com.team6.arcadesim.systems.MovementSystem;
 import com.team6.arcadesim.systems.SystemPipeline;
+import com.team6.arcadesim.ui.SandboxUI;
 
 public class SandboxScene extends AbstractPlayableScene {
 
@@ -73,21 +73,6 @@ public class SandboxScene extends AbstractPlayableScene {
     }
 
     @Override
-    public void update(float dt) {
-        // Update the UI stage (animations, layout, etc.)
-        sandboxUI.update(dt);
-
-        // Call parent's update which runs systemPipeline
-        // Only process physics if simulation is running
-        if (isSimulating) {
-            super.update(dt);
-        } else {
-            // Even when paused, still need to call processLevelLogic to handle inputs
-            processLevelLogic(dt);
-        }
-    }
-
-    @Override
     public void render(float dt) {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
 
@@ -99,7 +84,7 @@ public class SandboxScene extends AbstractPlayableScene {
         );
 
         // Render UI on top
-        sandboxUI.render(gameMaster.getViewportManager().getCamera());
+        sandboxUI.update(dt);
     }
 
     @Override
@@ -156,13 +141,13 @@ public class SandboxScene extends AbstractPlayableScene {
         });
 
         // Velocity/properties changed
-        sandboxUI.setOnVelocityChanged(() -> {
+        sandboxUI.setOnVelocityChanged((speedX, speedY) -> {
             // Update controller with new UI values
             simulationController.updateEntityProperties(
-                sandboxUI.getSelectedMass(),
-                sandboxUI.getSelectedRadius(),
-                sandboxUI.getSelectedSpeedX(),
-                sandboxUI.getSelectedSpeedY()
+                sandboxUI.getMass(),
+                sandboxUI.getRadius(),
+                speedX,
+                speedY
             );
         });
     }
