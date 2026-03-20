@@ -1,5 +1,13 @@
 .gitkeep
 ArcadeMusic.mp3
+audio/boom.wav
+audio/menu_bgm.wav
+audio/sandbox_bgm.wav
+audio/spawn.wav
 boop.mp3
 coin.png
+credits_bg.png
+mainmenu_bg.png
 rubberBlockBounce.mp3
+sandbox_bg.png
+sprite/spritesheet.png
