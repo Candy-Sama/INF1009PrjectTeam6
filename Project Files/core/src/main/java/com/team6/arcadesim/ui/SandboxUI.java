@@ -41,6 +41,7 @@ public class SandboxUI implements Disposable {
     private final TextButton removeButton;
     private final TextButton resetButton;
     private final TextButton startPauseButton;
+    private final TextButton timeScaleButton;
     private final TextButton returnButton;
     private final Label speedValueLabel;
     private final Label accelValueLabel;
@@ -50,6 +51,7 @@ public class SandboxUI implements Disposable {
     private Runnable onRemovePressed;
     private Runnable onResetPressed;
     private Runnable onStartPausePressed;
+    private Runnable onTimeScalePressed;
     private Runnable onReturnPressed;
     private Consumer<String> onEntityTypeChanged;
     private BiConsumer<Float, Float> onVelocityChanged;
@@ -68,6 +70,7 @@ public class SandboxUI implements Disposable {
         this.removeButton = new TextButton("Remove", skin);
         this.resetButton = new TextButton("Reset", skin);
         this.startPauseButton = new TextButton("Start", skin);
+        this.timeScaleButton = new TextButton("Speed x1", skin);
         this.returnButton = new TextButton("Return", skin);
         this.speedValueLabel = new Label("-", skin);
         this.accelValueLabel = new Label("-", skin);
@@ -133,6 +136,7 @@ public class SandboxUI implements Disposable {
         panel.add(row).padTop(8f).row();
 
         panel.add(startPauseButton).padTop(4f).row();
+        panel.add(timeScaleButton).padTop(4f).row();
         panel.add(returnButton).padTop(4f).padBottom(0f).row();
 
         panel.add(new Label("Learning HUD", skin)).left().padTop(12f).row();
@@ -186,6 +190,15 @@ public class SandboxUI implements Disposable {
             public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
                 if (onStartPausePressed != null) {
                     onStartPausePressed.run();
+                }
+            }
+        });
+
+        timeScaleButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+                if (onTimeScalePressed != null) {
+                    onTimeScalePressed.run();
                 }
             }
         });
@@ -341,6 +354,14 @@ public class SandboxUI implements Disposable {
         startPauseButton.setText(running ? "Pause" : "Start");
     }
 
+    public void setTimeScale(float scale) {
+        if (scale == (int) scale) {
+            timeScaleButton.setText("Speed x" + (int) scale);
+        } else {
+            timeScaleButton.setText(String.format("Speed x%.1f", scale));
+        }
+    }
+
     public void setEducationalStats(String selectedType, float speed, float acceleration, float nearestStarDistance) {
         selectedTypeValueLabel.setText(selectedType == null ? "None" : selectedType);
         speedValueLabel.setText(String.format("%.2f u/s", speed));
@@ -363,6 +384,10 @@ public class SandboxUI implements Disposable {
 
     public void setOnStartPausePressed(Runnable onStartPausePressed) {
         this.onStartPausePressed = onStartPausePressed;
+    }
+
+    public void setOnTimeScalePressed(Runnable onTimeScalePressed) {
+        this.onTimeScalePressed = onTimeScalePressed;
     }
 
     public void setOnReturnPressed(Runnable onReturnPressed) {

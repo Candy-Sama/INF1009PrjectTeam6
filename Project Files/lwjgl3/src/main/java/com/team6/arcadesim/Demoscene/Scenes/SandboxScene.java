@@ -12,10 +12,9 @@ import com.team6.arcadesim.components.MovementComponent;
 import com.team6.arcadesim.components.RadiusComponent;
 import com.team6.arcadesim.components.TransformComponent;
 import com.team6.arcadesim.ecs.Entity;
+import com.team6.arcadesim.managers.EntityManager;
 import com.team6.arcadesim.scenes.AbstractPlayableScene;
-import com.team6.arcadesim.systems.CollisionSystem;
-import com.team6.arcadesim.systems.GravitySystem;
-import com.team6.arcadesim.systems.MovementSystem;
+import com.team6.arcadesim.systems.EngineSystem;
 import com.team6.arcadesim.systems.SystemPipeline;
 import com.team6.arcadesim.ui.SandboxUI;
 
@@ -29,6 +28,7 @@ public class SandboxScene extends AbstractPlayableScene {
     private Entity selectedEntity;
 
     private boolean isSimulating = false;
+    private float simulationTimeScale = 1f;
 
     public SandboxScene(AbstractGameMaster gameMaster) {
         super(gameMaster, "SandboxScene");
@@ -36,10 +36,51 @@ public class SandboxScene extends AbstractPlayableScene {
 
     @Override
     protected void configureSystems(SystemPipeline pipeline) {
-        // Add physics systems in order
-        pipeline.addSystem(new GravitySystem());
-        pipeline.addSystem(new MovementSystem());
-        pipeline.addSystem(new CollisionSystem());
+        // Gate updates by isSimulating and apply time scale for educational controls.
+        pipeline.addSystem(new EngineSystem() {
+            @Override
+            public int getPriority() {
+                return 100;
+            }
+
+            @Override
+            public void update(float dt, AbstractGameMaster gameMaster, EntityManager entityManager) {
+                if (!isSimulating) {
+                    return;
+                }
+                gameMaster.getGravityManager().update(dt * simulationTimeScale, entityManager.getAllEntities());
+            }
+        });
+
+        pipeline.addSystem(new EngineSystem() {
+            @Override
+            public int getPriority() {
+                return 200;
+            }
+
+            @Override
+            public void update(float dt, AbstractGameMaster gameMaster, EntityManager entityManager) {
+                if (!isSimulating) {
+                    return;
+                }
+                gameMaster.getMovementManager().update(dt * simulationTimeScale, entityManager.getAllEntities());
+            }
+        });
+
+        pipeline.addSystem(new EngineSystem() {
+            @Override
+            public int getPriority() {
+                return 300;
+            }
+
+            @Override
+            public void update(float dt, AbstractGameMaster gameMaster, EntityManager entityManager) {
+                if (!isSimulating) {
+                    return;
+                }
+                gameMaster.getCollisionManager().update(dt * simulationTimeScale, entityManager.getAllEntities());
+            }
+        });
     }
 
     @Override
@@ -101,6 +142,9 @@ public class SandboxScene extends AbstractPlayableScene {
 
         // Wire UI callbacks to scene/controller logic
         wireUICallbacks();
+
+        setSimulating(false);
+        setTimeScale(1f);
     }
 
     @Override
@@ -177,6 +221,8 @@ public class SandboxScene extends AbstractPlayableScene {
             toggleSimulation();
         });
 
+        sandboxUI.setOnTimeScalePressed(this::toggleTimeScale);
+
         // Return button
         sandboxUI.setOnReturnPressed(() -> {
             // Go back to main menu or previous scene
@@ -207,6 +253,19 @@ public class SandboxScene extends AbstractPlayableScene {
     public void setSimulating(boolean running) {
         isSimulating = running;
         sandboxUI.setSimulationRunning(running);
+    }
+
+    public void setTimeScale(float scale) {
+        simulationTimeScale = Math.max(0.1f, scale);
+        sandboxUI.setTimeScale(simulationTimeScale);
+    }
+
+    public void toggleTimeScale() {
+        if (simulationTimeScale < 2f) {
+            setTimeScale(5f);
+        } else {
+            setTimeScale(1f);
+        }
     }
 
     /**
