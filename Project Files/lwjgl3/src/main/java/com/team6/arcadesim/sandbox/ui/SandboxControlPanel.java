@@ -33,6 +33,9 @@ public class SandboxControlPanel {
     private final TextField positionYField;
     private final TextButton startSimulationButton;
     private final TextButton clearBoardButton;
+    private final TextButton speed1xButton;
+    private final TextButton speed2xButton;
+    private final TextButton speed3xButton;
 
     public SandboxControlPanel(Skin skin) {
         rootTable = new Table();
@@ -122,6 +125,23 @@ public class SandboxControlPanel {
         actionsRow.add(clearBoardButton).width(HALF_BUTTON_WIDTH).height(42f);
         panel.add(actionsRow).padTop(4f);
         panel.row();
+
+        panel.add(new Label("Simulation Speed", skin)).padTop(2f);
+        panel.row();
+        Table speedRow = new Table();
+        speed1xButton = new TextButton("1x", skin);
+        speed2xButton = new TextButton("2x", skin);
+        speed3xButton = new TextButton("3x", skin);
+        float speedButtonWidth = (PANEL_CONTENT_WIDTH - (ROW_GAP * 2f)) / 3f;
+        speedRow.add(speed1xButton).width(speedButtonWidth).height(34f).padRight(ROW_GAP);
+        speedRow.add(speed2xButton).width(speedButtonWidth).height(34f).padRight(ROW_GAP);
+        speedRow.add(speed3xButton).width(speedButtonWidth).height(34f);
+        panel.add(speedRow).width(PANEL_CONTENT_WIDTH);
+        panel.row();
+        panel.add(createHintLabel("Affects physics update speed while simulation is running.", skin))
+            .width(PANEL_CONTENT_WIDTH).padTop(-2f).padBottom(6f);
+        panel.row();
+
         panel.add().growY();
     }
 
@@ -200,6 +220,18 @@ public class SandboxControlPanel {
         return clearBoardButton;
     }
 
+    public TextButton getSpeed1xButton() {
+        return speed1xButton;
+    }
+
+    public TextButton getSpeed2xButton() {
+        return speed2xButton;
+    }
+
+    public TextButton getSpeed3xButton() {
+        return speed3xButton;
+    }
+
     public void setSimulationRunning(boolean running) {
         startSimulationButton.setText(running ? "Pause Simulation" : "Start Simulation");
     }
@@ -210,6 +242,12 @@ public class SandboxControlPanel {
         } else {
             planetButton.setChecked(true);
         }
+    }
+
+    public void setSimulationSpeed(float speedMultiplier) {
+        speed1xButton.setChecked(Math.abs(speedMultiplier - 1f) < 0.001f);
+        speed2xButton.setChecked(Math.abs(speedMultiplier - 2f) < 0.001f);
+        speed3xButton.setChecked(Math.abs(speedMultiplier - 3f) < 0.001f);
     }
 
     private TextField createNumericField(String initialValue, Skin skin) {

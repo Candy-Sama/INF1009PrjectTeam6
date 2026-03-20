@@ -24,6 +24,7 @@ import com.team6.arcadesim.components.MovementComponent;
 import com.team6.arcadesim.components.RadiusComponent;
 import com.team6.arcadesim.components.TransformComponent;
 import com.team6.arcadesim.ecs.Entity;
+import com.team6.arcadesim.managers.EntityManager;
 import com.team6.arcadesim.scenes.AbstractPlayableScene;
 import com.team6.arcadesim.sandbox.BodyType;
 import com.team6.arcadesim.sandbox.audio.SandboxAudioService;
@@ -39,9 +40,7 @@ import com.team6.arcadesim.sandbox.simulation.SandboxTrajectoryService;
 import com.team6.arcadesim.sandbox.ui.SandboxControlPanel;
 import com.team6.arcadesim.sandbox.ui.SandboxEducationalHud;
 import com.team6.arcadesim.sandbox.ui.SandboxSkinFactory;
-import com.team6.arcadesim.systems.CollisionSystem;
-import com.team6.arcadesim.systems.GravitySystem;
-import com.team6.arcadesim.systems.MovementSystem;
+import com.team6.arcadesim.systems.EngineSystem;
 import com.team6.arcadesim.systems.SystemPipeline;
 
 public class SandboxScene extends AbstractPlayableScene {
@@ -71,6 +70,8 @@ public class SandboxScene extends AbstractPlayableScene {
     private Entity selectedEntity;
     private boolean syncingUiFromSelection;
     private boolean scenePaused;
+    private float simulationSpeedMultiplier;
+    private boolean syncingSpeedButtons;
 
     public SandboxScene(AbstractGameMaster gameMaster) {
         super(gameMaster, "SandboxScene", false);
@@ -91,13 +92,45 @@ public class SandboxScene extends AbstractPlayableScene {
         this.selectedEntity = null;
         this.syncingUiFromSelection = false;
         this.scenePaused = false;
+        this.simulationSpeedMultiplier = 1f;
+        this.syncingSpeedButtons = false;
     }
 
     @Override
     protected void configureSystems(SystemPipeline pipeline) {
-        pipeline.addSystem(new GravitySystem());
-        pipeline.addSystem(new MovementSystem());
-        pipeline.addSystem(new CollisionSystem());
+        pipeline.addSystem(new EngineSystem() {
+            @Override
+            public int getPriority() {
+                return 100;
+            }
+
+            @Override
+            public void update(float dt, AbstractGameMaster gameMaster, EntityManager entityManager) {
+                gameMaster.getGravityManager().update(dt * simulationSpeedMultiplier, entityManager.getAllEntities());
+            }
+        });
+        pipeline.addSystem(new EngineSystem() {
+            @Override
+            public int getPriority() {
+                return 200;
+            }
+
+            @Override
+            public void update(float dt, AbstractGameMaster gameMaster, EntityManager entityManager) {
+                gameMaster.getMovementManager().update(dt * simulationSpeedMultiplier, entityManager.getAllEntities());
+            }
+        });
+        pipeline.addSystem(new EngineSystem() {
+            @Override
+            public int getPriority() {
+                return 300;
+            }
+
+            @Override
+            public void update(float dt, AbstractGameMaster gameMaster, EntityManager entityManager) {
+                gameMaster.getCollisionManager().update(dt * simulationSpeedMultiplier, entityManager.getAllEntities());
+            }
+        });
     }
 
     @Override
@@ -120,6 +153,7 @@ public class SandboxScene extends AbstractPlayableScene {
         wireControlPanelEvents();
         bindLiveEditListeners();
         educationalHud.setNoSelection();
+        setSimulationSpeedMultiplier(1f);
         setMode(SandboxMode.BLUEPRINT);
         scenePaused = false;
 
@@ -320,6 +354,33 @@ public class SandboxScene extends AbstractPlayableScene {
                 clearBoardRequested = true;
             }
         });
+        controlPanel.getSpeed1xButton().addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeListener.ChangeEvent event, Actor actor) {
+                if (syncingSpeedButtons) {
+                    return;
+                }
+                setSimulationSpeedMultiplier(1f);
+            }
+        });
+        controlPanel.getSpeed2xButton().addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeListener.ChangeEvent event, Actor actor) {
+                if (syncingSpeedButtons) {
+                    return;
+                }
+                setSimulationSpeedMultiplier(2f);
+            }
+        });
+        controlPanel.getSpeed3xButton().addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeListener.ChangeEvent event, Actor actor) {
+                if (syncingSpeedButtons) {
+                    return;
+                }
+                setSimulationSpeedMultiplier(3f);
+            }
+        });
     }
 
     private void buildLegendOverlay() {
@@ -500,6 +561,18 @@ public class SandboxScene extends AbstractPlayableScene {
             educationalHud.setNoSelection();
         }
         trajectoryService.clear();
+    }
+
+    private void setSimulationSpeedMultiplier(float multiplier) {
+        simulationSpeedMultiplier = Math.max(1f, multiplier);
+        if (controlPanel != null) {
+            syncingSpeedButtons = true;
+            try {
+                controlPanel.setSimulationSpeed(simulationSpeedMultiplier);
+            } finally {
+                syncingSpeedButtons = false;
+            }
+        }
     }
 
     private void loadBackgroundAsset() {
