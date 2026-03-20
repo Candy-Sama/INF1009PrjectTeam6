@@ -15,9 +15,15 @@ public class InputManager {
     public InputManager() {
         this.inputState = new InputState();
         this.inputHandler = new InputHandler(inputState);
+<<<<<<< HEAD
         this.inputMultiplexer = new InputMultiplexer();
         this.inputMultiplexer.addProcessor(inputHandler);
         Gdx.input.setInputProcessor(inputMultiplexer);
+=======
+        
+        // Tells LibGDX to send all hardware events to OUR handler
+        Gdx.input.setInputProcessor(inputHandler);
+>>>>>>> main
     }
 
     public void addInputProcessor(InputProcessor processor) {

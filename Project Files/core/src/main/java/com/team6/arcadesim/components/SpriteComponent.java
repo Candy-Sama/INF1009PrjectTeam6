@@ -21,9 +21,17 @@ public class SpriteComponent implements Component {
         return spriteId;
     }
 
+<<<<<<< HEAD
     public void setSpriteId(String spriteId) {
         this.spriteId = spriteId;
     }
+=======
+    // --- Operations from UML ---
+    public String getTexturePath() { return texturePath; }
+
+    public void setTexture(Texture t) { this.texture = t; }
+    public Texture getTexture() { return texture; }
+>>>>>>> main
 
     public void setSize(float w, float h) {
         this.width = w;

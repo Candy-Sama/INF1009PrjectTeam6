@@ -5,6 +5,7 @@ import java.util.Set;
 
 public class InputState {
 
+    // HashSet is O(1) for lookups - very fast
     private Set<Integer> keysPressed;
     private Set<Integer> keysJustPressed;
     private Set<Integer> mouseButtonsPressed;
@@ -17,9 +18,11 @@ public class InputState {
         this.mouseButtonsJustPressed = new HashSet<>();
     }
 
+    // --- Write Methods (Called by InputHandler) ---
+
     public void setKeyPressed(int keycode) {
         keysPressed.add(keycode);
-        keysJustPressed.add(keycode);
+        keysJustPressed.add(keycode); // Mark as "Just Pressed" for this frame
     }
 
     public void setKeyReleased(int keycode) {
@@ -37,6 +40,8 @@ public class InputState {
         mouseButtonsJustPressed.remove(button);
     }
 
+    // --- Read Methods (Called by InputManager) ---
+
     public boolean isKeyDown(int keycode) {
         return keysPressed.contains(keycode);
     }
@@ -49,11 +54,16 @@ public class InputState {
         return mouseButtonsPressed.contains(button);
     }
 
+<<<<<<< HEAD
     public boolean isMouseButtonJustPressed(int button) {
         return mouseButtonsJustPressed.contains(button);
     }
+=======
+    // --- Frame Cleanup ---
+>>>>>>> main
 
     public void reset() {
+        // Clear the "Just Pressed" set so they don't trigger again next frame
         keysJustPressed.clear();
         mouseButtonsJustPressed.clear();
     }

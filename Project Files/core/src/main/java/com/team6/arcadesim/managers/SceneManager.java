@@ -14,6 +14,7 @@ import com.team6.arcadesim.scenes.AbstractScene;
 
 public class SceneManager {
 
+<<<<<<< HEAD
     // The stack handles which scene is currently active, allowing for overlays and popups.
     private final Deque<AbstractScene> sceneStack;
 
@@ -21,6 +22,11 @@ public class SceneManager {
     private final Map<String, Supplier<AbstractScene>> sceneRegistry;
     private EngineLogger logger;
     private EventBus eventBus;
+=======
+    private AbstractScene currentScene;
+    private Map<String, AbstractScene> sceneMap;
+    private Stack<AbstractScene> sceneStack = new Stack<>();
+>>>>>>> main
 
     public SceneManager() {
         this.sceneStack = new ArrayDeque<>();
@@ -29,6 +35,7 @@ public class SceneManager {
         this.eventBus = null;
     }
 
+<<<<<<< HEAD
     public void setLogger(EngineLogger logger) {
         this.logger = (logger == null) ? new NoOpEngineLogger() : logger;
     }
@@ -93,6 +100,44 @@ public class SceneManager {
         } else {
             logger.warn("SceneManager: Cannot pop the last scene.");
         }
+=======
+    public void addScene(AbstractScene scene) {
+        sceneMap.put(scene.getName(), scene);
+    }
+
+    public void setScene(AbstractScene newScene) {
+        // 1. Teardown the current scene
+        if (currentScene != null) {
+            currentScene.onExit();
+        }
+
+        // Clear the stack if any scenes are stacked
+        while (!sceneStack.isEmpty()) {
+            sceneStack.pop().onExit();
+        }
+
+        // 2. Switch the rerefence
+        currentScene = newScene;
+
+        // 3. Setup the new scene
+        if (currentScene != null) {
+            currentScene.onEnter();
+        }
+    }
+
+    // Loads a scene by its registered name.
+    public void loadScene(String sceneName) {
+        AbstractScene scene = sceneMap.get(sceneName);
+        if (scene != null) {
+            setScene(scene);
+        } else {
+            System.err.println("Error: Scene not found - " + sceneName);
+        }
+    }
+
+    public AbstractScene getCurrentScene() {
+        return currentScene;
+>>>>>>> main
     }
 
     public void update(float dt) {
@@ -107,6 +152,7 @@ public class SceneManager {
         }
     }
 
+<<<<<<< HEAD
     public void render(float dt) {
         for (java.util.Iterator<AbstractScene> it = sceneStack.descendingIterator(); it.hasNext();) {
             it.next().render(dt);
@@ -127,3 +173,37 @@ public class SceneManager {
         }
     }
 }
+=======
+    public void dispose() {
+        for (AbstractScene scene : sceneMap.values()) {
+            scene.dispose();
+        }
+        sceneMap.clear();
+    }
+
+
+    // --- Scene Stack Methods ---
+
+    //To put a scene on top of the current scene (e.g., for pause menus)
+    public void pushScene(AbstractScene overlayScene){
+        if(currentScene != null){
+            sceneStack.push(currentScene);
+            currentScene.onPause();
+        }
+        currentScene = overlayScene; //Switch to the overlay scene
+        currentScene.onEnter();
+    }
+
+    // To remove the top scene and return to the previous one
+    public void popScene(){
+        if(currentScene != null){
+            currentScene.onExit();
+        }
+        if(!sceneStack.isEmpty()){
+            currentScene = sceneStack.pop(); //get scene from stack
+            currentScene.onResume();
+        } 
+    }
+
+}
+>>>>>>> main

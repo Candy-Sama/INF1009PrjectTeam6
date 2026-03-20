@@ -8,14 +8,12 @@ public class CollisionComponent implements Component {
     private boolean isSolid; // If true, physics resolution stops overlap
     private boolean isTrigger; // If true, only notifies listeners (doesn't push back)
 
-    public CollisionComponent(float width, float height, boolean isSolid, boolean isTrigger) { //Rectangle by default
+    public CollisionComponent(float width, float height, boolean isSolid, boolean isTrigger) {
         this.width = width;
         this.height = height;
         this.isSolid = isSolid;
         this.isTrigger = isTrigger;
     }
-
-    
     
     // Default 32x32 box
     public CollisionComponent() {
@@ -26,6 +24,4 @@ public class CollisionComponent implements Component {
     public float getHeight() { return height; }
     public boolean isSolid() { return isSolid; }
     public boolean isTrigger() { return isTrigger; }
-
-
 }
