@@ -1,9 +1,14 @@
 package com.team6.arcadesim.Demoscene.Scenes;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.team6.arcadesim.AbstractGameMaster;
-import com.team6.arcadesim.Demoscene.Controller.SimulationController;
 import com.team6.arcadesim.Demoscene.CollisionListener.DestructionListener;
+import com.team6.arcadesim.Demoscene.Managers.SimulationController;
+import com.team6.arcadesim.components.CompositeShapeComponent;
+import com.team6.arcadesim.components.MassComponent;
+import com.team6.arcadesim.components.MovementComponent;
+import com.team6.arcadesim.components.RadiusComponent;
 import com.team6.arcadesim.ecs.Entity;
 import com.team6.arcadesim.scenes.AbstractPlayableScene;
 import com.team6.arcadesim.systems.CollisionSystem;
@@ -17,6 +22,7 @@ public class SandboxScene extends AbstractPlayableScene {
     private SandboxUI sandboxUI;
     private SimulationController simulationController;
     private DestructionListener destructionListener;
+    private Entity selectedEntity;
 
     private boolean isSimulating = false;
 
@@ -44,7 +50,37 @@ public class SandboxScene extends AbstractPlayableScene {
         sandboxUI.resize(1280, 720);
 
         // Initialize Controller
-        simulationController = new SimulationController(this, gameMaster);
+        simulationController = new SimulationController(
+            gameMaster,
+            this.getEntityManager(),
+            this::handleEntitySelected,
+            new SimulationController.SpawnValuesProvider() {
+                @Override
+                public float getMass() {
+                    return sandboxUI.getMass();
+                }
+
+                @Override
+                public float getRadius() {
+                    return sandboxUI.getRadius();
+                }
+
+                @Override
+                public float getSpeedX() {
+                    return sandboxUI.getSpeedX();
+                }
+
+                @Override
+                public float getSpeedY() {
+                    return sandboxUI.getSpeedY();
+                }
+
+                @Override
+                public String getType() {
+                    return sandboxUI.getEntityType();
+                }
+            }
+        );
 
         // Initialize Destruction Listener for collision audio
         destructionListener = new DestructionListener(
@@ -101,6 +137,7 @@ public class SandboxScene extends AbstractPlayableScene {
         // Cleanup
         this.getEntityManager().removeAll();
         gameMaster.getCollisionManager().reset();
+        selectedEntity = null;
         if (sandboxUI != null) {
             sandboxUI.dispose();
         }
@@ -112,7 +149,11 @@ public class SandboxScene extends AbstractPlayableScene {
     private void wireUICallbacks() {
         // Remove button
         sandboxUI.setOnRemovePressed(() -> {
-            simulationController.removeSelectedEntity();
+            if (selectedEntity != null) {
+                this.getEntityManager().removeEntity(selectedEntity);
+                selectedEntity = null;
+                onEntityDeselected();
+            }
         });
 
         // Reset button
@@ -120,6 +161,8 @@ public class SandboxScene extends AbstractPlayableScene {
             // Clear all entities and reset the scene
             this.getEntityManager().removeAll();
             gameMaster.getCollisionManager().reset();
+            selectedEntity = null;
+            onEntityDeselected();
             setSimulating(false);
             sandboxUI.setSimulationRunning(false);
         });
@@ -136,19 +179,13 @@ public class SandboxScene extends AbstractPlayableScene {
         });
 
         // Entity type changed (Star/Planet selector)
-        sandboxUI.setOnEntityTypeChanged((entityType) -> {
-            simulationController.setEntityType(entityType);
-        });
+        sandboxUI.setOnEntityTypeChanged(entityType -> { });
 
         // Velocity/properties changed
         sandboxUI.setOnVelocityChanged((speedX, speedY) -> {
-            // Update controller with new UI values
-            simulationController.updateEntityProperties(
-                sandboxUI.getMass(),
-                sandboxUI.getRadius(),
-                speedX,
-                speedY
-            );
+            if (selectedEntity != null && selectedEntity.hasComponent(MovementComponent.class)) {
+                selectedEntity.getComponent(MovementComponent.class).setVelocity(speedX, speedY);
+            }
         });
     }
 
@@ -182,12 +219,39 @@ public class SandboxScene extends AbstractPlayableScene {
         sandboxUI.populateSelectedEntity("", 0, 0, 0, 0);
     }
 
+    private void handleEntitySelected(Entity entity) {
+        selectedEntity = entity;
+
+        String entityType = "Planet";
+        if (entity.hasComponent(CompositeShapeComponent.class)) {
+            CompositeShapeComponent shape = entity.getComponent(CompositeShapeComponent.class);
+            if (!shape.getShapes().isEmpty() && Color.YELLOW.equals(shape.getShapes().get(0).getColor())) {
+                entityType = "Star";
+            }
+        }
+
+        float mass = entity.hasComponent(MassComponent.class)
+            ? entity.getComponent(MassComponent.class).getMass()
+            : 0f;
+        float radius = entity.hasComponent(RadiusComponent.class)
+            ? entity.getComponent(RadiusComponent.class).getRadius()
+            : 0f;
+        float speedX = 0f;
+        float speedY = 0f;
+        if (entity.hasComponent(MovementComponent.class)) {
+            MovementComponent movement = entity.getComponent(MovementComponent.class);
+            speedX = movement.getVelocity().x;
+            speedY = movement.getVelocity().y;
+        }
+
+        onEntitySelected(entityType, mass, radius, speedX, speedY);
+    }
+
     /**
      * Return the current selected entity ID (if any) for controller to use
      */
     public Entity getCurrentSelectedEntity() {
-        // This would need to be tracked by the SimulationController
-        return simulationController.getSelectedEntity();
+        return selectedEntity;
     }
 
     public boolean isSimulating() {
