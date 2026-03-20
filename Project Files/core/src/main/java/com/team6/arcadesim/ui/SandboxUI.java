@@ -141,17 +141,15 @@ public class SandboxUI implements Disposable {
 
         panel.add(new Label("Learning HUD", skin)).left().padTop(12f).row();
 
-        panel.add(new Label("Selected", skin)).left().row();
-        panel.add(selectedTypeValueLabel).left().row();
+        Table hudTable = new Table();
+        hudTable.defaults().padBottom(6f);
 
-        panel.add(new Label("Speed |v|", skin)).left().row();
-        panel.add(speedValueLabel).left().row();
+        addHudRow(hudTable, "Selected", selectedTypeValueLabel);
+        addHudRow(hudTable, "Speed |v|", speedValueLabel);
+        addHudRow(hudTable, "Accel |a|", accelValueLabel);
+        addHudRow(hudTable, "Nearest Star", nearestStarValueLabel);
 
-        panel.add(new Label("Accel |a|", skin)).left().row();
-        panel.add(accelValueLabel).left().row();
-
-        panel.add(new Label("Nearest Star", skin)).left().row();
-        panel.add(nearestStarValueLabel).left().row();
+        panel.add(hudTable).row();
 
         root.add(panel).width(PANEL_WIDTH).top().right();
         stage.addActor(root);
@@ -289,6 +287,16 @@ public class SandboxUI implements Disposable {
             return;
         }
         onVelocityChanged.accept(getSpeedX(), getSpeedY());
+    }
+
+    private void addHudRow(Table table, String title, Label valueLabel) {
+        Label titleLabel = new Label(title, skin);
+        titleLabel.setAlignment(Align.left);
+        valueLabel.setAlignment(Align.right);
+
+        table.add(titleLabel).left().expandX().fillX();
+        table.add(valueLabel).right().minWidth(110f);
+        table.row();
     }
 
     private float parse(String raw, float fallback) {
