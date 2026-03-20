@@ -6,4 +6,8 @@ audio/sandbox_bgm.wav
 audio/spawn.wav
 boop.mp3
 coin.png
+credits_bg.png
+mainmenu_bg.png
 rubberBlockBounce.mp3
+sandbox_bg.png
+sprite/spritesheet.png

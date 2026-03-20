@@ -50,6 +50,7 @@ public class SandboxAudioService implements EngineEventListener<SandboxAudioEven
                 playSpawnSfx();
                 break;
             case MUTUAL_DESTRUCTION:
+            case MERGE:
                 playBoomSfx();
                 break;
             default:

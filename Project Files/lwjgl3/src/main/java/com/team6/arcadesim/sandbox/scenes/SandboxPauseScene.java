@@ -20,6 +20,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.team6.arcadesim.AbstractGameMaster;
 import com.team6.arcadesim.scenes.AbstractScene;
+import com.team6.arcadesim.sandbox.config.SandboxConfig;
+import com.team6.arcadesim.sandbox.simulation.MergeCollisionResolver;
+import com.team6.arcadesim.sandbox.simulation.MutualDestructionResolver;
 
 public class SandboxPauseScene extends AbstractScene {
 
@@ -43,8 +46,13 @@ public class SandboxPauseScene extends AbstractScene {
     private Label masterValueLabel;
     private Label musicValueLabel;
     private Label sfxValueLabel;
+    private TextButton vectorModeButton;
+    private TextButton collisionModeButton;
+    private MutualDestructionResolver mutualDestructionResolver;
+    private MergeCollisionResolver mergeCollisionResolver;
     private boolean firstFrame;
     private boolean resumeRequested;
+    private boolean mainMenuRequested;
 
     public SandboxPauseScene(AbstractGameMaster gameMaster) {
         super(gameMaster, "SandboxPauseScene");
@@ -55,12 +63,17 @@ public class SandboxPauseScene extends AbstractScene {
         gameMaster.getViewportManager().setVirtualResolution(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
         firstFrame = true;
         resumeRequested = false;
+        mainMenuRequested = false;
 
         uiStage = new Stage(new FitViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT));
         registerSceneInputProcessorFirst(uiStage);
 
+        mutualDestructionResolver = new MutualDestructionResolver(gameMaster.getEventBus());
+        mergeCollisionResolver = new MergeCollisionResolver(gameMaster.getEventBus());
+
         createSkin();
         buildLayout();
+        applyCollisionResolverFromConfig();
         gameMaster.getSoundManager().pauseMusic();
     }
 
@@ -85,6 +98,12 @@ public class SandboxPauseScene extends AbstractScene {
         if (resumeRequested) {
             resumeRequested = false;
             gameMaster.getSceneManager().popScene();
+            return;
+        }
+
+        if (mainMenuRequested) {
+            mainMenuRequested = false;
+            gameMaster.getSceneManager().changeScene("main_menu");
             return;
         }
 
@@ -175,6 +194,31 @@ public class SandboxPauseScene extends AbstractScene {
 
         wireSliderListeners();
 
+        vectorModeButton = new TextButton("", skin);
+        refreshVectorModeButtonText();
+        vectorModeButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                SandboxConfig.showVelocityVectors = !SandboxConfig.showVelocityVectors;
+                refreshVectorModeButtonText();
+            }
+        });
+        panel.row();
+        panel.add(vectorModeButton).colspan(3).width(380f).height(52f).padTop(8f).center();
+
+        collisionModeButton = new TextButton("", skin);
+        refreshCollisionModeButtonText();
+        collisionModeButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                SandboxConfig.useMergeCollision = !SandboxConfig.useMergeCollision;
+                refreshCollisionModeButtonText();
+                applyCollisionResolverFromConfig();
+            }
+        });
+        panel.row();
+        panel.add(collisionModeButton).colspan(3).width(380f).height(52f).padTop(16f).center();
+
         TextButton resumeButton = new TextButton("Resume (P)", skin);
         resumeButton.addListener(new ChangeListener() {
             @Override
@@ -183,8 +227,18 @@ public class SandboxPauseScene extends AbstractScene {
             }
         });
 
+        TextButton mainMenuButton = new TextButton("Main Menu", skin);
+        mainMenuButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                mainMenuRequested = true;
+            }
+        });
+
         panel.row();
-        panel.add(resumeButton).colspan(3).width(240f).height(56f).padTop(24f).center();
+        panel.add(resumeButton).colspan(3).width(240f).height(56f).padTop(20f).center();
+        panel.row();
+        panel.add(mainMenuButton).colspan(3).width(240f).height(56f).padTop(10f).center();
     }
 
     private void addSliderRow(Table panel, String labelText, Slider slider, Label valueLabel) {
@@ -226,6 +280,36 @@ public class SandboxPauseScene extends AbstractScene {
 
     private String toPercent(float value) {
         return Math.round(value * 100f) + "%";
+    }
+
+    private void refreshVectorModeButtonText() {
+        if (vectorModeButton == null) {
+            return;
+        }
+        if (SandboxConfig.showVelocityVectors) {
+            vectorModeButton.setText("Velocity Vectors: ON");
+        } else {
+            vectorModeButton.setText("Velocity Vectors: OFF");
+        }
+    }
+
+    private void refreshCollisionModeButtonText() {
+        if (collisionModeButton == null) {
+            return;
+        }
+        if (SandboxConfig.useMergeCollision) {
+            collisionModeButton.setText("Collision Mode: Merge");
+        } else {
+            collisionModeButton.setText("Collision Mode: Mutual Destruction");
+        }
+    }
+
+    private void applyCollisionResolverFromConfig() {
+        if (SandboxConfig.useMergeCollision) {
+            gameMaster.getCollisionManager().setResolver(mergeCollisionResolver);
+        } else {
+            gameMaster.getCollisionManager().setResolver(mutualDestructionResolver);
+        }
     }
 
     private void createSkin() {

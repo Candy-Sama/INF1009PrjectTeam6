@@ -2,10 +2,17 @@ package com.team6.arcadesim.sandbox.scenes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -25,9 +32,12 @@ import com.team6.arcadesim.sandbox.controllers.SimulationController;
 import com.team6.arcadesim.sandbox.events.SandboxAudioEvent;
 import com.team6.arcadesim.sandbox.factory.CelestialEntityFactory;
 import com.team6.arcadesim.sandbox.render.TrajectoryRenderer;
+import com.team6.arcadesim.sandbox.simulation.CelestialSpriteRegistry;
+import com.team6.arcadesim.sandbox.simulation.MergeCollisionResolver;
 import com.team6.arcadesim.sandbox.simulation.MutualDestructionResolver;
 import com.team6.arcadesim.sandbox.simulation.SandboxTrajectoryService;
 import com.team6.arcadesim.sandbox.ui.SandboxControlPanel;
+import com.team6.arcadesim.sandbox.ui.SandboxEducationalHud;
 import com.team6.arcadesim.sandbox.ui.SandboxSkinFactory;
 import com.team6.arcadesim.systems.CollisionSystem;
 import com.team6.arcadesim.systems.GravitySystem;
@@ -42,10 +52,17 @@ public class SandboxScene extends AbstractPlayableScene {
     private Stage uiStage;
     private Skin uiSkin;
     private SandboxControlPanel controlPanel;
-    private final CelestialEntityFactory celestialEntityFactory;
+    private SandboxEducationalHud educationalHud;
+    private Table legendTable;
+    private CelestialEntityFactory celestialEntityFactory;
     private final MutualDestructionResolver mutualDestructionResolver;
+    private final MergeCollisionResolver mergeCollisionResolver;
     private final SandboxTrajectoryService trajectoryService;
     private final TrajectoryRenderer trajectoryRenderer;
+    private final ShapeRenderer vectorShapeRenderer;
+    private final SpriteBatch backgroundBatch;
+    private CelestialSpriteRegistry spriteRegistry;
+    private Texture backgroundTexture;
     private SandboxAudioService audioService;
     private SimulationController simulationController;
     private SandboxMode currentMode;
@@ -53,19 +70,27 @@ public class SandboxScene extends AbstractPlayableScene {
     private boolean clearBoardRequested;
     private Entity selectedEntity;
     private boolean syncingUiFromSelection;
+    private boolean scenePaused;
 
     public SandboxScene(AbstractGameMaster gameMaster) {
         super(gameMaster, "SandboxScene", false);
-        this.celestialEntityFactory = new CelestialEntityFactory();
+        this.celestialEntityFactory = null;
+        this.educationalHud = null;
         this.mutualDestructionResolver = new MutualDestructionResolver(gameMaster.getEventBus());
+        this.mergeCollisionResolver = new MergeCollisionResolver(gameMaster.getEventBus());
         this.trajectoryService = new SandboxTrajectoryService();
         this.trajectoryRenderer = new TrajectoryRenderer();
+        this.vectorShapeRenderer = new ShapeRenderer();
+        this.backgroundBatch = new SpriteBatch();
+        this.spriteRegistry = null;
+        this.backgroundTexture = null;
         this.audioService = null;
         this.currentMode = SandboxMode.BLUEPRINT;
         this.toggleSimulationRequested = false;
         this.clearBoardRequested = false;
         this.selectedEntity = null;
         this.syncingUiFromSelection = false;
+        this.scenePaused = false;
     }
 
     @Override
@@ -78,14 +103,25 @@ public class SandboxScene extends AbstractPlayableScene {
     @Override
     public void onEnter() {
         gameMaster.getViewportManager().setVirtualResolution(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+        loadBackgroundAsset();
+        initializeSpriteRegistry();
+        celestialEntityFactory = new CelestialEntityFactory(
+            spriteRegistry.getStarRegions(),
+            spriteRegistry.getPlanetRegions()
+        );
 
         uiStage = new Stage(new FitViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT));
         uiSkin = SandboxSkinFactory.createSkin();
         controlPanel = new SandboxControlPanel(uiSkin);
+        educationalHud = new SandboxEducationalHud(uiSkin);
+        uiStage.addActor(educationalHud.getRootTable());
         uiStage.addActor(controlPanel.getRootTable());
+        buildLegendOverlay();
         wireControlPanelEvents();
         bindLiveEditListeners();
+        educationalHud.setNoSelection();
         setMode(SandboxMode.BLUEPRINT);
+        scenePaused = false;
 
         audioService = new SandboxAudioService(gameMaster);
         if (gameMaster.getEventBus() != null) {
@@ -93,7 +129,7 @@ public class SandboxScene extends AbstractPlayableScene {
         }
         audioService.playSandboxBgm();
 
-        gameMaster.getCollisionManager().setResolver(mutualDestructionResolver);
+        applyCollisionResolver();
         registerSceneInputProcessorFirst(uiStage);
         simulationController = new SimulationController(
             gameMaster,
@@ -102,9 +138,13 @@ public class SandboxScene extends AbstractPlayableScene {
             entity -> {
                 selectedEntity = entity;
                 bindUiToSelectedEntity();
+                updateEducationalHud();
                 trajectoryService.markDirty();
             },
-            () -> selectedEntity = null,
+            () -> {
+                selectedEntity = null;
+                updateEducationalHud();
+            },
             this::isPointerOverUi,
             this::getSpawnRequestFromUi
         );
@@ -125,11 +165,47 @@ public class SandboxScene extends AbstractPlayableScene {
         gameMaster.getCollisionManager().setResolver(null);
         unregisterSceneInputProcessor(simulationController);
         unregisterSceneInputProcessor(uiStage);
+        scenePaused = false;
+    }
+
+    @Override
+    public void onPause() {
+        scenePaused = true;
+    }
+
+    @Override
+    public void onResume() {
+        scenePaused = false;
+        applyCollisionResolver();
     }
 
     @Override
     protected void processLevelLogic(float dt) {
-        if (gameMaster.getInputManager().isKeyJustPressed(Input.Keys.P)) {
+        // Global pause behavior:
+        // - ESC always pauses, even while editing text fields.
+        // - P pauses only when not actively typing in a TextField.
+        if (uiStage != null) {
+            Actor keyboardFocus = uiStage.getKeyboardFocus();
+            boolean editingText = keyboardFocus instanceof TextField;
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+                uiStage.setKeyboardFocus(null);
+                gameMaster.getSceneManager().pushScene("sandbox_pause");
+                return;
+            }
+
+            if (editingText) {
+                // Quick way to exit textbox without touching UI internals.
+                if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+                    uiStage.setKeyboardFocus(null);
+                } else if (gameMaster.getInputManager().isMouseButtonJustPressed(Input.Buttons.LEFT) && !isPointerOverUi()) {
+                    uiStage.setKeyboardFocus(null);
+                }
+            } else if (gameMaster.getInputManager().isKeyJustPressed(Input.Keys.P) || Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+                gameMaster.getSceneManager().pushScene("sandbox_pause");
+                return;
+            }
+        } else if (gameMaster.getInputManager().isKeyJustPressed(Input.Keys.P) || Gdx.input.isKeyJustPressed(Input.Keys.P)) {
             gameMaster.getSceneManager().pushScene("sandbox_pause");
             return;
         }
@@ -149,6 +225,7 @@ public class SandboxScene extends AbstractPlayableScene {
         }
 
         pruneInactiveEntities();
+        updateEducationalHud();
 
         if (currentMode == SandboxMode.BLUEPRINT) {
             trajectoryService.updatePredictions(
@@ -166,11 +243,20 @@ public class SandboxScene extends AbstractPlayableScene {
 
     @Override
     public void render(float dt) {
+        renderTiledBackground();
+
         gameMaster.getRenderManager().render(
             dt,
             getEntityManager().getAllEntities(),
             gameMaster.getViewportManager().getCamera()
         );
+
+        if (isSimulationRunning()
+            && !scenePaused
+            && currentMode == SandboxMode.SIMULATION
+            && SandboxConfig.showVelocityVectors) {
+            renderVelocityVectors();
+        }
 
         if (currentMode == SandboxMode.BLUEPRINT) {
             trajectoryRenderer.render(
@@ -192,6 +278,16 @@ public class SandboxScene extends AbstractPlayableScene {
     public void dispose() {
         super.dispose();
         trajectoryRenderer.dispose();
+        vectorShapeRenderer.dispose();
+        backgroundBatch.dispose();
+        if (spriteRegistry != null) {
+            spriteRegistry.dispose();
+            spriteRegistry = null;
+        }
+        if (backgroundTexture != null) {
+            backgroundTexture.dispose();
+            backgroundTexture = null;
+        }
         if (audioService != null) {
             audioService.dispose();
             audioService = null;
@@ -200,11 +296,13 @@ public class SandboxScene extends AbstractPlayableScene {
             uiStage.dispose();
             uiStage = null;
         }
+        legendTable = null;
         if (uiSkin != null) {
             uiSkin.dispose();
             uiSkin = null;
         }
         controlPanel = null;
+        educationalHud = null;
         simulationController = null;
         selectedEntity = null;
     }
@@ -222,6 +320,23 @@ public class SandboxScene extends AbstractPlayableScene {
                 clearBoardRequested = true;
             }
         });
+    }
+
+    private void buildLegendOverlay() {
+        legendTable = new Table();
+        legendTable.setFillParent(true);
+        legendTable.bottom().left();
+        legendTable.pad(12f);
+        legendTable.setTouchable(Touchable.disabled);
+
+        Label legendLabel = new Label(
+            "Legend: P / ESC to pause  |  Click an entity to select it, then edit values from the side panel.",
+            uiSkin
+        );
+        legendLabel.setWrap(true);
+
+        legendTable.add(legendLabel).width(760f).left();
+        uiStage.addActor(legendTable);
     }
 
     private void bindLiveEditListeners() {
@@ -381,7 +496,94 @@ public class SandboxScene extends AbstractPlayableScene {
     private void clearBoard() {
         getEntityManager().removeAll();
         selectedEntity = null;
+        if (educationalHud != null) {
+            educationalHud.setNoSelection();
+        }
         trajectoryService.clear();
+    }
+
+    private void loadBackgroundAsset() {
+        if (backgroundTexture != null) {
+            backgroundTexture.dispose();
+            backgroundTexture = null;
+        }
+        try {
+            if (Gdx.files.internal("sandbox_bg.png").exists()) {
+                backgroundTexture = new Texture(Gdx.files.internal("sandbox_bg.png"));
+                backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+            }
+        } catch (Exception ex) {
+            System.err.println("Failed to load sandbox_bg.png (" + ex.getMessage() + ")");
+        }
+    }
+
+    private void initializeSpriteRegistry() {
+        if (spriteRegistry != null) {
+            spriteRegistry.dispose();
+        }
+        spriteRegistry = new CelestialSpriteRegistry();
+        spriteRegistry.load();
+    }
+
+    private void renderTiledBackground() {
+        if (backgroundTexture == null) {
+            return;
+        }
+
+        com.badlogic.gdx.graphics.OrthographicCamera camera = gameMaster.getViewportManager().getCamera();
+        float worldWidth = camera.viewportWidth * camera.zoom;
+        float worldHeight = camera.viewportHeight * camera.zoom;
+        float left = camera.position.x - (worldWidth / 2f);
+        float bottom = camera.position.y - (worldHeight / 2f);
+        float tileScale = 512f;
+
+        backgroundBatch.setProjectionMatrix(camera.combined);
+        backgroundBatch.begin();
+        backgroundBatch.draw(
+            backgroundTexture,
+            left,
+            bottom,
+            worldWidth,
+            worldHeight,
+            left / tileScale,
+            bottom / tileScale,
+            (left + worldWidth) / tileScale,
+            (bottom + worldHeight) / tileScale
+        );
+        backgroundBatch.end();
+    }
+
+    private void applyCollisionResolver() {
+        if (SandboxConfig.useMergeCollision) {
+            gameMaster.getCollisionManager().setResolver(mergeCollisionResolver);
+        } else {
+            gameMaster.getCollisionManager().setResolver(mutualDestructionResolver);
+        }
+    }
+
+    private void renderVelocityVectors() {
+        vectorShapeRenderer.setProjectionMatrix(gameMaster.getViewportManager().getCamera().combined);
+        vectorShapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        vectorShapeRenderer.setColor(Color.GREEN);
+
+        for (Entity entity : getEntityManager().getAllEntities()) {
+            if (entity == null || !entity.isActive()) {
+                continue;
+            }
+            if (!entity.hasComponent(TransformComponent.class) || !entity.hasComponent(MovementComponent.class)) {
+                continue;
+            }
+
+            TransformComponent transform = entity.getComponent(TransformComponent.class);
+            MovementComponent movement = entity.getComponent(MovementComponent.class);
+            float startX = transform.getPosition().x;
+            float startY = transform.getPosition().y;
+            float endX = startX + (movement.getVelocity().x * SandboxConfig.VELOCITY_VECTOR_SCALE);
+            float endY = startY + (movement.getVelocity().y * SandboxConfig.VELOCITY_VECTOR_SCALE);
+            vectorShapeRenderer.line(startX, startY, endX, endY);
+        }
+
+        vectorShapeRenderer.end();
     }
 
     private void pruneInactiveEntities() {
@@ -416,6 +618,121 @@ public class SandboxScene extends AbstractPlayableScene {
         float velocityX = SandboxConfig.clampVelocity(controlPanel.getVelocityXValue());
         float velocityY = SandboxConfig.clampVelocity(controlPanel.getVelocityYValue());
         return new SimulationController.SpawnRequest(bodyType, mass, radius, velocityX, velocityY);
+    }
+
+    private void updateEducationalHud() {
+        if (educationalHud == null) {
+            return;
+        }
+        if (selectedEntity == null || !selectedEntity.isActive()) {
+            educationalHud.setNoSelection();
+            return;
+        }
+        if (!selectedEntity.hasComponent(TransformComponent.class)
+            || !selectedEntity.hasComponent(MassComponent.class)
+            || !selectedEntity.hasComponent(RadiusComponent.class)) {
+            educationalHud.setNoSelection();
+            return;
+        }
+
+        TransformComponent selectedTransform = selectedEntity.getComponent(TransformComponent.class);
+        MassComponent selectedMass = selectedEntity.getComponent(MassComponent.class);
+        RadiusComponent selectedRadius = selectedEntity.getComponent(RadiusComponent.class);
+        MovementComponent selectedMovement = selectedEntity.getComponent(MovementComponent.class);
+
+        boolean selectedIsStar = (selectedMovement == null);
+        float speed = selectedIsStar ? 0f : selectedMovement.getVelocity().len();
+
+        float gravityConstant = gameMaster.getGravityManager().getGravityConfig().getGravityConstant();
+        float minDistanceSq = gameMaster.getGravityManager().getGravityConfig().getMinDistanceSq();
+
+        float nearestStarDistance = -1f;
+        float nearestStarMass = -1f;
+        float totalAccX = 0f;
+        float totalAccY = 0f;
+
+        for (Entity entity : getEntityManager().getAllEntities()) {
+            if (entity == null || entity == selectedEntity || !entity.isActive()) {
+                continue;
+            }
+            if (!entity.hasComponent(TransformComponent.class) || !entity.hasComponent(MassComponent.class)) {
+                continue;
+            }
+
+            TransformComponent otherTransform = entity.getComponent(TransformComponent.class);
+            MassComponent otherMass = entity.getComponent(MassComponent.class);
+
+            float dx = otherTransform.getPosition().x - selectedTransform.getPosition().x;
+            float dy = otherTransform.getPosition().y - selectedTransform.getPosition().y;
+            float rawDistanceSq = (dx * dx) + (dy * dy);
+            float clampedDistanceSq = Math.max(rawDistanceSq, minDistanceSq);
+            float clampedDistance = (float) Math.sqrt(clampedDistanceSq);
+
+            if (clampedDistance <= 0f) {
+                continue;
+            }
+
+            float force = gravityConstant * otherMass.getMass() / clampedDistanceSq;
+            totalAccX += force * (dx / clampedDistance);
+            totalAccY += force * (dy / clampedDistance);
+
+            boolean otherIsStar = !entity.hasComponent(MovementComponent.class);
+            if (otherIsStar) {
+                float rawDistance = (float) Math.sqrt(rawDistanceSq);
+                if (nearestStarDistance < 0f || rawDistance < nearestStarDistance) {
+                    nearestStarDistance = rawDistance;
+                    nearestStarMass = otherMass.getMass();
+                }
+            }
+        }
+
+        float accelerationMagnitude = (float) Math.sqrt((totalAccX * totalAccX) + (totalAccY * totalAccY));
+        String orbitType = classifyOrbitType(
+            selectedIsStar,
+            speed,
+            nearestStarDistance,
+            nearestStarMass,
+            gravityConstant
+        );
+
+        educationalHud.setStats(
+            selectedIsStar ? "Star" : "Planet",
+            selectedMass.getMass(),
+            selectedRadius.getRadius(),
+            speed,
+            accelerationMagnitude,
+            nearestStarDistance,
+            orbitType
+        );
+    }
+
+    private String classifyOrbitType(
+        boolean selectedIsStar,
+        float speed,
+        float nearestStarDistance,
+        float nearestStarMass,
+        float gravityConstant
+    ) {
+        if (selectedIsStar) {
+            return "Anchor";
+        }
+        if (nearestStarDistance <= 0f || nearestStarMass <= 0f) {
+            return "Free Drift";
+        }
+
+        float circularSpeed = (float) Math.sqrt((gravityConstant * nearestStarMass) / nearestStarDistance);
+        float escapeSpeed = (float) (Math.sqrt(2f) * circularSpeed);
+
+        if (speed < circularSpeed * 0.4f) {
+            return "Falling In";
+        }
+        if (Math.abs(speed - circularSpeed) <= circularSpeed * 0.15f) {
+            return "Near Circular";
+        }
+        if (speed < escapeSpeed) {
+            return "Elliptical";
+        }
+        return "Escape";
     }
 
     private interface FloatConsumer {

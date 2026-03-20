@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -17,9 +17,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.team6.arcadesim.AbstractGameMaster;
 import com.team6.arcadesim.scenes.AbstractScene;
-import com.team6.arcadesim.sandbox.audio.SandboxAudioService;
 
-public class MainMenuScene extends AbstractScene {
+public class CreditsScene extends AbstractScene {
 
     private static final int VIRTUAL_WIDTH = 1280;
     private static final int VIRTUAL_HEIGHT = 720;
@@ -27,55 +26,31 @@ public class MainMenuScene extends AbstractScene {
     private Stage uiStage;
     private Skin skin;
     private BitmapFont font;
-    private Texture panelTexture;
+    private Texture backgroundTexture;
     private Texture buttonUpTexture;
     private Texture buttonOverTexture;
     private Texture buttonDownTexture;
-    private SandboxAudioService audioService;
-    private boolean startRequested;
-    private boolean creditsRequested;
 
-    public MainMenuScene(AbstractGameMaster gameMaster) {
-        super(gameMaster, "MainMenuScene");
+    public CreditsScene(AbstractGameMaster gameMaster) {
+        super(gameMaster, "CreditsScene");
     }
 
     @Override
     public void onEnter() {
         gameMaster.getViewportManager().setVirtualResolution(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
-        startRequested = false;
-        creditsRequested = false;
-
         uiStage = new Stage(new FitViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT));
         registerSceneInputProcessorFirst(uiStage);
-
-        audioService = new SandboxAudioService(gameMaster);
-        audioService.playMenuBgm();
-
         createSkin();
         buildLayout();
     }
 
     @Override
     public void onExit() {
-        getEntityManager().removeAll();
-        if (audioService != null) {
-            audioService.stopMenuBgm();
-        }
         unregisterSceneInputProcessor(uiStage);
     }
 
     @Override
     public void update(float dt) {
-        if (startRequested) {
-            startRequested = false;
-            gameMaster.getSceneManager().changeScene("sandbox");
-            return;
-        }
-        if (creditsRequested) {
-            creditsRequested = false;
-            gameMaster.getSceneManager().changeScene("credits");
-            return;
-        }
         if (uiStage != null) {
             uiStage.act(dt);
         }
@@ -102,13 +77,9 @@ public class MainMenuScene extends AbstractScene {
             skin.dispose();
             skin = null;
         }
-        if (audioService != null) {
-            audioService.dispose();
-            audioService = null;
-        }
-        if (panelTexture != null) {
-            panelTexture.dispose();
-            panelTexture = null;
+        if (backgroundTexture != null) {
+            backgroundTexture.dispose();
+            backgroundTexture = null;
         }
         if (buttonUpTexture != null) {
             buttonUpTexture.dispose();
@@ -127,46 +98,54 @@ public class MainMenuScene extends AbstractScene {
     private void buildLayout() {
         Table root = new Table();
         root.setFillParent(true);
-        root.setBackground(skin.getDrawable("panel-bg"));
-        root.pad(36f);
+        root.setBackground(skin.getDrawable("bg-black"));
+        root.pad(28f);
         uiStage.addActor(root);
 
         Label title = new Label("ArcadeSim Gravity Sandbox", skin, "title");
-        TextButton startButton = new TextButton("Start Sandbox", skin);
-        TextButton exitButton = new TextButton("Exit", skin);
+        Label team = new Label("Created by Team 6", skin);
+        Label team1 = new Label("1. Chanel", skin);
+        Label team2 = new Label("2. Cheston", skin);
+        Label team3 = new Label("3. Jolyn", skin);
+        Label team4 = new Label("4. Kong Sheng", skin);
+        Label team5 = new Label("5. Mustaquim", skin);
 
-        startButton.addListener(new ChangeListener() {
+        TextButton shutdownButton = new TextButton("Shut Down Simulator", skin);
+        shutdownButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
-                startRequested = true;
+                Gdx.app.exit();
             }
         });
 
-        exitButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
-                creditsRequested = true;
-            }
-        });
-
-        root.add(title).padBottom(36f).center();
+        root.add(title).padBottom(20f).center();
         root.row();
-        root.add(startButton).width(320f).height(70f).padBottom(16f);
+        root.add(team).padBottom(10f).center();
         root.row();
-        root.add(exitButton).width(320f).height(70f);
+        root.add(team1).padBottom(20f).center();
+        root.row();
+        root.add(team2).padBottom(20f).center();
+        root.row();
+        root.add(team3).padBottom(20f).center();
+        root.row();
+        root.add(team4).padBottom(20f).center();
+        root.row();
+        root.add(team5).padBottom(20f).center();
+        root.row();
+        root.add(shutdownButton).width(360f).height(68f).bottom().center().expandY();
     }
 
     private void createSkin() {
         skin = new Skin();
         font = new BitmapFont();
 
-        panelTexture = loadTextureOrFallback("mainmenu_bg.png", 0.10f, 0.12f, 0.16f, 0.92f);
-        buttonUpTexture = createSolidTexture(1, 1, 0.18f, 0.28f, 0.45f, 1f);
-        buttonOverTexture = createSolidTexture(1, 1, 0.22f, 0.36f, 0.56f, 1f);
-        buttonDownTexture = createSolidTexture(1, 1, 0.14f, 0.22f, 0.36f, 1f);
+        backgroundTexture = loadTextureOrFallback("credits_bg.png", 0f, 0f, 0f, 1f);
+        buttonUpTexture = createSolidTexture(1, 1, 0.24f, 0.24f, 0.24f, 1f);
+        buttonOverTexture = createSolidTexture(1, 1, 0.35f, 0.35f, 0.35f, 1f);
+        buttonDownTexture = createSolidTexture(1, 1, 0.17f, 0.17f, 0.17f, 1f);
 
         skin.add("default-font", font);
-        skin.add("panel-bg", new TextureRegionDrawable(new TextureRegion(panelTexture)), Drawable.class);
+        skin.add("bg-black", new TextureRegionDrawable(new TextureRegion(backgroundTexture)), Drawable.class);
 
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.up = new TextureRegionDrawable(new TextureRegion(buttonUpTexture));
@@ -183,7 +162,7 @@ public class MainMenuScene extends AbstractScene {
 
         Label.LabelStyle titleLabelStyle = new Label.LabelStyle();
         titleLabelStyle.font = font;
-        titleLabelStyle.fontColor = new Color(0.95f, 0.93f, 0.82f, 1f);
+        titleLabelStyle.fontColor = new Color(0.93f, 0.93f, 0.93f, 1f);
         skin.add("title", titleLabelStyle);
     }
 

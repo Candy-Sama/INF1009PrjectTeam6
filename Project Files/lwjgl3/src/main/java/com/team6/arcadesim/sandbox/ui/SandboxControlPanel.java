@@ -13,6 +13,14 @@ import com.team6.arcadesim.sandbox.config.SandboxConfig;
 
 public class SandboxControlPanel {
 
+    private static final float PANEL_WIDTH = 300f;
+    private static final float PANEL_PADDING = 12f;
+    private static final float PANEL_CONTENT_WIDTH = PANEL_WIDTH - (PANEL_PADDING * 2f);
+    private static final float ROW_GAP = 6f;
+    private static final float SMALL_LABEL_WIDTH = 14f;
+    private static final float HALF_FIELD_WIDTH = (PANEL_CONTENT_WIDTH - (SMALL_LABEL_WIDTH * 2f) - ROW_GAP) / 2f;
+    private static final float HALF_BUTTON_WIDTH = (PANEL_CONTENT_WIDTH - ROW_GAP) / 2f;
+
     private final Table rootTable;
     private final TextButton starButton;
     private final TextButton planetButton;
@@ -30,18 +38,18 @@ public class SandboxControlPanel {
         rootTable = new Table();
         rootTable.setFillParent(true);
         rootTable.top().right();
-        rootTable.pad(16f);
+        rootTable.pad(12f);
 
         Table panel = new Table();
         panel.setBackground(skin.getDrawable("panel-bg"));
         panel.setTouchable(Touchable.enabled);
-        panel.pad(18f);
-        panel.defaults().padBottom(10f).left();
+        panel.pad(PANEL_PADDING);
+        panel.defaults().padBottom(6f).left();
 
-        rootTable.add(panel).width(280f).growY();
+        rootTable.add(panel).width(PANEL_WIDTH).growY();
 
         Label headingLabel = new Label("Sandbox Control Panel", skin, "heading");
-        panel.add(headingLabel).padBottom(16f);
+        panel.add(headingLabel).padBottom(10f);
         panel.row();
 
         panel.add(new Label("Body Type", skin));
@@ -54,21 +62,25 @@ public class SandboxControlPanel {
         bodyTypeGroup.setMinCheckCount(1);
         bodyTypeGroup.setMaxCheckCount(1);
         starButton.setChecked(true);
-        bodyTypeRow.add(starButton).width(155f).height(42f).padRight(8f);
-        bodyTypeRow.add(planetButton).width(155f).height(42f);
-        panel.add(bodyTypeRow).padBottom(14f);
+        bodyTypeRow.add(starButton).width(HALF_BUTTON_WIDTH).height(36f).padRight(ROW_GAP);
+        bodyTypeRow.add(planetButton).width(HALF_BUTTON_WIDTH).height(36f);
+        panel.add(bodyTypeRow).padBottom(10f);
         panel.row();
 
         panel.add(new Label("Radius", skin));
         panel.row();
         radiusField = createNumericField(String.valueOf((int) SandboxConfig.DEFAULT_RADIUS), skin);
-        panel.add(radiusField).width(320f).height(40f);
+        panel.add(radiusField).width(PANEL_CONTENT_WIDTH).height(34f);
+        panel.row();
+        panel.add(createHintLabel("Radius controls size and collision range.", skin)).width(PANEL_CONTENT_WIDTH).padTop(-2f);
         panel.row();
 
         panel.add(new Label("Mass", skin));
         panel.row();
         massField = createNumericField(String.valueOf((int) SandboxConfig.DEFAULT_MASS), skin);
-        panel.add(massField).width(320f).height(40f);
+        panel.add(massField).width(PANEL_CONTENT_WIDTH).height(34f);
+        panel.row();
+        panel.add(createHintLabel("Higher mass creates stronger gravity pull.", skin)).width(PANEL_CONTENT_WIDTH).padTop(-2f);
         panel.row();
 
         panel.add(new Label("Initial Velocity Vector", skin));
@@ -76,11 +88,15 @@ public class SandboxControlPanel {
         Table velocityRow = new Table();
         velocityXField = createNumericField(String.valueOf((int) SandboxConfig.DEFAULT_VELOCITY), skin);
         velocityYField = createNumericField(String.valueOf((int) SandboxConfig.DEFAULT_VELOCITY), skin);
-        velocityRow.add(new Label("X", skin)).width(16f);
-        velocityRow.add(velocityXField).width(132f).height(40f).padRight(8f);
-        velocityRow.add(new Label("Y", skin)).width(16f);
-        velocityRow.add(velocityYField).width(132f).height(40f);
+        velocityRow.add(new Label("X", skin)).width(SMALL_LABEL_WIDTH);
+        velocityRow.add(velocityXField).width(HALF_FIELD_WIDTH).height(34f).padRight(ROW_GAP);
+        velocityRow.add(new Label("Y", skin)).width(SMALL_LABEL_WIDTH);
+        velocityRow.add(velocityYField).width(HALF_FIELD_WIDTH).height(34f);
         panel.add(velocityRow);
+        panel.row();
+        panel.add(createHintLabel("Velocity X controls left/right motion.", skin)).width(PANEL_CONTENT_WIDTH).padTop(-2f);
+        panel.row();
+        panel.add(createHintLabel("Velocity Y controls up/down motion.", skin)).width(PANEL_CONTENT_WIDTH).padTop(-2f);
         panel.row();
 
         panel.add(new Label("Initial Position Vector", skin));
@@ -88,18 +104,22 @@ public class SandboxControlPanel {
         Table positionRow = new Table();
         positionXField = createNumericField("640", skin);
         positionYField = createNumericField("360", skin);
-        positionRow.add(new Label("X", skin)).width(16f);
-        positionRow.add(positionXField).width(132f).height(40f).padRight(8f);
-        positionRow.add(new Label("Y", skin)).width(16f);
-        positionRow.add(positionYField).width(132f).height(40f);
-        panel.add(positionRow).padBottom(20f);
+        positionRow.add(new Label("X", skin)).width(SMALL_LABEL_WIDTH);
+        positionRow.add(positionXField).width(HALF_FIELD_WIDTH).height(34f).padRight(ROW_GAP);
+        positionRow.add(new Label("Y", skin)).width(SMALL_LABEL_WIDTH);
+        positionRow.add(positionYField).width(HALF_FIELD_WIDTH).height(34f);
+        panel.add(positionRow);
+        panel.row();
+        panel.add(createHintLabel("Position X sets spawn point horizontally.", skin)).width(PANEL_CONTENT_WIDTH).padTop(-2f);
+        panel.row();
+        panel.add(createHintLabel("Position Y sets spawn point vertically.", skin)).width(PANEL_CONTENT_WIDTH).padTop(-2f).padBottom(10f);
         panel.row();
 
         Table actionsRow = new Table();
         startSimulationButton = new TextButton("Start Simulation", skin);
         clearBoardButton = new TextButton("Clear Board", skin);
-        actionsRow.add(startSimulationButton).width(155f).height(50f).padRight(10f);
-        actionsRow.add(clearBoardButton).width(155f).height(50f);
+        actionsRow.add(startSimulationButton).width(HALF_BUTTON_WIDTH).height(42f).padRight(ROW_GAP);
+        actionsRow.add(clearBoardButton).width(HALF_BUTTON_WIDTH).height(42f);
         panel.add(actionsRow).padTop(4f);
         panel.row();
         panel.add().growY();
@@ -207,5 +227,13 @@ public class SandboxControlPanel {
         } catch (NumberFormatException ex) {
             return fallback;
         }
+    }
+
+    private Label createHintLabel(String text, Skin skin) {
+        Label hintLabel = new Label(text, skin);
+        hintLabel.setWrap(true);
+        hintLabel.setFontScale(0.9f);
+        hintLabel.setColor(0.72f, 0.76f, 0.84f, 1f);
+        return hintLabel;
     }
 }

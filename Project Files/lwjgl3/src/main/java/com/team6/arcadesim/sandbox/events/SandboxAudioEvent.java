@@ -7,7 +7,8 @@ public class SandboxAudioEvent implements EngineEvent {
 
     public enum Type {
         ENTITY_SPAWNED,
-        MUTUAL_DESTRUCTION
+        MUTUAL_DESTRUCTION,
+        MERGE
     }
 
     private final Type type;
