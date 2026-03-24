@@ -47,9 +47,6 @@ public final class SandboxConfig {
 
     ));
 
-    public static boolean showVelocityVectors = false;
-    public static boolean useMergeCollision = false;
-
     public static final class SpriteCell {
         private final int row;
         private final int col;

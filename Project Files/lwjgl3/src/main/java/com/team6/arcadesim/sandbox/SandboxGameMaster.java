@@ -2,12 +2,15 @@ package com.team6.arcadesim.sandbox;
 
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.team6.arcadesim.AbstractGameMaster;
+import com.team6.arcadesim.sandbox.config.SandboxRuntimeSettings;
 import com.team6.arcadesim.sandbox.scenes.CreditsScene;
 import com.team6.arcadesim.sandbox.scenes.MainMenuScene;
 import com.team6.arcadesim.sandbox.scenes.SandboxPauseScene;
 import com.team6.arcadesim.sandbox.scenes.SandboxScene;
 
 public class SandboxGameMaster extends AbstractGameMaster {
+
+    private final SandboxRuntimeSettings runtimeSettings = new SandboxRuntimeSettings();
 
     @Override
     public void init() {
@@ -27,5 +30,9 @@ public class SandboxGameMaster extends AbstractGameMaster {
     public void render() {
         ScreenUtils.clear(0.08f, 0.09f, 0.12f, 1f);
         super.render();
+    }
+
+    public SandboxRuntimeSettings getRuntimeSettings() {
+        return runtimeSettings;
     }
 }

@@ -84,26 +84,26 @@ public class SandboxAudioService implements EngineEventListener<SandboxAudioEven
     private void preloadMusic(String id, String path) {
         try {
             if (!Gdx.files.internal(path).exists()) {
-                System.err.println("Missing music file: " + path);
+                gameMaster.getLogger().warn("Missing music file: " + path);
                 return;
             }
             Music music = Gdx.audio.newMusic(Gdx.files.internal(path));
             gameMaster.getSoundManager().preload(id, new AudioClip(music));
         } catch (Exception ex) {
-            System.err.println("Failed to load music: " + path + " (" + ex.getMessage() + ")");
+            gameMaster.getLogger().error("Failed to load music: " + path + " (" + ex.getMessage() + ")");
         }
     }
 
     private void preloadSound(String id, String path) {
         try {
             if (!Gdx.files.internal(path).exists()) {
-                System.err.println("Missing sound file: " + path);
+                gameMaster.getLogger().warn("Missing sound file: " + path);
                 return;
             }
             Sound sound = Gdx.audio.newSound(Gdx.files.internal(path));
             gameMaster.getSoundManager().preload(id, new AudioClip(sound));
         } catch (Exception ex) {
-            System.err.println("Failed to load sound: " + path + " (" + ex.getMessage() + ")");
+            gameMaster.getLogger().error("Failed to load sound: " + path + " (" + ex.getMessage() + ")");
         }
     }
 }

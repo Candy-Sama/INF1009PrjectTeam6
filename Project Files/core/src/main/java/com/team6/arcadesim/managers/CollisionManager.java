@@ -69,10 +69,16 @@ public class CollisionManager {
 
         for (int i = 0; i < collidableEntities.size(); i++) {
             Entity a = collidableEntities.get(i);
+            if (a == null || !a.isActive()) {
+                continue;
+            }
             CollisionComponent ca = a.getComponent(CollisionComponent.class);
 
             for (int j = i + 1; j < collidableEntities.size(); j++) {
                 Entity b = collidableEntities.get(j);
+                if (b == null || !b.isActive()) {
+                    continue;
+                }
                 CollisionComponent cb = b.getComponent(CollisionComponent.class);
 
                 if (!broadphaseOverlap(a, b)) {
@@ -89,6 +95,10 @@ public class CollisionManager {
                     notifyCollisionStay(a, b);
                 } else {
                     notifyCollisionStart(a, b);
+                }
+
+                if (!a.isActive() || !b.isActive()) {
+                    continue;
                 }
 
                 if (ca.isSolid() && cb.isSolid() && !ca.isTrigger() && !cb.isTrigger()) {

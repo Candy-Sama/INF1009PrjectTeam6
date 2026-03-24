@@ -65,9 +65,7 @@ public class MergeCollisionResolver implements CollisionResolver {
         survivor.addComponent(new CollisionComponent(radius * 2f, radius * 2f, true, false));
 
         MovementComponent movement = survivor.getComponent(MovementComponent.class);
-        if (movement == null) {
-            survivor.addComponent(new MovementComponent(velocityX, velocityY));
-        } else {
+        if (movement != null) {
             movement.setVelocity(velocityX, velocityY);
         }
 

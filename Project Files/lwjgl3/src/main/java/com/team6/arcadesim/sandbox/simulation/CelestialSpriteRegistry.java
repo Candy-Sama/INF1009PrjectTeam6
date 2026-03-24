@@ -8,6 +8,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
+import com.team6.arcadesim.logging.EngineLogger;
+import com.team6.arcadesim.logging.NoOpEngineLogger;
 import com.team6.arcadesim.sandbox.config.SandboxConfig;
 import com.team6.arcadesim.sandbox.config.SandboxConfig.SpriteCell;
 
@@ -16,11 +18,17 @@ public class CelestialSpriteRegistry implements Disposable {
     private Texture spritesheet;
     private final List<TextureRegion> starRegions;
     private final List<TextureRegion> planetRegions;
+    private final EngineLogger logger;
 
     public CelestialSpriteRegistry() {
+        this(new NoOpEngineLogger());
+    }
+
+    public CelestialSpriteRegistry(EngineLogger logger) {
         this.spritesheet = null;
         this.starRegions = new ArrayList<>();
         this.planetRegions = new ArrayList<>();
+        this.logger = (logger == null) ? new NoOpEngineLogger() : logger;
     }
 
     public void load() {
@@ -29,7 +37,7 @@ public class CelestialSpriteRegistry implements Disposable {
 
         try {
             if (!Gdx.files.internal(SandboxConfig.SPRITESHEET_PATH).exists()) {
-                System.err.println("Spritesheet not found: " + SandboxConfig.SPRITESHEET_PATH);
+                logger.warn("Spritesheet not found: " + SandboxConfig.SPRITESHEET_PATH);
                 return;
             }
 
@@ -41,7 +49,7 @@ public class CelestialSpriteRegistry implements Disposable {
             buildPool("STAR", SandboxConfig.STAR_SPRITE_CELLS, starRegions, totalRows, totalCols, cellSize);
             buildPool("PLANET", SandboxConfig.PLANET_SPRITE_CELLS, planetRegions, totalRows, totalCols, cellSize);
         } catch (Exception ex) {
-            System.err.println("Failed loading spritesheet registry: " + ex.getMessage());
+            logger.error("Failed loading spritesheet registry: " + ex.getMessage());
             clearPools();
             disposeSpritesheetOnly();
         }
@@ -76,7 +84,7 @@ public class CelestialSpriteRegistry implements Disposable {
             int row = cell.getRow();
             int col = cell.getCol();
             if (row < 0 || col < 0 || row >= totalRows || col >= totalCols) {
-                System.err.println(
+                logger.warn(
                     "Skipping invalid " + poolName + " sprite cell (" + row + "," + col + ") " +
                     "for sheet " + totalCols + "x" + totalRows + " cells."
                 );

@@ -77,7 +77,7 @@ public class SimulationController extends InputAdapter {
         }
 
         if (countActiveEntities() >= SandboxConfig.MAX_ACTIVE_BODIES) {
-            System.out.println("Spawn blocked");
+            gameMaster.getLogger().warn("Spawn blocked: reached max active entity cap.");
             onClearSelection.run();
             return true;
         }
@@ -88,7 +88,7 @@ public class SimulationController extends InputAdapter {
         }
 
         if (overlapsExistingEntity(worldPosition.x, worldPosition.y, spawnRequest.radius)) {
-            System.out.println("Spawn blocked");
+            gameMaster.getLogger().warn("Spawn blocked: overlaps an existing entity.");
             onClearSelection.run();
             return true;
         }

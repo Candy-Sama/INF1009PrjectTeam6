@@ -1,6 +1,7 @@
 package com.team6.arcadesim.sandbox.simulation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ public class SandboxTrajectoryService {
 
     private final SandboxNBodyAdapter adapter;
     private Map<Integer, List<Vector2>> latestMovablePaths;
+    private Map<Integer, List<Vector2>> readOnlyMovablePaths;
     private boolean dirty;
 
     public SandboxTrajectoryService() {
@@ -24,6 +26,7 @@ public class SandboxTrajectoryService {
     public SandboxTrajectoryService(SandboxNBodyAdapter adapter) {
         this.adapter = adapter;
         this.latestMovablePaths = new LinkedHashMap<>();
+        this.readOnlyMovablePaths = Collections.emptyMap();
         this.dirty = true;
     }
 
@@ -33,6 +36,7 @@ public class SandboxTrajectoryService {
 
     public void clear() {
         latestMovablePaths.clear();
+        readOnlyMovablePaths = Collections.emptyMap();
         dirty = true;
     }
 
@@ -55,11 +59,12 @@ public class SandboxTrajectoryService {
         Map<Integer, List<Vector2>> allPaths = runEulerPrediction(states, fixedDt, resolvedGravityConfig);
 
         latestMovablePaths = filterMovablePaths(allPaths, states);
+        readOnlyMovablePaths = buildReadOnlyView(latestMovablePaths);
         dirty = false;
     }
 
     public Map<Integer, List<Vector2>> getPredictedPaths() {
-        return deepCopy(latestMovablePaths);
+        return readOnlyMovablePaths;
     }
 
     private Map<Integer, List<Vector2>> runEulerPrediction(
@@ -182,15 +187,16 @@ public class SandboxTrajectoryService {
         return copies;
     }
 
-    private Map<Integer, List<Vector2>> deepCopy(Map<Integer, List<Vector2>> source) {
-        Map<Integer, List<Vector2>> copy = new LinkedHashMap<>();
-        for (Map.Entry<Integer, List<Vector2>> entry : source.entrySet()) {
-            List<Vector2> points = new ArrayList<>(entry.getValue().size());
-            for (Vector2 point : entry.getValue()) {
-                points.add(new Vector2(point));
-            }
-            copy.put(entry.getKey(), points);
+    private Map<Integer, List<Vector2>> buildReadOnlyView(Map<Integer, List<Vector2>> source) {
+        if (source == null || source.isEmpty()) {
+            return Collections.emptyMap();
         }
-        return copy;
+
+        Map<Integer, List<Vector2>> view = new LinkedHashMap<>(source.size());
+        for (Map.Entry<Integer, List<Vector2>> entry : source.entrySet()) {
+            List<Vector2> path = entry.getValue();
+            view.put(entry.getKey(), (path == null) ? Collections.emptyList() : Collections.unmodifiableList(path));
+        }
+        return Collections.unmodifiableMap(view);
     }
 }

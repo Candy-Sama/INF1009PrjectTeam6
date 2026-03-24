@@ -20,7 +20,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.team6.arcadesim.AbstractGameMaster;
 import com.team6.arcadesim.scenes.AbstractScene;
-import com.team6.arcadesim.sandbox.config.SandboxConfig;
+import com.team6.arcadesim.sandbox.SandboxGameMaster;
+import com.team6.arcadesim.sandbox.config.SandboxRuntimeSettings;
 import com.team6.arcadesim.sandbox.simulation.MergeCollisionResolver;
 import com.team6.arcadesim.sandbox.simulation.MutualDestructionResolver;
 
@@ -53,9 +54,11 @@ public class SandboxPauseScene extends AbstractScene {
     private boolean firstFrame;
     private boolean resumeRequested;
     private boolean mainMenuRequested;
+    private final SandboxRuntimeSettings fallbackRuntimeSettings;
 
     public SandboxPauseScene(AbstractGameMaster gameMaster) {
         super(gameMaster, "SandboxPauseScene");
+        this.fallbackRuntimeSettings = new SandboxRuntimeSettings();
     }
 
     @Override
@@ -199,7 +202,7 @@ public class SandboxPauseScene extends AbstractScene {
         vectorModeButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                SandboxConfig.showVelocityVectors = !SandboxConfig.showVelocityVectors;
+                getRuntimeSettings().toggleShowVelocityVectors();
                 refreshVectorModeButtonText();
             }
         });
@@ -211,7 +214,7 @@ public class SandboxPauseScene extends AbstractScene {
         collisionModeButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                SandboxConfig.useMergeCollision = !SandboxConfig.useMergeCollision;
+                getRuntimeSettings().toggleUseMergeCollision();
                 refreshCollisionModeButtonText();
                 applyCollisionResolverFromConfig();
             }
@@ -286,7 +289,7 @@ public class SandboxPauseScene extends AbstractScene {
         if (vectorModeButton == null) {
             return;
         }
-        if (SandboxConfig.showVelocityVectors) {
+        if (getRuntimeSettings().isShowVelocityVectors()) {
             vectorModeButton.setText("Velocity Vectors: ON");
         } else {
             vectorModeButton.setText("Velocity Vectors: OFF");
@@ -297,7 +300,7 @@ public class SandboxPauseScene extends AbstractScene {
         if (collisionModeButton == null) {
             return;
         }
-        if (SandboxConfig.useMergeCollision) {
+        if (getRuntimeSettings().isUseMergeCollision()) {
             collisionModeButton.setText("Collision Mode: Merge");
         } else {
             collisionModeButton.setText("Collision Mode: Mutual Destruction");
@@ -305,7 +308,7 @@ public class SandboxPauseScene extends AbstractScene {
     }
 
     private void applyCollisionResolverFromConfig() {
-        if (SandboxConfig.useMergeCollision) {
+        if (getRuntimeSettings().isUseMergeCollision()) {
             gameMaster.getCollisionManager().setResolver(mergeCollisionResolver);
         } else {
             gameMaster.getCollisionManager().setResolver(mutualDestructionResolver);
@@ -364,5 +367,12 @@ public class SandboxPauseScene extends AbstractScene {
         Texture texture = new Texture(pixmap);
         pixmap.dispose();
         return texture;
+    }
+
+    private SandboxRuntimeSettings getRuntimeSettings() {
+        if (gameMaster instanceof SandboxGameMaster) {
+            return ((SandboxGameMaster) gameMaster).getRuntimeSettings();
+        }
+        return fallbackRuntimeSettings;
     }
 }

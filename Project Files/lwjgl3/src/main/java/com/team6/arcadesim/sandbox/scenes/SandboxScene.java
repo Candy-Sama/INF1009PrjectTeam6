@@ -25,10 +25,13 @@ import com.team6.arcadesim.components.RadiusComponent;
 import com.team6.arcadesim.components.TransformComponent;
 import com.team6.arcadesim.ecs.Entity;
 import com.team6.arcadesim.managers.EntityManager;
+import com.team6.arcadesim.managers.InputManager;
 import com.team6.arcadesim.scenes.AbstractPlayableScene;
 import com.team6.arcadesim.sandbox.BodyType;
+import com.team6.arcadesim.sandbox.SandboxGameMaster;
 import com.team6.arcadesim.sandbox.audio.SandboxAudioService;
 import com.team6.arcadesim.sandbox.config.SandboxConfig;
+import com.team6.arcadesim.sandbox.config.SandboxRuntimeSettings;
 import com.team6.arcadesim.sandbox.controllers.SimulationController;
 import com.team6.arcadesim.sandbox.events.SandboxAudioEvent;
 import com.team6.arcadesim.sandbox.factory.CelestialEntityFactory;
@@ -72,6 +75,7 @@ public class SandboxScene extends AbstractPlayableScene {
     private boolean scenePaused;
     private float simulationSpeedMultiplier;
     private boolean syncingSpeedButtons;
+    private final SandboxRuntimeSettings fallbackRuntimeSettings;
 
     public SandboxScene(AbstractGameMaster gameMaster) {
         super(gameMaster, "SandboxScene", false);
@@ -94,6 +98,7 @@ public class SandboxScene extends AbstractPlayableScene {
         this.scenePaused = false;
         this.simulationSpeedMultiplier = 1f;
         this.syncingSpeedButtons = false;
+        this.fallbackRuntimeSettings = new SandboxRuntimeSettings();
     }
 
     @Override
@@ -221,8 +226,9 @@ public class SandboxScene extends AbstractPlayableScene {
         if (uiStage != null) {
             Actor keyboardFocus = uiStage.getKeyboardFocus();
             boolean editingText = keyboardFocus instanceof TextField;
+            InputManager inputManager = gameMaster.getInputManager();
 
-            if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            if (inputManager.isKeyJustPressed(Input.Keys.ESCAPE)) {
                 uiStage.setKeyboardFocus(null);
                 gameMaster.getSceneManager().pushScene("sandbox_pause");
                 return;
@@ -230,16 +236,16 @@ public class SandboxScene extends AbstractPlayableScene {
 
             if (editingText) {
                 // Quick way to exit textbox without touching UI internals.
-                if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+                if (inputManager.isKeyJustPressed(Input.Keys.ENTER)) {
                     uiStage.setKeyboardFocus(null);
-                } else if (gameMaster.getInputManager().isMouseButtonJustPressed(Input.Buttons.LEFT) && !isPointerOverUi()) {
+                } else if (inputManager.isMouseButtonJustPressed(Input.Buttons.LEFT) && !isPointerOverUi()) {
                     uiStage.setKeyboardFocus(null);
                 }
-            } else if (gameMaster.getInputManager().isKeyJustPressed(Input.Keys.P) || Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+            } else if (inputManager.isKeyJustPressed(Input.Keys.P)) {
                 gameMaster.getSceneManager().pushScene("sandbox_pause");
                 return;
             }
-        } else if (gameMaster.getInputManager().isKeyJustPressed(Input.Keys.P) || Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+        } else if (gameMaster.getInputManager().isKeyJustPressed(Input.Keys.P)) {
             gameMaster.getSceneManager().pushScene("sandbox_pause");
             return;
         }
@@ -288,7 +294,7 @@ public class SandboxScene extends AbstractPlayableScene {
         if (isSimulationRunning()
             && !scenePaused
             && currentMode == SandboxMode.SIMULATION
-            && SandboxConfig.showVelocityVectors) {
+            && getRuntimeSettings().isShowVelocityVectors()) {
             renderVelocityVectors();
         }
 
@@ -586,7 +592,7 @@ public class SandboxScene extends AbstractPlayableScene {
                 backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
             }
         } catch (Exception ex) {
-            System.err.println("Failed to load sandbox_bg.png (" + ex.getMessage() + ")");
+            gameMaster.getLogger().warn("Failed to load sandbox_bg.png (" + ex.getMessage() + ")");
         }
     }
 
@@ -594,7 +600,7 @@ public class SandboxScene extends AbstractPlayableScene {
         if (spriteRegistry != null) {
             spriteRegistry.dispose();
         }
-        spriteRegistry = new CelestialSpriteRegistry();
+        spriteRegistry = new CelestialSpriteRegistry(gameMaster.getLogger());
         spriteRegistry.load();
     }
 
@@ -627,7 +633,7 @@ public class SandboxScene extends AbstractPlayableScene {
     }
 
     private void applyCollisionResolver() {
-        if (SandboxConfig.useMergeCollision) {
+        if (getRuntimeSettings().isUseMergeCollision()) {
             gameMaster.getCollisionManager().setResolver(mergeCollisionResolver);
         } else {
             gameMaster.getCollisionManager().setResolver(mutualDestructionResolver);
@@ -810,5 +816,12 @@ public class SandboxScene extends AbstractPlayableScene {
 
     private interface FloatConsumer {
         void accept(float value);
+    }
+
+    private SandboxRuntimeSettings getRuntimeSettings() {
+        if (gameMaster instanceof SandboxGameMaster) {
+            return ((SandboxGameMaster) gameMaster).getRuntimeSettings();
+        }
+        return fallbackRuntimeSettings;
     }
 }
