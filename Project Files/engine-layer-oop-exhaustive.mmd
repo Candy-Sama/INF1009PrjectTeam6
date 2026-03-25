@@ -670,7 +670,19 @@ class SandboxUI {
   +dispose() : void
 }
 
-
+class EngineTimingConfig {
+  -fixedTimeStep : float
+  -maxFrameTime : float
+  -maxSimulationSteps : int
+  +EngineTimingConfig()
+  +EngineTimingConfig(float fixedTimeStep, float maxFrameTime, int maxSimulationSteps)
+  +getFixedTimeStep() : float
+  +setFixedTimeStep(float fixedTimeStep) : void
+  +getMaxFrameTime() : float
+  +setMaxFrameTime(float maxFrameTime) : void
+  +getMaxSimulationSteps() : int
+  +setMaxSimulationSteps(int maxSimulationSteps) : void
+}
 
 
 
