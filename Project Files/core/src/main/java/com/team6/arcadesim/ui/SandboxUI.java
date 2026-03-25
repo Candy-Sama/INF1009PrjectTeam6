@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
@@ -24,7 +25,8 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class SandboxUI implements Disposable {
 
-    private static final float PANEL_WIDTH = 320f;
+    private static final float CONTROL_PANEL_WIDTH = 320f;
+    private static final float HUD_PANEL_WIDTH = 230f;
     private static final float DEFAULT_MASS = 10f;
     private static final float DEFAULT_RADIUS = 12f;
     private static final float DEFAULT_SPEED = 0f;
@@ -33,6 +35,7 @@ public class SandboxUI implements Disposable {
     private final Skin skin;
 
     private final SelectBox<String> entitySelector;
+    private final SelectBox<String> presetSelector;
     private final TextField massField;
     private final TextField radiusField;
     private final TextField speedXField;
@@ -40,11 +43,20 @@ public class SandboxUI implements Disposable {
     private final TextButton removeButton;
     private final TextButton resetButton;
     private final TextButton startPauseButton;
+    private final TextButton timeScaleButton;
+    private final TextButton loadPresetButton;
     private final TextButton returnButton;
+    private final Label speedValueLabel;
+    private final Label accelValueLabel;
+    private final Label nearestStarValueLabel;
+    private final Label orbitTypeValueLabel;
+    private final Label selectedTypeValueLabel;
 
     private Runnable onRemovePressed;
     private Runnable onResetPressed;
     private Runnable onStartPausePressed;
+    private Runnable onTimeScalePressed;
+    private Consumer<String> onPresetLoadRequested;
     private Runnable onReturnPressed;
     private Consumer<String> onEntityTypeChanged;
     private BiConsumer<Float, Float> onVelocityChanged;
@@ -56,6 +68,7 @@ public class SandboxUI implements Disposable {
         this.stage = new Stage(new ScreenViewport());
 
         this.entitySelector = new SelectBox<>(skin);
+        this.presetSelector = new SelectBox<>(skin);
         this.massField = new TextField(Float.toString(DEFAULT_MASS), skin);
         this.radiusField = new TextField(Float.toString(DEFAULT_RADIUS), skin);
         this.speedXField = new TextField(Float.toString(DEFAULT_SPEED), skin);
@@ -63,7 +76,14 @@ public class SandboxUI implements Disposable {
         this.removeButton = new TextButton("Remove", skin);
         this.resetButton = new TextButton("Reset", skin);
         this.startPauseButton = new TextButton("Start", skin);
+        this.timeScaleButton = new TextButton("Speed x1", skin);
+        this.loadPresetButton = new TextButton("Load Preset", skin);
         this.returnButton = new TextButton("Return", skin);
+        this.speedValueLabel = new Label("-", skin);
+        this.accelValueLabel = new Label("-", skin);
+        this.nearestStarValueLabel = new Label("-", skin);
+        this.orbitTypeValueLabel = new Label("-", skin);
+        this.selectedTypeValueLabel = new Label("None", skin);
 
         configureFields();
         buildLayout();
@@ -90,43 +110,74 @@ public class SandboxUI implements Disposable {
     private void buildLayout() {
         Table root = new Table();
         root.setFillParent(true);
-        root.top().right().pad(20f);
+        root.top().left().pad(20f);
 
-        Table panel = new Table();
-        panel.setBackground(skin.getDrawable("panel-bg"));
-        panel.pad(18f);
-        panel.defaults().width(PANEL_WIDTH - 36f).padBottom(10f);
+        Table controlsPanel = new Table();
+        controlsPanel.setBackground(skin.getDrawable("panel-bg"));
+        controlsPanel.pad(18f);
+        controlsPanel.defaults().width(CONTROL_PANEL_WIDTH - 36f).padBottom(10f);
 
         Label title = new Label("Sandbox Controls", skin);
         title.setAlignment(Align.center);
-        panel.add(title).padBottom(16f).row();
+        controlsPanel.add(title).padBottom(16f).row();
 
-        panel.add(new Label("Entity Type", skin)).left().row();
+        controlsPanel.add(new Label("Entity Type", skin)).left().row();
         entitySelector.setItems("Star", "Planet");
-        panel.add(entitySelector).row();
+        controlsPanel.add(entitySelector).row();
 
-        panel.add(new Label("Mass", skin)).left().row();
-        panel.add(massField).row();
+        controlsPanel.add(new Label("Preset Scenario", skin)).left().row();
+        presetSelector.setItems("Sun-Earth", "Binary Stars");
+        controlsPanel.add(presetSelector).row();
+        controlsPanel.add(loadPresetButton).row();
 
-        panel.add(new Label("Radius", skin)).left().row();
-        panel.add(radiusField).row();
+        controlsPanel.add(new Label("Mass", skin)).left().row();
+        controlsPanel.add(massField).row();
+        controlsPanel.add(createHintLabel("Higher mass gives stronger gravity pull.")).left().padTop(-4f).row();
 
-        panel.add(new Label("Speed X", skin)).left().row();
-        panel.add(speedXField).row();
+        controlsPanel.add(new Label("Radius", skin)).left().row();
+        controlsPanel.add(radiusField).row();
+        controlsPanel.add(createHintLabel("Radius affects body size and collision area.")).left().padTop(-4f).row();
 
-        panel.add(new Label("Speed Y", skin)).left().row();
-        panel.add(speedYField).row();
+        controlsPanel.add(new Label("Speed X", skin)).left().row();
+        controlsPanel.add(speedXField).row();
+
+        controlsPanel.add(new Label("Speed Y", skin)).left().row();
+        controlsPanel.add(speedYField).row();
+        controlsPanel.add(createHintLabel("Initial velocity shapes orbit path.")).left().padTop(-4f).row();
 
         Table row = new Table();
         row.defaults().expandX().fillX().padRight(8f);
         row.add(removeButton);
         row.add(resetButton).padRight(0f);
-        panel.add(row).padTop(8f).row();
+        controlsPanel.add(row).padTop(8f).row();
 
-        panel.add(startPauseButton).padTop(4f).row();
-        panel.add(returnButton).padTop(4f).padBottom(0f).row();
+        controlsPanel.add(startPauseButton).padTop(4f).row();
+        controlsPanel.add(timeScaleButton).padTop(4f).row();
+        controlsPanel.add(returnButton).padTop(4f).padBottom(0f).row();
 
-        root.add(panel).width(PANEL_WIDTH).top().right();
+        Table hudPanel = new Table();
+        hudPanel.setBackground(skin.getDrawable("panel-bg"));
+        hudPanel.pad(18f);
+        hudPanel.defaults().width(HUD_PANEL_WIDTH - 36f).padBottom(10f);
+
+        Label hudTitle = new Label("Learning HUD", skin);
+        hudTitle.setAlignment(Align.center);
+        hudPanel.add(hudTitle).padBottom(16f).row();
+
+        Table hudTable = new Table();
+        hudTable.defaults().padBottom(6f);
+
+        addHudRow(hudTable, "Selected", selectedTypeValueLabel);
+        addHudRow(hudTable, "Speed |v|", speedValueLabel);
+        addHudRow(hudTable, "Accel |a|", accelValueLabel);
+        addHudRow(hudTable, "Nearest Star", nearestStarValueLabel);
+        addHudRow(hudTable, "Orbit Type", orbitTypeValueLabel);
+
+        hudPanel.add(hudTable).row();
+
+        root.add(hudPanel).width(HUD_PANEL_WIDTH).top().left();
+        root.add().expandX();
+        root.add(controlsPanel).width(CONTROL_PANEL_WIDTH).top().right();
         stage.addActor(root);
     }
 
@@ -167,6 +218,24 @@ public class SandboxUI implements Disposable {
             }
         });
 
+        timeScaleButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+                if (onTimeScalePressed != null) {
+                    onTimeScalePressed.run();
+                }
+            }
+        });
+
+        loadPresetButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+                if (onPresetLoadRequested != null) {
+                    onPresetLoadRequested.accept(presetSelector.getSelected());
+                }
+            }
+        });
+
         returnButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
@@ -185,16 +254,16 @@ public class SandboxUI implements Disposable {
         BitmapFont font = new BitmapFont();
         uiSkin.add("default-font", font);
 
-        uiSkin.add("button-up", solid(0.22f, 0.24f, 0.30f, 1f));
-        uiSkin.add("button-over", solid(0.30f, 0.33f, 0.40f, 1f));
-        uiSkin.add("button-down", solid(0.16f, 0.18f, 0.24f, 1f));
-        uiSkin.add("field-bg", solid(0.14f, 0.15f, 0.19f, 1f));
-        uiSkin.add("field-focus", solid(0.20f, 0.22f, 0.28f, 1f));
-        uiSkin.add("panel-bg", solid(0.07f, 0.08f, 0.11f, 0.94f));
-        uiSkin.add("select-bg", solid(0.14f, 0.15f, 0.19f, 1f));
-        uiSkin.add("select-open", solid(0.18f, 0.20f, 0.26f, 1f));
-        uiSkin.add("list-select", solid(0.30f, 0.34f, 0.45f, 1f));
-        uiSkin.add("list-bg", solid(0.12f, 0.13f, 0.17f, 0.98f));
+        uiSkin.add("button-up", solid(0.22f, 0.24f, 0.30f, 1f), Drawable.class);
+        uiSkin.add("button-over", solid(0.30f, 0.33f, 0.40f, 1f), Drawable.class);
+        uiSkin.add("button-down", solid(0.16f, 0.18f, 0.24f, 1f), Drawable.class);
+        uiSkin.add("field-bg", solid(0.14f, 0.15f, 0.19f, 1f), Drawable.class);
+        uiSkin.add("field-focus", solid(0.20f, 0.22f, 0.28f, 1f), Drawable.class);
+        uiSkin.add("panel-bg", solid(0.07f, 0.08f, 0.11f, 0.94f), Drawable.class);
+        uiSkin.add("select-bg", solid(0.14f, 0.15f, 0.19f, 1f), Drawable.class);
+        uiSkin.add("select-open", solid(0.18f, 0.20f, 0.26f, 1f), Drawable.class);
+        uiSkin.add("list-select", solid(0.30f, 0.34f, 0.45f, 1f), Drawable.class);
+        uiSkin.add("list-bg", solid(0.12f, 0.13f, 0.17f, 0.98f), Drawable.class);
 
         Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
         uiSkin.add("default", labelStyle);
@@ -253,6 +322,23 @@ public class SandboxUI implements Disposable {
             return;
         }
         onVelocityChanged.accept(getSpeedX(), getSpeedY());
+    }
+
+    private void addHudRow(Table table, String title, Label valueLabel) {
+        Label titleLabel = new Label(title, skin);
+        titleLabel.setAlignment(Align.left);
+        valueLabel.setAlignment(Align.right);
+
+        table.add(titleLabel).left().expandX().fillX();
+        table.add(valueLabel).right().minWidth(110f);
+        table.row();
+    }
+
+    private Label createHintLabel(String text) {
+        Label hintLabel = new Label(text, skin);
+        hintLabel.setWrap(true);
+        hintLabel.setColor(0.72f, 0.76f, 0.84f, 1f);
+        return hintLabel;
     }
 
     private float parse(String raw, float fallback) {
@@ -318,6 +404,27 @@ public class SandboxUI implements Disposable {
         startPauseButton.setText(running ? "Pause" : "Start");
     }
 
+    public void setTimeScale(float scale) {
+        if (scale == (int) scale) {
+            timeScaleButton.setText("Speed x" + (int) scale);
+        } else {
+            timeScaleButton.setText(String.format("Speed x%.1f", scale));
+        }
+    }
+
+    public void setEducationalStats(String selectedType, float speed, float acceleration, float nearestStarDistance, String orbitType) {
+        selectedTypeValueLabel.setText(selectedType == null ? "None" : selectedType);
+        speedValueLabel.setText(String.format("%.2f u/s", speed));
+        accelValueLabel.setText(String.format("%.2f u/s^2", acceleration));
+        orbitTypeValueLabel.setText((orbitType == null || orbitType.isBlank()) ? "N/A" : orbitType);
+
+        if (nearestStarDistance < 0f) {
+            nearestStarValueLabel.setText("N/A");
+        } else {
+            nearestStarValueLabel.setText(String.format("%.2f u", nearestStarDistance));
+        }
+    }
+
     public void setOnRemovePressed(Runnable onRemovePressed) {
         this.onRemovePressed = onRemovePressed;
     }
@@ -328,6 +435,14 @@ public class SandboxUI implements Disposable {
 
     public void setOnStartPausePressed(Runnable onStartPausePressed) {
         this.onStartPausePressed = onStartPausePressed;
+    }
+
+    public void setOnTimeScalePressed(Runnable onTimeScalePressed) {
+        this.onTimeScalePressed = onTimeScalePressed;
+    }
+
+    public void setOnPresetLoadRequested(Consumer<String> onPresetLoadRequested) {
+        this.onPresetLoadRequested = onPresetLoadRequested;
     }
 
     public void setOnReturnPressed(Runnable onReturnPressed) {
