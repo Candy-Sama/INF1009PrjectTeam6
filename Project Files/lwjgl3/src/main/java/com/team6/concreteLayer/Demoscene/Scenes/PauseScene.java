@@ -165,7 +165,7 @@
 //     }
 // }
 
-package com.team6.arcadesim.Demoscene.Scenes;
+package com.team6.concreteLayer.Demoscene.Scenes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -176,9 +176,9 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
-import com.team6.arcadesim.AbstractGameMaster;
-import com.team6.arcadesim.Demoscene.UI.VolumeSlider;
-import com.team6.arcadesim.scenes.AbstractScene;
+import com.team6.concreteLayer.Demoscene.UI.VolumeSlider;
+import com.team6.engineLayer.AbstractGameMaster;
+import com.team6.engineLayer.scenes.AbstractScene;
 
 public class PauseScene extends AbstractScene {
 

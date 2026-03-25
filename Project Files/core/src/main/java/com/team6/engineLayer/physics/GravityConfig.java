@@ -1,4 +1,4 @@
-package com.team6.arcadesim.physics;
+package com.team6.engineLayer.physics;
 
 public class GravityConfig {
 

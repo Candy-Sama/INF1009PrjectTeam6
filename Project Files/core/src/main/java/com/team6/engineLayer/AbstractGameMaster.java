@@ -1,19 +1,19 @@
-package com.team6.arcadesim;
+package com.team6.engineLayer;
 
 import com.badlogic.gdx.ApplicationListener;
-import com.team6.arcadesim.config.EngineTimingConfig;
-import com.team6.arcadesim.events.EventBus;
-import com.team6.arcadesim.logging.ConsoleEngineLogger;
-import com.team6.arcadesim.logging.EngineLogger;
-import com.team6.arcadesim.managers.CollisionManager;
-import com.team6.arcadesim.managers.GravityManager;
-import com.team6.arcadesim.managers.InputManager;
-import com.team6.arcadesim.managers.MovementManager;
-import com.team6.arcadesim.managers.RenderManager;
-import com.team6.arcadesim.managers.SceneManager;
-import com.team6.arcadesim.managers.SoundManager;
-import com.team6.arcadesim.managers.ViewportManager;
-import com.team6.arcadesim.physics.GravityConfig;
+import com.team6.engineLayer.config.EngineTimingConfig;
+import com.team6.engineLayer.events.EventBus;
+import com.team6.engineLayer.logging.ConsoleEngineLogger;
+import com.team6.engineLayer.logging.EngineLogger;
+import com.team6.engineLayer.managers.CollisionManager;
+import com.team6.engineLayer.managers.GravityManager;
+import com.team6.engineLayer.managers.InputManager;
+import com.team6.engineLayer.managers.MovementManager;
+import com.team6.engineLayer.managers.RenderManager;
+import com.team6.engineLayer.managers.SceneManager;
+import com.team6.engineLayer.managers.SoundManager;
+import com.team6.engineLayer.managers.ViewportManager;
+import com.team6.engineLayer.physics.GravityConfig;
 
 public abstract class AbstractGameMaster implements ApplicationListener {
 
@@ -122,9 +122,6 @@ public abstract class AbstractGameMaster implements ApplicationListener {
     public SoundManager getSoundManager() { return soundManager; }
     public GravityManager getGravityManager() { return gravityManager; }
     public EngineTimingConfig getEngineTimingConfig() { return engineTimingConfig; }
-    
-    
-    
     public void setEngineTimingConfig(EngineTimingConfig engineTimingConfig) {
         this.engineTimingConfig = (engineTimingConfig == null) ? new EngineTimingConfig() : engineTimingConfig;
     }

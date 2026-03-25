@@ -1,13 +1,13 @@
-package com.team6.arcadesim.managers;
+package com.team6.engineLayer.managers;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import com.badlogic.gdx.utils.Disposable;
-import com.team6.arcadesim.ecs.AudioClip;
-import com.team6.arcadesim.interfaces.AudioHandler;
-import com.team6.arcadesim.logging.EngineLogger;
-import com.team6.arcadesim.logging.NoOpEngineLogger;
+import com.team6.engineLayer.ecs.AudioClip;
+import com.team6.engineLayer.interfaces.AudioHandler;
+import com.team6.engineLayer.logging.EngineLogger;
+import com.team6.engineLayer.logging.NoOpEngineLogger;
 
 public class SoundManager implements Disposable {
 

@@ -1,12 +1,12 @@
-package com.team6.arcadesim.scenes;
+package com.team6.engineLayer.scenes;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.utils.Disposable;
-import com.team6.arcadesim.AbstractGameMaster;
-import com.team6.arcadesim.managers.EntityManager;
+import com.team6.engineLayer.AbstractGameMaster;
+import com.team6.engineLayer.managers.EntityManager;
 
 public abstract class AbstractScene implements Disposable {
 

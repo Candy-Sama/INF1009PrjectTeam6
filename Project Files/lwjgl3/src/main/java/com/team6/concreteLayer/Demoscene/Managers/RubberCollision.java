@@ -1,9 +1,9 @@
-package com.team6.arcadesim.Demoscene.Managers;
+package com.team6.concreteLayer.Demoscene.Managers;
 
-import com.team6.arcadesim.components.MovementComponent;
-import com.team6.arcadesim.components.TransformComponent;
-import com.team6.arcadesim.ecs.Entity;
-import com.team6.arcadesim.interfaces.CollisionResolver;
+import com.team6.engineLayer.components.MovementComponent;
+import com.team6.engineLayer.components.TransformComponent;
+import com.team6.engineLayer.ecs.Entity;
+import com.team6.engineLayer.interfaces.CollisionResolver;
 
 public class RubberCollision implements CollisionResolver{
     public void resolve(Entity mover, Entity obstacle) {

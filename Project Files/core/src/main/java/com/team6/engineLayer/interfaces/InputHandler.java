@@ -1,6 +1,6 @@
-package com.team6.arcadesim.interfaces;
+package com.team6.engineLayer.interfaces;
 import com.badlogic.gdx.InputProcessor;
-import com.team6.arcadesim.input.InputState;
+import com.team6.engineLayer.input.InputState;
 
 public class InputHandler implements InputProcessor {
 

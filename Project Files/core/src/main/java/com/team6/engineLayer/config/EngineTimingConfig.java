@@ -1,4 +1,4 @@
-package com.team6.arcadesim.config;
+package com.team6.engineLayer.config;
 
 public class EngineTimingConfig {
 

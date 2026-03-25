@@ -1,13 +1,13 @@
-package com.team6.arcadesim.sandbox.simulation;
+package com.team6.concreteLayer.sandbox.simulation;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.math.Vector2;
-import com.team6.arcadesim.components.MassComponent;
-import com.team6.arcadesim.components.MovementComponent;
-import com.team6.arcadesim.components.TransformComponent;
-import com.team6.arcadesim.ecs.Entity;
+import com.team6.engineLayer.components.MassComponent;
+import com.team6.engineLayer.components.MovementComponent;
+import com.team6.engineLayer.components.TransformComponent;
+import com.team6.engineLayer.ecs.Entity;
 
 public class SandboxNBodyAdapter {
 

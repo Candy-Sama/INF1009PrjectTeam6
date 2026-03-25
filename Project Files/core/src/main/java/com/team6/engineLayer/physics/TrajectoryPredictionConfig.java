@@ -1,6 +1,6 @@
-package com.team6.arcadesim.physics;
+package com.team6.engineLayer.physics;
 
-import com.team6.arcadesim.config.EngineTimingConfig;
+import com.team6.engineLayer.config.EngineTimingConfig;
 
 public class TrajectoryPredictionConfig {
 

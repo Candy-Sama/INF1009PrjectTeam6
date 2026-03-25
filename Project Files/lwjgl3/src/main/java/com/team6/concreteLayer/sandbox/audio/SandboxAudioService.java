@@ -1,12 +1,12 @@
-package com.team6.arcadesim.sandbox.audio;
+package com.team6.concreteLayer.sandbox.audio;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.team6.arcadesim.AbstractGameMaster;
-import com.team6.arcadesim.ecs.AudioClip;
-import com.team6.arcadesim.events.EngineEventListener;
-import com.team6.arcadesim.sandbox.events.SandboxAudioEvent;
+import com.team6.concreteLayer.sandbox.events.SandboxAudioEvent;
+import com.team6.engineLayer.AbstractGameMaster;
+import com.team6.engineLayer.ecs.AudioClip;
+import com.team6.engineLayer.events.EngineEventListener;
 
 public class SandboxAudioService implements EngineEventListener<SandboxAudioEvent> {
 

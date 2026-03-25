@@ -1,4 +1,4 @@
-package com.team6.arcadesim.logging;
+package com.team6.engineLayer.logging;
 
 public class ConsoleEngineLogger implements EngineLogger {
 

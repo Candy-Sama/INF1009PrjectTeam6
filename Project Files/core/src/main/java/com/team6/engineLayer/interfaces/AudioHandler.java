@@ -1,5 +1,5 @@
-package com.team6.arcadesim.interfaces;
-import com.team6.arcadesim.ecs.AudioClip;
+package com.team6.engineLayer.interfaces;
+import com.team6.engineLayer.ecs.AudioClip;
 
 public interface AudioHandler {
     void init();

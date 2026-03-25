@@ -5,12 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.jupiter.api.Test;
+import com.team6.engineLayer.components.CollisionComponent;
+import com.team6.engineLayer.components.RadiusComponent;
+import com.team6.engineLayer.components.TransformComponent;
+import com.team6.engineLayer.ecs.Entity;
+import com.team6.engineLayer.managers.CollisionManager;
 
-import com.team6.arcadesim.components.CollisionComponent;
-import com.team6.arcadesim.components.RadiusComponent;
-import com.team6.arcadesim.components.TransformComponent;
-import com.team6.arcadesim.ecs.Entity;
+import org.junit.jupiter.api.Test;
 
 public class CollisionManagerCircleTest {
 

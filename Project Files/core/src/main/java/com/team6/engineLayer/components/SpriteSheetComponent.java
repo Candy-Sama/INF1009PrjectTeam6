@@ -1,8 +1,8 @@
-package com.team6.arcadesim.components;
+package com.team6.engineLayer.components;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.team6.arcadesim.ecs.Component;
+import com.team6.engineLayer.ecs.Component;
 
 public class SpriteSheetComponent implements Component {
 

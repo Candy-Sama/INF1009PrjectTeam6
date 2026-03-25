@@ -1,5 +1,5 @@
-package com.team6.arcadesim.components;
-import com.team6.arcadesim.ecs.Component;
+package com.team6.engineLayer.components;
+import com.team6.engineLayer.ecs.Component;
 
 public class CollisionComponent implements Component {
 

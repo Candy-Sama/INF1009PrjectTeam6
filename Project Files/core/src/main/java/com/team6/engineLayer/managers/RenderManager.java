@@ -1,4 +1,4 @@
-package com.team6.arcadesim.managers;
+package com.team6.engineLayer.managers;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,11 +10,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
-import com.team6.arcadesim.components.CompositeShapeComponent;
-import com.team6.arcadesim.components.RadiusComponent;
-import com.team6.arcadesim.components.SpriteComponent;
-import com.team6.arcadesim.components.TransformComponent;
-import com.team6.arcadesim.ecs.Entity;
+import com.team6.engineLayer.components.CompositeShapeComponent;
+import com.team6.engineLayer.components.RadiusComponent;
+import com.team6.engineLayer.components.SpriteComponent;
+import com.team6.engineLayer.components.TransformComponent;
+import com.team6.engineLayer.ecs.Entity;
 
 
 public class RenderManager implements Disposable {

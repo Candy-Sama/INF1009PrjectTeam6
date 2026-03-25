@@ -1,10 +1,10 @@
-package com.team6.arcadesim.managers;
+package com.team6.engineLayer.managers;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.InputMultiplexer;
-import com.team6.arcadesim.input.InputState;
-import com.team6.arcadesim.interfaces.InputHandler;
+import com.badlogic.gdx.InputProcessor;
+import com.team6.engineLayer.input.InputState;
+import com.team6.engineLayer.interfaces.InputHandler;
 
 public class InputManager {
 

@@ -1,8 +1,9 @@
-package com.team6.arcadesim.Demoscene.CollisionListener;
-import com.team6.arcadesim.interfaces.CollisionListener;
-import com.team6.arcadesim.ecs.Entity;
-import com.team6.arcadesim.components.MovementComponent;
+package com.team6.concreteLayer.Demoscene.CollisionListener;
 import java.util.function.Consumer; // Standard Java Interface
+
+import com.team6.engineLayer.components.MovementComponent;
+import com.team6.engineLayer.ecs.Entity;
+import com.team6.engineLayer.interfaces.CollisionListener;
 
 public class DemoCollisionListener implements CollisionListener {
 

@@ -1,12 +1,13 @@
-package com.team6.arcadesim.managers;
+package com.team6.engineLayer.managers;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.team6.arcadesim.components.MassComponent;
-import com.team6.arcadesim.components.MovementComponent;
-import com.team6.arcadesim.components.TransformComponent;
-import com.team6.arcadesim.ecs.Entity;
-import com.team6.arcadesim.physics.GravityConfig;
+
+import com.team6.engineLayer.components.MassComponent;
+import com.team6.engineLayer.components.MovementComponent;
+import com.team6.engineLayer.components.TransformComponent;
+import com.team6.engineLayer.ecs.Entity;
+import com.team6.engineLayer.physics.GravityConfig;
 
 public class GravityManager {
 

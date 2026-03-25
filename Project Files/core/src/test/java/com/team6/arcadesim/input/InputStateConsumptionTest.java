@@ -3,6 +3,8 @@ package com.team6.arcadesim.input;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.team6.engineLayer.input.InputState;
+
 import org.junit.jupiter.api.Test;
 
 public class InputStateConsumptionTest {

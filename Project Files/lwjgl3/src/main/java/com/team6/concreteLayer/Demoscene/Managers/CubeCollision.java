@@ -1,10 +1,10 @@
-package com.team6.arcadesim.Demoscene.Managers;
+package com.team6.concreteLayer.Demoscene.Managers;
 import com.badlogic.gdx.math.Vector2;
-import com.team6.arcadesim.components.CollisionComponent;
-import com.team6.arcadesim.components.MovementComponent;
-import com.team6.arcadesim.components.TransformComponent;
-import com.team6.arcadesim.ecs.Entity;
-import com.team6.arcadesim.interfaces.CollisionResolver;
+import com.team6.engineLayer.components.CollisionComponent;
+import com.team6.engineLayer.components.MovementComponent;
+import com.team6.engineLayer.components.TransformComponent;
+import com.team6.engineLayer.ecs.Entity;
+import com.team6.engineLayer.interfaces.CollisionResolver;
 
 public class CubeCollision implements CollisionResolver {
 

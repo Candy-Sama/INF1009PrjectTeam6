@@ -1,10 +1,10 @@
-package com.team6.arcadesim.Demoscene;
+package com.team6.concreteLayer.Demoscene;
 
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.team6.arcadesim.AbstractGameMaster;
-import com.team6.arcadesim.Demoscene.Scenes.DemoScene;
-import com.team6.arcadesim.Demoscene.Scenes.PauseScene;
-import com.team6.arcadesim.Demoscene.Scenes.DemoSolar;
+import com.team6.concreteLayer.Demoscene.Scenes.DemoScene;
+import com.team6.concreteLayer.Demoscene.Scenes.DemoSolar;
+import com.team6.concreteLayer.Demoscene.Scenes.PauseScene;
+import com.team6.engineLayer.AbstractGameMaster;
 
 public class GameMaster extends AbstractGameMaster {
 

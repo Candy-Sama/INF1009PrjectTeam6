@@ -1,20 +1,20 @@
-package com.team6.arcadesim.Demoscene.Scenes;
+package com.team6.concreteLayer.Demoscene.Scenes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
-import com.team6.arcadesim.AbstractGameMaster;
-import com.team6.arcadesim.Demoscene.CollisionListener.DemoCollisionListener;
-import com.team6.arcadesim.Demoscene.Managers.RubberCollision;
-import com.team6.arcadesim.components.CollisionComponent;
-import com.team6.arcadesim.components.MovementComponent;
-import com.team6.arcadesim.components.SpriteComponent;
-import com.team6.arcadesim.components.TransformComponent;
-import com.team6.arcadesim.ecs.AudioClip;
-import com.team6.arcadesim.ecs.Entity;
-import com.team6.arcadesim.interfaces.CollisionResolver;
-import com.team6.arcadesim.scenes.AbstractScene;
+import com.team6.concreteLayer.Demoscene.CollisionListener.DemoCollisionListener;
+import com.team6.concreteLayer.Demoscene.Managers.RubberCollision;
+import com.team6.engineLayer.AbstractGameMaster;
+import com.team6.engineLayer.components.CollisionComponent;
+import com.team6.engineLayer.components.MovementComponent;
+import com.team6.engineLayer.components.SpriteComponent;
+import com.team6.engineLayer.components.TransformComponent;
+import com.team6.engineLayer.ecs.AudioClip;
+import com.team6.engineLayer.ecs.Entity;
+import com.team6.engineLayer.interfaces.CollisionResolver;
+import com.team6.engineLayer.scenes.AbstractScene;
 
 public class DemoGravity extends AbstractScene {
 

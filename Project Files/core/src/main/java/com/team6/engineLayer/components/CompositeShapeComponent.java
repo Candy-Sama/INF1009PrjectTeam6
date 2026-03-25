@@ -1,10 +1,10 @@
-package com.team6.arcadesim.components;
+package com.team6.engineLayer.components;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.graphics.Color;
-import com.team6.arcadesim.ecs.Component;
+import com.team6.engineLayer.ecs.Component;
 
 public class CompositeShapeComponent implements Component {
     private List<SubShape> shapes;

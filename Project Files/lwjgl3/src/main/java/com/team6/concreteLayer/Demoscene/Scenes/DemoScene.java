@@ -137,7 +137,7 @@
 //     }
 // }
 
-package com.team6.arcadesim.Demoscene.Scenes;
+package com.team6.concreteLayer.Demoscene.Scenes;
 
 import java.util.List;
 
@@ -150,25 +150,25 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.team6.arcadesim.AbstractGameMaster;
-import com.team6.arcadesim.components.CollisionComponent;
-import com.team6.arcadesim.components.MovementComponent;
-import com.team6.arcadesim.components.SpriteComponent;
-import com.team6.arcadesim.components.TransformComponent;
-import com.team6.arcadesim.ecs.AudioClip;
-import com.team6.arcadesim.ecs.Entity;
-import com.team6.arcadesim.interfaces.CollisionListener;
-import com.team6.arcadesim.scenes.AbstractPlayableScene;
-import com.team6.arcadesim.systems.CollisionSystem;
-import com.team6.arcadesim.systems.MovementSystem;
-import com.team6.arcadesim.systems.SystemPipeline;
+import com.team6.engineLayer.AbstractGameMaster;
+import com.team6.engineLayer.components.CollisionComponent;
+import com.team6.engineLayer.components.MovementComponent;
+import com.team6.engineLayer.components.SpriteComponent;
+import com.team6.engineLayer.components.TransformComponent;
+import com.team6.engineLayer.ecs.AudioClip;
+import com.team6.engineLayer.ecs.Entity;
+import com.team6.engineLayer.interfaces.CollisionListener;
+import com.team6.engineLayer.scenes.AbstractPlayableScene;
+import com.team6.engineLayer.systems.CollisionSystem;
+import com.team6.engineLayer.systems.MovementSystem;
+import com.team6.engineLayer.systems.SystemPipeline;
 
 // Extends AbstractPlayableScene to inherit automatic physics loops
 public class DemoScene extends AbstractPlayableScene { 
 
     private static final String SCENE_NAME = "DemoScene";
     private static final String COIN_SPRITE_ID = "demo.coin";
-    private com.team6.arcadesim.Demoscene.Managers.CubeCollision cubeCollision;
+    private com.team6.concreteLayer.Demoscene.Managers.CubeCollision cubeCollision;
     private Vector2 sceneResolution = new Vector2(1280, 720);
     private Texture coinTex;
     private BitmapFont font;
@@ -209,7 +209,7 @@ public class DemoScene extends AbstractPlayableScene {
         gameMaster.getSoundManager().preload("demoMusic", new AudioClip(demoMusic));
         gameMaster.getSoundManager().playMusic("demoMusic", true);
 
-        cubeCollision = new com.team6.arcadesim.Demoscene.Managers.CubeCollision(sceneResolution.x, sceneResolution.y);
+        cubeCollision = new com.team6.concreteLayer.Demoscene.Managers.CubeCollision(sceneResolution.x, sceneResolution.y);
         
         gameMaster.getCollisionManager().setResolver(cubeCollision);
 

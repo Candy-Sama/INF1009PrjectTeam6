@@ -1,4 +1,4 @@
-package com.team6.arcadesim.sandbox.scenes;
+package com.team6.concreteLayer.sandbox.scenes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -15,8 +15,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.team6.arcadesim.AbstractGameMaster;
-import com.team6.arcadesim.scenes.AbstractScene;
+import com.team6.engineLayer.AbstractGameMaster;
+import com.team6.engineLayer.scenes.AbstractScene;
 
 public class CreditsScene extends AbstractScene {
 
@@ -108,7 +108,7 @@ public class CreditsScene extends AbstractScene {
         Label team2 = new Label("2. Cheston", skin);
         Label team3 = new Label("3. Jolyn", skin);
         Label team4 = new Label("4. Kong Sheng", skin);
-        Label team5 = new Label("5. Mustaquim", skin);
+        Label team5 = new Label("5. Mustaqim", skin);
 
         TextButton shutdownButton = new TextButton("Shut Down Simulator", skin);
         shutdownButton.addListener(new ChangeListener() {

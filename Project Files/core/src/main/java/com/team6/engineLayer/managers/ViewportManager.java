@@ -1,4 +1,4 @@
-package com.team6.arcadesim.managers;
+package com.team6.engineLayer.managers;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Rectangle;

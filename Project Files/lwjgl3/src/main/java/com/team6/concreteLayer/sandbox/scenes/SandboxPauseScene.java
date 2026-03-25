@@ -1,4 +1,4 @@
-package com.team6.arcadesim.sandbox.scenes;
+package com.team6.concreteLayer.sandbox.scenes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -18,12 +18,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.team6.arcadesim.AbstractGameMaster;
-import com.team6.arcadesim.scenes.AbstractScene;
-import com.team6.arcadesim.sandbox.SandboxGameMaster;
-import com.team6.arcadesim.sandbox.config.SandboxRuntimeSettings;
-import com.team6.arcadesim.sandbox.simulation.MergeCollisionResolver;
-import com.team6.arcadesim.sandbox.simulation.MutualDestructionResolver;
+import com.team6.concreteLayer.sandbox.SandboxGameMaster;
+import com.team6.concreteLayer.sandbox.config.SandboxRuntimeSettings;
+import com.team6.concreteLayer.sandbox.simulation.MergeCollisionResolver;
+import com.team6.concreteLayer.sandbox.simulation.MutualDestructionResolver;
+import com.team6.engineLayer.AbstractGameMaster;
+import com.team6.engineLayer.scenes.AbstractScene;
 
 public class SandboxPauseScene extends AbstractScene {
 

@@ -1,4 +1,4 @@
-package com.team6.arcadesim.managers;
+package com.team6.engineLayer.managers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,16 +6,16 @@ import java.util.List;
 import java.util.Map;
 
 import com.badlogic.gdx.math.Rectangle;
-import com.team6.arcadesim.components.CollisionComponent;
-import com.team6.arcadesim.components.RadiusComponent;
-import com.team6.arcadesim.components.TransformComponent;
-import com.team6.arcadesim.ecs.Entity;
-import com.team6.arcadesim.events.CollisionEvent;
-import com.team6.arcadesim.events.EventBus;
-import com.team6.arcadesim.interfaces.CollisionListener;
-import com.team6.arcadesim.interfaces.CollisionResolver;
-import com.team6.arcadesim.logging.EngineLogger;
-import com.team6.arcadesim.logging.NoOpEngineLogger;
+import com.team6.engineLayer.components.CollisionComponent;
+import com.team6.engineLayer.components.RadiusComponent;
+import com.team6.engineLayer.components.TransformComponent;
+import com.team6.engineLayer.ecs.Entity;
+import com.team6.engineLayer.events.CollisionEvent;
+import com.team6.engineLayer.events.EventBus;
+import com.team6.engineLayer.interfaces.CollisionListener;
+import com.team6.engineLayer.interfaces.CollisionResolver;
+import com.team6.engineLayer.logging.EngineLogger;
+import com.team6.engineLayer.logging.NoOpEngineLogger;
 
 public class CollisionManager {
 

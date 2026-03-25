@@ -1,12 +1,12 @@
-package com.team6.arcadesim.sandbox;
+package com.team6.concreteLayer.sandbox;
 
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.team6.arcadesim.AbstractGameMaster;
-import com.team6.arcadesim.sandbox.config.SandboxRuntimeSettings;
-import com.team6.arcadesim.sandbox.scenes.CreditsScene;
-import com.team6.arcadesim.sandbox.scenes.MainMenuScene;
-import com.team6.arcadesim.sandbox.scenes.SandboxPauseScene;
-import com.team6.arcadesim.sandbox.scenes.SandboxScene;
+import com.team6.concreteLayer.sandbox.config.SandboxRuntimeSettings;
+import com.team6.concreteLayer.sandbox.scenes.CreditsScene;
+import com.team6.concreteLayer.sandbox.scenes.MainMenuScene;
+import com.team6.concreteLayer.sandbox.scenes.SandboxPauseScene;
+import com.team6.concreteLayer.sandbox.scenes.SandboxScene;
+import com.team6.engineLayer.AbstractGameMaster;
 
 public class SandboxGameMaster extends AbstractGameMaster {
 

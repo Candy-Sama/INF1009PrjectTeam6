@@ -1,4 +1,4 @@
-package com.team6.arcadesim.ecs;
+package com.team6.engineLayer.ecs;
 
 import java.util.HashMap;
 import java.util.Map;

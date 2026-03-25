@@ -1,18 +1,18 @@
-package com.team6.arcadesim.Demoscene.Scenes;
+package com.team6.concreteLayer.Demoscene.Scenes;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.team6.arcadesim.AbstractGameMaster;
-import com.team6.arcadesim.components.CompositeShapeComponent;
-import com.team6.arcadesim.components.MassComponent;
-import com.team6.arcadesim.components.MovementComponent;
-import com.team6.arcadesim.components.TransformComponent;
-import com.team6.arcadesim.ecs.Entity;
-import com.team6.arcadesim.scenes.AbstractPlayableScene;
-import com.team6.arcadesim.systems.CollisionSystem;
-import com.team6.arcadesim.systems.GravitySystem;
-import com.team6.arcadesim.systems.MovementSystem;
-import com.team6.arcadesim.systems.SystemPipeline;
+import com.team6.engineLayer.AbstractGameMaster;
+import com.team6.engineLayer.components.CompositeShapeComponent;
+import com.team6.engineLayer.components.MassComponent;
+import com.team6.engineLayer.components.MovementComponent;
+import com.team6.engineLayer.components.TransformComponent;
+import com.team6.engineLayer.ecs.Entity;
+import com.team6.engineLayer.scenes.AbstractPlayableScene;
+import com.team6.engineLayer.systems.CollisionSystem;
+import com.team6.engineLayer.systems.GravitySystem;
+import com.team6.engineLayer.systems.MovementSystem;
+import com.team6.engineLayer.systems.SystemPipeline;
 
 public class DemoSolar extends AbstractPlayableScene {
 

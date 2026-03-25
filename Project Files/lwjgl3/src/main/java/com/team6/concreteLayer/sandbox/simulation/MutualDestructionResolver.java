@@ -1,9 +1,9 @@
-package com.team6.arcadesim.sandbox.simulation;
+package com.team6.concreteLayer.sandbox.simulation;
 
-import com.team6.arcadesim.ecs.Entity;
-import com.team6.arcadesim.events.EventBus;
-import com.team6.arcadesim.interfaces.CollisionResolver;
-import com.team6.arcadesim.sandbox.events.SandboxAudioEvent;
+import com.team6.concreteLayer.sandbox.events.SandboxAudioEvent;
+import com.team6.engineLayer.ecs.Entity;
+import com.team6.engineLayer.events.EventBus;
+import com.team6.engineLayer.interfaces.CollisionResolver;
 
 public class MutualDestructionResolver implements CollisionResolver {
 

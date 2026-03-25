@@ -2,12 +2,13 @@ package com.team6.arcadesim.scenes;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.jupiter.api.Test;
+import com.team6.engineLayer.AbstractGameMaster;
+import com.team6.engineLayer.managers.EntityManager;
+import com.team6.engineLayer.scenes.AbstractPlayableScene;
+import com.team6.engineLayer.systems.EngineSystem;
+import com.team6.engineLayer.systems.SystemPipeline;
 
-import com.team6.arcadesim.AbstractGameMaster;
-import com.team6.arcadesim.managers.EntityManager;
-import com.team6.arcadesim.systems.EngineSystem;
-import com.team6.arcadesim.systems.SystemPipeline;
+import org.junit.jupiter.api.Test;
 
 public class AbstractPlayableScenePhaseGateTest {
 

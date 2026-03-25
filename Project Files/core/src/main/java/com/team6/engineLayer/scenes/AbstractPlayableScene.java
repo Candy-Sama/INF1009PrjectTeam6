@@ -1,7 +1,7 @@
-package com.team6.arcadesim.scenes;
+package com.team6.engineLayer.scenes;
 
-import com.team6.arcadesim.systems.SystemPipeline;
-import com.team6.arcadesim.AbstractGameMaster;
+import com.team6.engineLayer.AbstractGameMaster;
+import com.team6.engineLayer.systems.SystemPipeline;
 
 public abstract class AbstractPlayableScene extends AbstractScene {
 

@@ -1,6 +1,6 @@
-package com.team6.arcadesim.components;
+package com.team6.engineLayer.components;
 
-import com.team6.arcadesim.ecs.Component;
+import com.team6.engineLayer.ecs.Component;
 
 public class MassComponent implements Component {
     private float mass;

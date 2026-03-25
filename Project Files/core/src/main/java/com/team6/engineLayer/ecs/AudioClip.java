@@ -1,4 +1,4 @@
-package com.team6.arcadesim.ecs;
+package com.team6.engineLayer.ecs;
 
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;

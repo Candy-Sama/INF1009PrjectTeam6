@@ -1,11 +1,11 @@
-package com.team6.arcadesim.managers;
+package com.team6.engineLayer.managers;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.team6.arcadesim.ecs.Component;
-import com.team6.arcadesim.ecs.Entity;
+import com.team6.engineLayer.ecs.Component;
+import com.team6.engineLayer.ecs.Entity;
 
 public class EntityManager {
 

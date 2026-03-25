@@ -1,7 +1,7 @@
-package com.team6.arcadesim.systems;
+package com.team6.engineLayer.systems;
 
-import com.team6.arcadesim.AbstractGameMaster;
-import com.team6.arcadesim.managers.EntityManager;
+import com.team6.engineLayer.AbstractGameMaster;
+import com.team6.engineLayer.managers.EntityManager;
 
 public class CollisionSystem implements EngineSystem {
 

@@ -1,6 +1,6 @@
-package com.team6.arcadesim.interfaces;
+package com.team6.engineLayer.interfaces;
 
-import com.team6.arcadesim.ecs.Entity;
+import com.team6.engineLayer.ecs.Entity;
 
 public interface CollisionListener {
     void onCollisionStart(Entity a, Entity b);

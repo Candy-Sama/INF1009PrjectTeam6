@@ -1,4 +1,4 @@
-package com.team6.arcadesim.sandbox.simulation;
+package com.team6.concreteLayer.sandbox.simulation;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,10 +8,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
-import com.team6.arcadesim.logging.EngineLogger;
-import com.team6.arcadesim.logging.NoOpEngineLogger;
-import com.team6.arcadesim.sandbox.config.SandboxConfig;
-import com.team6.arcadesim.sandbox.config.SandboxConfig.SpriteCell;
+import com.team6.concreteLayer.sandbox.config.SandboxConfig;
+import com.team6.concreteLayer.sandbox.config.SandboxConfig.SpriteCell;
+import com.team6.engineLayer.logging.EngineLogger;
+import com.team6.engineLayer.logging.NoOpEngineLogger;
 
 public class CelestialSpriteRegistry implements Disposable {
 

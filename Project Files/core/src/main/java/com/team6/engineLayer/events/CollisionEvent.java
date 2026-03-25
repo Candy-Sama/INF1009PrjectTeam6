@@ -1,6 +1,6 @@
-package com.team6.arcadesim.events;
+package com.team6.engineLayer.events;
 
-import com.team6.arcadesim.ecs.Entity;
+import com.team6.engineLayer.ecs.Entity;
 
 public class CollisionEvent implements EngineEvent {
 

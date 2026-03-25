@@ -1,7 +1,7 @@
-package com.team6.arcadesim.sandbox.events;
+package com.team6.concreteLayer.sandbox.events;
 
-import com.team6.arcadesim.ecs.Entity;
-import com.team6.arcadesim.events.EngineEvent;
+import com.team6.engineLayer.ecs.Entity;
+import com.team6.engineLayer.events.EngineEvent;
 
 public class SandboxAudioEvent implements EngineEvent {
 

@@ -1,4 +1,4 @@
-package com.team6.arcadesim.managers;
+package com.team6.engineLayer.managers;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -6,11 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import com.team6.arcadesim.events.EventBus;
-import com.team6.arcadesim.events.SceneLifecycleEvent;
-import com.team6.arcadesim.logging.EngineLogger;
-import com.team6.arcadesim.logging.NoOpEngineLogger;
-import com.team6.arcadesim.scenes.AbstractScene;
+import com.team6.engineLayer.events.EventBus;
+import com.team6.engineLayer.events.SceneLifecycleEvent;
+import com.team6.engineLayer.logging.EngineLogger;
+import com.team6.engineLayer.logging.NoOpEngineLogger;
+import com.team6.engineLayer.scenes.AbstractScene;
 
 public class SceneManager {
 

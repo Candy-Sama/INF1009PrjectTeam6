@@ -1,11 +1,11 @@
-package com.team6.arcadesim.systems;
+package com.team6.engineLayer.systems;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import com.team6.arcadesim.AbstractGameMaster;
-import com.team6.arcadesim.managers.EntityManager;
+import com.team6.engineLayer.AbstractGameMaster;
+import com.team6.engineLayer.managers.EntityManager;
 
 public class SystemPipeline {
 
