@@ -113,15 +113,18 @@ public abstract class AbstractGameMaster implements ApplicationListener {
         if (soundManager != null) soundManager.dispose();
     }
     
+    public SceneManager getSceneManager() { return sceneManager; }
+    public ViewportManager getViewportManager() { return viewportManager; }
+    public InputManager getInputManager() { return inputManager; }
     public MovementManager getMovementManager() { return movementManager; }
     public CollisionManager getCollisionManager() { return collisionManager; }
     public RenderManager getRenderManager() { return renderManager; }
     public SoundManager getSoundManager() { return soundManager; }
-    public InputManager getInputManager() { return inputManager; }
-    public ViewportManager getViewportManager() { return viewportManager; }
-    public SceneManager getSceneManager() { return sceneManager; }
     public GravityManager getGravityManager() { return gravityManager; }
     public EngineTimingConfig getEngineTimingConfig() { return engineTimingConfig; }
+    
+    
+    
     public void setEngineTimingConfig(EngineTimingConfig engineTimingConfig) {
         this.engineTimingConfig = (engineTimingConfig == null) ? new EngineTimingConfig() : engineTimingConfig;
     }

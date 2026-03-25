@@ -1,0 +1,437 @@
+classDiagram
+direction TB
+
+%% =========================
+%% Core OOP abstractions
+%% =========================
+class AbstractGameMaster {
+  <<abstract>>
+  -isRunning : boolean
+  -lastFrameTime : long
+  -accumulator : float
+  #sceneManager : SceneManager
+  #viewportManager : ViewportManager
+  #inputManager : InputManager
+  #renderManager : RenderManager
+  #movementManager : MovementManager
+  #gravityManager : GravityManager
+  #collisionManager : CollisionManager
+  #soundManager : SoundManager
+  #eventBus : EventBus
+  #logger : EngineLogger
+  #engineTimingConfig : EngineTimingConfig
+  +init() : void
+  +update(float dt) : void
+  +create() : void
+  +render() : void
+  +getSceneManager() : SceneManager
+  +getViewportManager() : ViewportManager
+  +getInputManager() : InputManager
+  +getRenderManager() : RenderManager
+  +getMovementManager() : MovementManager
+  +getGravityManager() : GravityManager
+  +getCollisionManager() : CollisionManager
+  +getSoundManager() : SoundManager
+  +getEventBus() : EventBus
+  +getLogger() : EngineLogger
+}
+
+class AbstractScene {
+  <<abstract>>
+  -sceneName : String
+  #gameMaster : AbstractGameMaster
+  #entityManager : EntityManager
+  +onEnter() : void
+  +onPause() : void
+  +onResume() : void
+  +onExit() : void
+  +update(float dt) : void
+  +render(float dt) : void
+  +getName() : String
+  +getEntityManager() : EntityManager
+  +attachSceneInputProcessors() : void
+  +detachSceneInputProcessors() : void
+}
+
+class AbstractPlayableScene {
+  <<abstract>>
+  -systemPipeline : SystemPipeline
+  -simulationRunning : boolean
+  +configureSystems(SystemPipeline pipeline) : void
+  +shouldRunSystems() : boolean
+  +update(float dt) : void
+  +startSimulation() : void
+  +pauseSimulation() : void
+  +setSimulationRunning(boolean simulationRunning) : void
+  +isSimulationRunning() : boolean
+}
+
+class SceneManager {
+  -sceneStack : Deque
+  -sceneRegistry : Map
+  -eventBus : EventBus
+  -logger : EngineLogger
+  +setLogger(EngineLogger logger) : void
+  +setEventBus(EventBus eventBus) : void
+  +registerScene(String routeName, Supplier sceneFactory) : void
+  +changeScene(String routeName) : void
+  +pushScene(String routeName) : void
+  +popScene() : void
+  +update(float dt) : void
+  +render(float dt) : void
+  +dispose() : void
+}
+
+%% =========================
+%% ECS model
+%% =========================
+class EntityManager {
+  -entities : List
+  -pendingAdditions : List
+  -pendingRemovals : List
+  -updateInProgress : boolean
+  +createEntity() : Entity
+  +addEntity(Entity e) : void
+  +removeEntity(Entity e) : void
+  +beginUpdate() : void
+  +endUpdate() : void
+  +getAllEntities() : List
+  +getEntitiesFor(Class... componentTypes) : List
+  +getEntityById(int id) : Entity
+}
+
+class Entity {
+  -id : int
+  -active : boolean
+  -components : Map
+  +getId() : int
+  +isActive() : boolean
+  +setActive(boolean active) : void
+  +addComponent(Component c) : void
+  +getComponent(Class type) : T
+  +hasComponent(Class type) : boolean
+}
+
+class Component {
+  <<interface>>
+}
+
+class TransformComponent {
+  -position : Vector2
+  -rotation : float
+  +getPosition() : Vector2
+  +setPosition(float x, float y) : void
+  +getRotation() : float
+  +setRotation(float rotation) : void
+}
+
+class MovementComponent {
+  -velocity : Vector2
+  -acceleration : Vector2
+  +getVelocity() : Vector2
+  +setVelocity(float x, float y) : void
+  +getAcceleration() : Vector2
+  +setAcceleration(float x, float y) : void
+}
+
+class MassComponent {
+  -mass : float
+  +getMass() : float
+}
+
+class CollisionComponent {
+  -width : float
+  -height : float
+  -isSolid : boolean
+  -isTrigger : boolean
+  +getWidth() : float
+  +getHeight() : float
+  +isSolid() : boolean
+  +isTrigger() : boolean
+}
+
+class RadiusComponent {
+  -radius : float
+  +getRadius() : float
+}
+
+%% =========================
+%% Systems and managers
+%% =========================
+class EngineSystem {
+  <<interface>>
+  +update(float dt, AbstractGameMaster gameMaster, EntityManager entityManager) : void
+}
+
+class SystemPipeline {
+  -systems : List
+  +addSystem(EngineSystem system) : void
+  +removeSystem(EngineSystem system) : void
+  +clearSystems() : void
+  +getSystems() : List
+  +update(float dt, AbstractGameMaster gameMaster, EntityManager entityManager) : void
+}
+
+class MovementSystem {
+  -priority : int
+  +update(float dt, AbstractGameMaster gameMaster, EntityManager entityManager) : void
+}
+
+class GravitySystem {
+  -priority : int
+  +update(float dt, AbstractGameMaster gameMaster, EntityManager entityManager) : void
+}
+
+class CollisionSystem {
+  -priority : int
+  +update(float dt, AbstractGameMaster gameMaster, EntityManager entityManager) : void
+}
+
+class MovementManager {
+  +update(float dt, List entities) : void
+  +moveEntity(Entity e, Vector2 direction) : void
+  +stopEntity(Entity e) : void
+}
+
+class GravityManager {
+  -gravityConfig : GravityConfig
+  +getGravityConfig() : GravityConfig
+  +setGravityConfig(GravityConfig gravityConfig) : void
+  +update(float dt, List entities) : void
+}
+
+class CollisionManager {
+  -listeners : List
+  -eventBus : EventBus
+  -logger : EngineLogger
+  +setEventBus(EventBus eventBus) : void
+  +setLogger(EngineLogger logger) : void
+  +addCollisionListener(CollisionListener listener) : void
+  +removeCollisionListener(CollisionListener listener) : void
+  +update(float dt, List entities) : void
+  +reset() : void
+}
+
+class RenderManager {
+  -textureRegistry : Map
+  +registerTexture(String spriteId, Texture texture) : void
+  +unregisterTexture(String spriteId) : void
+  +getTexture(String spriteId) : Texture
+  +clearTextureRegistry() : void
+  +render(float dt, List entities, OrthographicCamera camera) : void
+  +dispose() : void
+}
+
+class InputManager {
+  -inputState : InputState
+  -inputHandler : InputHandler
+  +addInputProcessor(InputProcessor processor) : void
+  +addInputProcessorFirst(InputProcessor processor) : void
+  +removeInputProcessor(InputProcessor processor) : void
+  +clearTransientInputs() : void
+  +isKeyDown(int keycode) : boolean
+  +isKeyJustPressed(int keycode) : boolean
+  +isMouseButtonDown(int button) : boolean
+  +isMouseButtonJustPressed(int button) : boolean
+  +consumeMouseButtonJustPressed(int button) : boolean
+}
+
+%% =========================
+%% Events and logging
+%% =========================
+class EventBus {
+  -listeners : Map
+  +subscribe(Class eventType, EngineEventListener listener) : void
+  +unsubscribe(Class eventType, EngineEventListener listener) : void
+  +publish(T event) : void
+}
+
+class EngineEvent {
+  <<interface>>
+}
+
+class SceneLifecycleEvent {
+  -type : Type
+  -fromScene : String
+  -toScene : String
+}
+
+class CollisionEvent {
+  -type : Type
+  -entityA : Entity
+  -entityB : Entity
+}
+
+class EngineLogger {
+  <<interface>>
+  +info(String message) : void
+  +warn(String message) : void
+  +error(String message) : void
+}
+
+class ConsoleEngineLogger {
+  +info(String message) : void
+  +warn(String message) : void
+  +error(String message) : void
+}
+
+%% =========================
+%% Input and physics
+%% =========================
+class InputState {
+  -keysPressed : Set
+  -keysJustPressed : Set
+  -mouseButtonsPressed : Set
+  -mouseButtonsJustPressed : Set
+  +setKeyPressed(int keycode) : void
+  +setKeyReleased(int keycode) : void
+  +setMouseButtonPressed(int button) : void
+  +setMouseButtonReleased(int button) : void
+  +isKeyDown(int keycode) : boolean
+  +isKeyJustPressed(int keycode) : boolean
+  +isMouseButtonDown(int button) : boolean
+  +isMouseButtonJustPressed(int button) : boolean
+  +consumeMouseButtonJustPressed(int button) : boolean
+  +reset() : void
+}
+
+class InputHandler {
+  -inputState : InputState
+  +keyDown(int keycode) : boolean
+  +keyUp(int keycode) : boolean
+  +keyTyped(char character) : boolean
+  +touchDown(int screenX, int screenY, int pointer, int button) : boolean
+  +touchUp(int screenX, int screenY, int pointer, int button) : boolean
+  +touchDragged(int screenX, int screenY, int pointer) : boolean
+  +mouseMoved(int screenX, int screenY) : boolean
+  +scrolled(float amountX, float amountY) : boolean
+}
+
+class GravityConfig {
+  -gravityConstant : float
+  -minDistanceSq : float
+  +getGravityConstant() : float
+  +setGravityConstant(float gravityConstant) : void
+  +getMinDistanceSq() : float
+  +setMinDistanceSq(float minDistanceSq) : void
+}
+
+class EngineTimingConfig {
+  -fixedTimeStep : float
+  -maxFrameTime : float
+  -maxSimulationSteps : int
+  +getFixedTimeStep() : float
+  +setFixedTimeStep(float fixedTimeStep) : void
+  +getMaxFrameTime() : float
+  +setMaxFrameTime(float maxFrameTime) : void
+  +getMaxSimulationSteps() : int
+  +setMaxSimulationSteps(int maxSimulationSteps) : void
+}
+
+class NBodyTrajectoryPredictor {
+  +predictPaths(List bodies, GravityConfig gravityConfig, TrajectoryPredictionConfig predictionConfig) : Map
+  +simulateFinalStates(List bodies, GravityConfig gravityConfig, int steps, float fixedDt) : List
+  +stepSimulation(List states, GravityConfig gravityConfig, float fixedDt) : void
+}
+
+class TrajectoryPredictionCache {
+  -predictor : NBodyTrajectoryPredictor
+  -cachedPaths : Map
+  +markDirty() : void
+  +getOrRecompute(List bodies, GravityConfig gravityConfig, TrajectoryPredictionConfig predictionConfig) : Map
+}
+
+class TrajectoryPredictionConfig {
+  -predictionSteps : int
+  -sampleInterval : int
+  -maxBodies : int
+  -maxPathPoints : int
+  -fixedTimeStep : float
+  +getPredictionSteps() : int
+  +setPredictionSteps(int predictionSteps) : void
+  +getSampleInterval() : int
+  +setSampleInterval(int sampleInterval) : void
+  +getMaxBodies() : int
+  +setMaxBodies(int maxBodies) : void
+  +getMaxPathPoints() : int
+  +setMaxPathPoints(int maxPathPoints) : void
+  +getFixedTimeStep() : float
+  +setFixedTimeStep(float fixedTimeStep) : void
+  +useEngineTiming(EngineTimingConfig engineTimingConfig) : void
+}
+
+class ViewportManager {
+  -camera : OrthographicCamera
+  -viewport : Viewport
+  +resize(int screenW, int screenH) : void
+  +apply() : void
+  +getCamera() : OrthographicCamera
+}
+
+class SoundManager {
+  -soundLibrary : Map
+  +playSFX(String id) : void
+  +playMusic(String id, boolean loop) : void
+  +stopMusic() : void
+}
+
+%% =========================
+%% OOP-friendly relationships
+%% =========================
+AbstractPlayableScene --|> AbstractScene : inherits
+MovementSystem ..|> EngineSystem : implements
+GravitySystem ..|> EngineSystem : implements
+CollisionSystem ..|> EngineSystem : implements
+TransformComponent ..|> Component : implements
+MovementComponent ..|> Component : implements
+MassComponent ..|> Component : implements
+CollisionComponent ..|> Component : implements
+RadiusComponent ..|> Component : implements
+SceneLifecycleEvent ..|> EngineEvent : implements
+CollisionEvent ..|> EngineEvent : implements
+ConsoleEngineLogger ..|> EngineLogger : implements
+
+AbstractGameMaster *-- SceneManager : owns
+AbstractGameMaster *-- ViewportManager : owns
+AbstractGameMaster *-- InputManager : owns
+AbstractGameMaster *-- RenderManager : owns
+AbstractGameMaster *-- MovementManager : owns
+AbstractGameMaster *-- GravityManager : owns
+AbstractGameMaster *-- CollisionManager : owns
+AbstractGameMaster *-- SoundManager : owns
+AbstractGameMaster *-- EventBus : owns
+AbstractGameMaster *-- EngineLogger : owns
+AbstractGameMaster *-- EngineTimingConfig : owns
+
+SceneManager *-- AbstractScene : manages
+AbstractScene *-- EntityManager : contains
+AbstractScene ..> AbstractGameMaster : uses
+AbstractPlayableScene *-- SystemPipeline : runs
+
+EntityManager *-- Entity : stores
+Entity o-- Component : has
+
+SystemPipeline o-- EngineSystem : executes
+MovementSystem ..> MovementManager : delegates
+GravitySystem ..> GravityManager : delegates
+CollisionSystem ..> CollisionManager : delegates
+
+InputManager *-- InputState : tracks
+InputManager *-- InputHandler : handles
+InputHandler ..> InputState : updates
+
+EventBus o-- EngineEvent : dispatches
+SceneManager ..> SceneLifecycleEvent : publishes
+CollisionManager ..> CollisionEvent : publishes
+
+GravityManager ..> GravityConfig : config
+RenderManager ..> TransformComponent : reads
+CollisionManager ..> CollisionComponent : checks
+CollisionManager ..> RadiusComponent : checks
+MovementManager ..> MovementComponent : updates
+MovementManager ..> TransformComponent : updates
+
+TrajectoryPredictionCache *-- NBodyTrajectoryPredictor : uses
+NBodyTrajectoryPredictor ..> GravityConfig : reads
+NBodyTrajectoryPredictor ..> TrajectoryPredictionConfig : reads
+TrajectoryPredictionConfig ..> EngineTimingConfig : maps

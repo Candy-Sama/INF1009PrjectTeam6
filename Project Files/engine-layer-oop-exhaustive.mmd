@@ -1,0 +1,679 @@
+classDiagram
+direction TB
+
+class AbstractGameMaster {
+  
+  -isRunning : boolean
+  -lastFrameTime : long
+  -accumulator : float
+  #sceneManager : SceneManager
+  #viewportManager : ViewportManager
+  #inputManager : InputManager
+  #movementManager : MovementManager
+  #collisionManager : CollisionManager
+  #renderManager : RenderManager
+  #soundManager : SoundManager
+  #gravityManager : GravityManager
+  #engineTimingConfig : EngineTimingConfig
+  #eventBus : EventBus
+  #logger : EngineLogger
+  +init() : abstract void
+  +update(float dt) : abstract void
+  +create() : void
+  +render() : void
+  +getSceneManager() : SceneManager
+  +getViewportManager() : ViewportManager
+  +getInputManager() : InputManager
+  +getMovementManager() : MovementManager
+  +getCollisionManager() : CollisionManager
+  +getRenderManager() : RenderManager
+  +getSoundManager() : SoundManager
+  +getGravityManager() : GravityManager
+  +getEngineTimingConfig() : EngineTimingConfig
+  +setEngineTimingConfig(EngineTimingConfig engineTimingConfig) : void
+  +getEventBus() : EventBus
+  +getLogger() : EngineLogger
+}
+
+class TestExtensions {
+  +test() : void
+}
+
+class CollisionComponent {
+  -width : float
+  -height : float
+  -isSolid : boolean
+  -isTrigger : boolean
+  +CollisionComponent(float width, float height, boolean isSolid, boolean isTrigger)
+  +CollisionComponent()
+  +getWidth() : float
+  +getHeight() : float
+  +isSolid() : boolean
+  +isTrigger() : boolean
+}
+
+class CompositeShapeComponent {
+  -shapes : List
+  -type : ShapeType
+  -color : Color
+  -filled : boolean
+  -offsetX : float
+  -offsetY : float
+  -dimensions : float[]
+  +CompositeShapeComponent()
+  +getShapes() : List
+  +addShape(SubShape shape) : void
+  +removeShape(SubShape shape) : void
+  +clearShapes() : void
+  +createCircle(float offsetX, float offsetY, float radius, Color color, boolean filled) : SubShape
+  +createLine(float x1, float y1, float x2, float y2, Color color) : SubShape
+  +createPolygon(float[] vertices, Color color, boolean filled) : SubShape
+  +getType() : ShapeType
+  +getColor() : Color
+  +isFilled() : boolean
+  +getOffsetX() : float
+  +getOffsetY() : float
+  +getDimensions() : float[]
+  +setColor(Color color) : void
+  +setFilled(boolean filled) : void
+  +setOffsetX(float offsetX) : void
+  +setOffsetY(float offsetY) : void
+}
+
+class MassComponent {
+  -mass : float
+  +MassComponent(float mass)
+  +getMass() : float
+  +setMass(float mass) : void
+}
+
+class MovementComponent {
+  -velocity : Vector2
+  -acceleration : Vector2
+  +MovementComponent()
+  +MovementComponent(float vx, float vy)
+  +getVelocity() : Vector2
+  +setVelocity(float x, float y) : void
+  +setVelocity(Vector2 v) : void
+  +getAcceleration() : Vector2
+  +setAcceleration(float x, float y) : void
+}
+
+class RadiusComponent {
+  -radius : float
+  +RadiusComponent(float radius)
+  +getRadius() : float
+  +setRadius(float radius) : void
+}
+
+class SpriteComponent {
+  -region : TextureRegion
+  -spriteId : String
+  -width : float
+  -height : float
+  -flipX : boolean
+  -flipY : boolean
+  +SpriteComponent(Texture texture)
+  +SpriteComponent(TextureRegion region)
+  +SpriteComponent(String spriteId, float width, float height)
+  +getRegion() : TextureRegion
+  +setRegion(TextureRegion region) : void
+  +getSpriteId() : String
+  +setSpriteId(String spriteId) : void
+  +setSize(float w, float h) : void
+  +getWidth() : float
+  +getHeight() : float
+  +setFlip(boolean x, boolean y) : void
+  +isFlipX() : boolean
+  +isFlipY() : boolean
+}
+
+class SpriteSheetComponent {
+  -region : TextureRegion
+  -width : float
+  -height : float
+  -flipX : boolean
+  -flipY : boolean
+  +SpriteSheetComponent(Texture texture)
+  +SpriteSheetComponent(Texture texture, float width, float height)
+  +getRegion() : TextureRegion
+  +setTexture(Texture texture) : void
+  +getWidth() : float
+  +setWidth(float width) : void
+  +getHeight() : float
+  +setHeight(float height) : void
+  +isFlipX() : boolean
+  +setFlipX(boolean flipX) : void
+  +isFlipY() : boolean
+  +setFlipY(boolean flipY) : void
+}
+
+class TransformComponent {
+  -position : Vector2
+  -rotation : float
+  +TransformComponent(float x, float y)
+  +TransformComponent()
+  +getPosition() : Vector2
+  +setPosition(float x, float y) : void
+  +setPosition(Vector2 pos) : void
+  +getRotation() : float
+  +setRotation(float rotation) : void
+}
+
+class EngineTimingConfig {
+  -fixedTimeStep : float
+  -maxFrameTime : float
+  -maxSimulationSteps : int
+  +EngineTimingConfig()
+  +EngineTimingConfig(float fixedTimeStep, float maxFrameTime, int maxSimulationSteps)
+  +getFixedTimeStep() : float
+  +setFixedTimeStep(float fixedTimeStep) : void
+  +getMaxFrameTime() : float
+  +setMaxFrameTime(float maxFrameTime) : void
+  +getMaxSimulationSteps() : int
+  +setMaxSimulationSteps(int maxSimulationSteps) : void
+}
+
+class AudioClip {
+  -sound : Sound
+  -music : Music
+  -isMusic : boolean
+  +AudioClip(Sound sound)
+  +AudioClip(Music music)
+  +getSound() : Sound
+  +getMusic() : Music
+  +isMusic() : boolean
+  +dispose() : void
+}
+
+class Component {
+  
+}
+
+class Entity {
+  -id : int
+  -active : boolean
+  -components : Map
+  +Entity()
+  +getId() : int
+  +isActive() : boolean
+  +setActive(boolean active) : void
+  +addComponent(Component c) : void
+  +getComponent(Class type) :  T
+  +hasComponent(Class type) : boolean
+}
+
+class CollisionEvent {
+  -type : Type
+  -entityA : Entity
+  -entityB : Entity
+  +CollisionEvent(Type type, Entity entityA, Entity entityB)
+  +getType() : Type
+  +getEntityA() : Entity
+  +getEntityB() : Entity
+}
+
+class EngineEvent {
+  
+}
+
+class EventBus {
+  -listeners : Map
+  +EventBus()
+  +subscribe(Class eventType, EngineEventListener listener) :  void
+  +unsubscribe(Class eventType, EngineEventListener listener) :  void
+  +publish(T event) :  void
+}
+
+class SceneLifecycleEvent {
+  -type : Type
+  -fromScene : String
+  -toScene : String
+  +SceneLifecycleEvent(Type type, String fromScene, String toScene)
+  +getType() : Type
+  +getFromScene() : String
+  +getToScene() : String
+}
+
+class InputState {
+  -keysPressed : Set
+  -keysJustPressed : Set
+  -mouseButtonsPressed : Set
+  -mouseButtonsJustPressed : Set
+  +InputState()
+  +setKeyPressed(int keycode) : void
+  +setKeyReleased(int keycode) : void
+  +setMouseButtonPressed(int button) : void
+  +setMouseButtonReleased(int button) : void
+  +isKeyDown(int keycode) : boolean
+  +isKeyJustPressed(int keycode) : boolean
+  +isMouseButtonDown(int button) : boolean
+  +isMouseButtonJustPressed(int button) : boolean
+  +consumeMouseButtonJustPressed(int button) : boolean
+  +reset() : void
+}
+
+class AudioHandler {
+  
+}
+
+class CollisionListener {
+  
+}
+
+class CollisionResolver {
+  
+}
+
+class CollisionShape {
+  
+}
+
+class InputHandler {
+  -inputState : InputState
+  +InputHandler(InputState inputState)
+  +keyDown(int keycode) : boolean
+  +keyUp(int keycode) : boolean
+  +keyTyped(char character) : boolean
+  +touchDown(int screenX, int screenY, int pointer, int button) : boolean
+  +touchUp(int screenX, int screenY, int pointer, int button) : boolean
+  +touchCancelled(int screenX, int screenY, int pointer, int button) : boolean
+  +touchDragged(int screenX, int screenY, int pointer) : boolean
+  +mouseMoved(int screenX, int screenY) : boolean
+  +scrolled(float amountX, float amountY) : boolean
+}
+
+class ConsoleEngineLogger {
+  +info(String message) : void
+  +warn(String message) : void
+  +error(String message) : void
+}
+
+class EngineLogger {
+  
+}
+
+class NoOpEngineLogger {
+  +info(String message) : void
+  +warn(String message) : void
+  +error(String message) : void
+}
+
+class CollisionManager {
+  -listeners : List
+  -resolver : CollisionResolver
+  -rectA : Rectangle
+  -rectB : Rectangle
+  -activeContacts : Map
+  -eventBus : EventBus
+  -logger : EngineLogger
+  -entityA : Entity
+  -entityB : Entity
+  +CollisionManager()
+  +setEventBus(EventBus eventBus) : void
+  +setLogger(EngineLogger logger) : void
+  +setResolver(CollisionResolver resolver) : void
+  +addCollisionListener(CollisionListener listener) : void
+  +removeCollisionListener(CollisionListener listener) : void
+  +update(float dt, List entities) : void
+  -notifyCollisionStart(Entity a, Entity b) : void
+  -notifyCollisionStay(Entity a, Entity b) : void
+  -notifyCollisionEnd(Entity a, Entity b) : void
+  -broadphaseOverlap(Entity a, Entity b) : boolean
+  -narrowphaseOverlap(Entity a, Entity b) : boolean
+  -circleOverlap(Entity a, Entity b) : boolean
+  -isCircle(Entity entity) : boolean
+  -getHalfWidth(Entity entity) : float
+  -getHalfHeight(Entity entity) : float
+  -toPairKey(Entity a, Entity b) : long
+  -isValid(Entity e) : boolean
+  +reset() : void
+}
+
+class EntityManager {
+  -entities : List
+  -pendingAdditions : List
+  -pendingRemovals : List
+  -updateInProgress : boolean
+  +EntityManager()
+  +addEntity(Entity e) : void
+  +removeEntity(Entity e) : void
+  +createEntity() : Entity
+  +removeAll() : void
+  +beginUpdate() : void
+  +endUpdate() : void
+  +getAllEntities() : List
+  +getEntitiesFor(Class... componentTypes) : List
+  +getEntityById(int id) : Entity
+  +dispose() : void
+  -flushPendingChanges() : void
+}
+
+class GravityManager {
+  -gravityConfig : GravityConfig
+  +GravityManager()
+  +GravityManager(GravityConfig gravityConfig)
+  +setGravityConfig(GravityConfig gravityConfig) : void
+  +getGravityConfig() : GravityConfig
+  +update(float dt, List entities) : void
+}
+
+class InputManager {
+  -inputState : InputState
+  -inputHandler : InputHandler
+  -inputMultiplexer : InputMultiplexer
+  +InputManager()
+  +addInputProcessor(InputProcessor processor) : void
+  +addInputProcessorFirst(InputProcessor processor) : void
+  +removeInputProcessor(InputProcessor processor) : void
+  +clearTransientInputs() : void
+  +isKeyDown(int keycode) : boolean
+  +isKeyJustPressed(int keycode) : boolean
+  +isMouseButtonDown(int button) : boolean
+  +isMouseButtonJustPressed(int button) : boolean
+  +consumeMouseButtonJustPressed(int button) : boolean
+  +consumeWorldClick(int button, boolean pointerOverUi) : boolean
+  +getMouseX() : int
+  +getMouseY() : int
+}
+
+class MovementManager {
+  +update(float dt, List entities) : void
+  +moveEntity(Entity e, Vector2 direction) : void
+  +stopEntity(Entity e) : void
+}
+
+class RenderManager {
+  -batch : SpriteBatch
+  -shapeRenderer : ShapeRenderer
+  -textureRegistry : Map
+  +RenderManager()
+  +registerTexture(String spriteId, Texture texture) : void
+  +unregisterTexture(String spriteId) : void
+  +getTexture(String spriteId) : Texture
+  +clearTextureRegistry() : void
+  +render(float dt, List entities, OrthographicCamera camera) : void
+  -renderShape(CompositeShapeComponent.SubShape shape, float entityX, float entityY) : void
+  +getBatch() : SpriteBatch
+  +getShapeRenderer() : ShapeRenderer
+  +dispose() : void
+}
+
+class SceneManager {
+  -sceneStack : Deque
+  -sceneRegistry : Map
+  -logger : EngineLogger
+  -eventBus : EventBus
+  +SceneManager()
+  +setLogger(EngineLogger logger) : void
+  +setEventBus(EventBus eventBus) : void
+  +registerScene(String routeName, Supplier sceneFactory) : void
+  +changeScene(String routeName) : void
+  +pushScene(String routeName) : void
+  +popScene() : void
+  +update(float dt) : void
+  +render(float dt) : void
+  +dispose() : void
+  -publishSceneEvent(SceneLifecycleEvent.Type type, String fromScene, String toScene) : void
+}
+
+class SoundManager {
+  -audioHandler : AudioHandler
+  -playingMusicId : String
+  -soundLibrary : Map
+  -logger : EngineLogger
+  -currentMusic : com.badlogic.gdx.audio.Music
+  +SoundManager()
+  +init() : void
+  +playSFX(AudioClip clip, float volume) : void
+  +playMusic(AudioClip clip, boolean loop, float volume) : void
+  +stopMusic() : void
+  +setVolume(AudioClip clip, float volume) : void
+  +shutdown() : void
+  +setLogger(EngineLogger logger) : void
+  +preload(String id, AudioClip clip) : void
+  +playSFX(String id) : void
+  +playMusic(String id, boolean loop) : void
+  +stopMusic() : void
+  +pauseMusic() : void
+  +resumeMusic() : void
+  +setMasterVolume(float v) : void
+  +setSFXVolume(float v) : void
+  +setMusicVolume(float v) : void
+  +getMasterVolume() : float
+  +getSFXVolume() : float
+  +getMusicVolume() : float
+  +dispose() : void
+}
+
+class ViewportManager {
+  -camera : OrthographicCamera
+  -viewport : Viewport
+  -baseResolutionWidth : int
+  -baseResolutionHeight : int
+  -screenWidth : int
+  -screenHeight : int
+  +ViewportManager()
+  +setVirtualResolution(int w, int h) : void
+  +resize(int screenW, int screenH) : void
+  +apply() : void
+  +setCameraPosition(Vector2 position) : void
+  +setCameraPosition(float x, float y) : void
+  +getCamera() : OrthographicCamera
+  +screenToWorld(Vector2 screenCoords) : Vector2
+  +screenToWorld(float x, float y) : Vector2
+  +worldToScreen(Vector2 worldCoords) : Vector2
+  +getViewBounds() : Rectangle
+  +getScale() : int
+}
+
+class GravityConfig {
+  -gravityConstant : float
+  -minDistanceSq : float
+  +GravityConfig()
+  +GravityConfig(float gravityConstant, float minDistanceSq)
+  +getGravityConstant() : float
+  +setGravityConstant(float gravityConstant) : void
+  +getMinDistanceSq() : float
+  +setMinDistanceSq(float minDistanceSq) : void
+}
+
+class NBodyState {
+  -id : int
+  -position : Vector2
+  -velocity : Vector2
+  -mass : float
+  -movable : boolean
+  +NBodyState(int id, Vector2 position, Vector2 velocity, float mass, boolean movable)
+  +getId() : int
+  +getPosition() : Vector2
+  +getVelocity() : Vector2
+  +getMass() : float
+  +setMass(float mass) : void
+  +isMovable() : boolean
+  +setMovable(boolean movable) : void
+  +copy() : NBodyState
+}
+
+class NBodyTrajectoryPredictor {
+  +predictPaths(List bodies, GravityConfig gravityConfig, TrajectoryPredictionConfig predictionConfig) : Map
+  +simulateFinalStates(List bodies, GravityConfig gravityConfig, int steps, float fixedDt) : List
+  +stepSimulation(List states, GravityConfig gravityConfig, float fixedDt) : void
+  -computeAcceleration(NBodyState current, List states, GravityConfig gravityConfig) : Vector2
+  -copyAndLimitBodies(List bodies, int maxBodies) : List
+}
+
+class TrajectoryPredictionCache {
+  -predictor : NBodyTrajectoryPredictor
+  -dirty : boolean
+  -recomputeCount : int
+  -lastSignature : int
+  -cachedPaths : Map
+  +TrajectoryPredictionCache()
+  +TrajectoryPredictionCache(NBodyTrajectoryPredictor predictor)
+  +markDirty() : void
+  +isDirty() : boolean
+  +getRecomputeCount() : int
+  +getOrRecompute(List bodies, GravityConfig gravityConfig, TrajectoryPredictionConfig predictionConfig) : Map
+  -computeSignature(List bodies, GravityConfig gravityConfig, TrajectoryPredictionConfig predictionConfig) : int
+  -deepCopy(Map source) : Map
+}
+
+class TrajectoryPredictionConfig {
+  -predictionSteps : int
+  -sampleInterval : int
+  -maxBodies : int
+  -maxPathPoints : int
+  -fixedTimeStep : float
+  +TrajectoryPredictionConfig()
+  +TrajectoryPredictionConfig(int predictionSteps, int sampleInterval, int maxBodies, int maxPathPoints, float fixedTimeStep)
+  +getPredictionSteps() : int
+  +setPredictionSteps(int predictionSteps) : void
+  +getSampleInterval() : int
+  +setSampleInterval(int sampleInterval) : void
+  +getMaxBodies() : int
+  +setMaxBodies(int maxBodies) : void
+  +getMaxPathPoints() : int
+  +setMaxPathPoints(int maxPathPoints) : void
+  +getFixedTimeStep() : float
+  +setFixedTimeStep(float fixedTimeStep) : void
+  +useEngineTiming(EngineTimingConfig engineTimingConfig) : void
+}
+
+class AbstractPlayableScene {
+  
+  -systemPipeline : SystemPipeline
+  -simulationRunning : boolean
+  +AbstractPlayableScene(AbstractGameMaster gameMaster, String sceneName)
+  +AbstractPlayableScene(AbstractGameMaster gameMaster, String sceneName, boolean startSimulating)
+  +update(float dt) : void
+  #configureSystems(SystemPipeline pipeline) : void
+  #shouldRunSystems() : boolean
+  +startSimulation() : void
+  +pauseSimulation() : void
+  +setSimulationRunning(boolean simulationRunning) : void
+  +isSimulationRunning() : boolean
+  #processLevelLogic(float dt) : abstract void
+}
+
+class AbstractScene {
+  
+  -sceneName : String
+  #gameMaster : AbstractGameMaster
+  #entityManager : EntityManager
+  -sceneInputProcessors : List
+  -sceneInputProcessorsFirst : List
+  -inputProcessorsAttached : boolean
+  +AbstractScene(AbstractGameMaster gameMaster, String sceneName)
+  +onEnter() : abstract void
+  +onPause() : void
+  +onResume() : void
+  +onExit() : abstract void
+  +update(float dt) : abstract void
+  +render(float dt) : abstract void
+  +getName() : String
+  +getEntityManager() : EntityManager
+  #registerSceneInputProcessor(InputProcessor processor) : void
+  #registerSceneInputProcessorFirst(InputProcessor processor) : void
+  #unregisterSceneInputProcessor(InputProcessor processor) : void
+  +attachSceneInputProcessors() : void
+  +detachSceneInputProcessors() : void
+  +dispose() : void
+}
+
+class CollisionSystem {
+  -priority : int
+  +CollisionSystem()
+  +CollisionSystem(int priority)
+  +getPriority() : int
+  +update(float dt, AbstractGameMaster gameMaster, EntityManager entityManager) : void
+}
+
+class EngineSystem {
+  
+}
+
+class GravitySystem {
+  -priority : int
+  +GravitySystem()
+  +GravitySystem(int priority)
+  +getPriority() : int
+  +update(float dt, AbstractGameMaster gameMaster, EntityManager entityManager) : void
+}
+
+class MovementSystem {
+  -priority : int
+  +MovementSystem()
+  +MovementSystem(int priority)
+  +getPriority() : int
+  +update(float dt, AbstractGameMaster gameMaster, EntityManager entityManager) : void
+}
+
+class SystemPipeline {
+  -systems : List
+  +SystemPipeline()
+  +addSystem(EngineSystem system) : void
+  +removeSystem(EngineSystem system) : void
+  +clearSystems() : void
+  +getSystems() : List
+  +update(float dt, AbstractGameMaster gameMaster, EntityManager entityManager) : void
+}
+
+class SandboxUI {
+  -stage : Stage
+  -skin : Skin
+  -entitySelector : SelectBox
+  -massField : TextField
+  -radiusField : TextField
+  -speedXField : TextField
+  -speedYField : TextField
+  -removeButton : TextButton
+  -resetButton : TextButton
+  -startPauseButton : TextButton
+  -returnButton : TextButton
+  -onRemovePressed : Runnable
+  -onResetPressed : Runnable
+  -onStartPausePressed : Runnable
+  -onReturnPressed : Runnable
+  -onEntityTypeChanged : Consumer
+  -onVelocityChanged : BiConsumer
+  -suppressVelocityCallbacks : boolean
+  +SandboxUI()
+  -configureFields() : void
+  -buildLayout() : void
+  -bindEvents() : void
+  +changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) : void
+  +changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) : void
+  +changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) : void
+  +changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) : void
+  +changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) : void
+  -buildSkin() : Skin
+  -solid(float r, float g, float b, float a) : TextureRegionDrawable
+  -notifyVelocityChanged() : void
+  -parse(String raw, float fallback) : float
+  +update(float dt) : void
+  +resize(int width, int height) : void
+  +getStage() : Stage
+  +getEntityType() : String
+  +getMass() : float
+  +getRadius() : float
+  +getSpeedX() : float
+  +getSpeedY() : float
+  +populateSelectedEntity(String entityType, float mass, float radius, float speedX, float speedY) : void
+  +setSimulationRunning(boolean running) : void
+  +setOnRemovePressed(Runnable onRemovePressed) : void
+  +setOnResetPressed(Runnable onResetPressed) : void
+  +setOnStartPausePressed(Runnable onStartPausePressed) : void
+  +setOnReturnPressed(Runnable onReturnPressed) : void
+  +setOnEntityTypeChanged(Consumer onEntityTypeChanged) : void
+  +setOnVelocityChanged(BiConsumer onVelocityChanged) : void
+  +dispose() : void
+}
+
+
+
+
+
+
+
+
